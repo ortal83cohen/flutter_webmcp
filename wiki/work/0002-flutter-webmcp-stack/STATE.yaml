@@ -1,12 +1,12 @@
 id: "0002-flutter-webmcp-stack"
 title: "Pick the stack and architecture for the Flutter WebMCP package skeleton"
 route: full
-phase: plan
-round: 1
-verdict: FAIL
+phase: superseded
+round: 0
+verdict: null
 owner_agent: null
 created: "2026-09-04"
-updated: "2026-09-04"
+updated: "2026-09-05"
 
 blockers:
   - id: "research-F-001"
@@ -60,8 +60,31 @@ decisions:
     verdict: FAIL
     action: revise-plan
     reason: "plan-review-01 F-001/F-002/F-003 are unsatisfiable-as-written gaps (stale README assumption, AC-010 needs an unexposed facade member, AC-023 has no implementing step). Revising plan after research fix since the plan's bridge-target prose depends on the corrected research recommendation."
+  - round: 2
+    verdict: PASS
+    action: annotate-only
+    reason: "research-review-02: independently re-verified every corrected claim (Document entry point, issue #130 closure, browser-exclusivity) against primary sources; PASS with 0 blockers. Four IMPORTANT findings (untraceable DevTools-panel source, two under-cited claims, one unsourced Declarative-API rejection sentence) recorded as followups, not acted on now — none affects the skeleton's design."
+  - round: 3
+    verdict: FAIL
+    action: escalate
+    reason: "plan-review-03: FAIL, 3 blockers, and the validator explicitly flagged oscillation across all 3 rounds (analysis-stage/AC-017 boundary, negative-cases-restate-positive class, AC-020 specifically). Escalated to the user per validation-rubrics.md's oscillation rule rather than opening round 4. User chose: rewrite the plan from a clean draft, with explicit instruction to decide the analyzer binary up front and sweep every criterion's negative case as one pass."
+  - round: 2
+    verdict: CONDITIONAL
+    action: revise-plan
+    reason: "plan-review-02: 2 blockers (false claim that root analyze can't reach example/, disproven by the validator's own test; README merge instruction structurally self-contradictory) plus 9 IMPORTANT findings, all closed in this pass: single analyzer invocation (dropped the false two-invocation claim, six check-script stages not seven), README edit specified as an untouched two-H1-sections structure with a new AC-025 protecting the ADR-referenced sentence, eight (not six) layout paths in verification approach, unresolved-count corrected to eight with the three previously-unhandled items given explicit handling sentences, verification-approach overclaim scoped to name its three non-exit-code exceptions, four criteria (AC-011/020/022/024) given concrete injectable negative cases, AC-023 split into AC-023 (fixed network-import list) and AC-026 (manual secret review, evidenced in the verify report) since a doc-comment reminder had no recorded outcome, format stage scoped to source directories only (avoids example/build/), and .fvmrc added to pin Flutter's exact release across the lock file and CI. This is round 3's input; per validation-rubrics.md's 3-round cap, round 3 is the last round before this phase must restart from scratch rather than open round 4 — the validator's round-2 report additionally warned that a third defect in the README paragraph specifically should be treated as oscillation and escalated rather than revised again."
+
+  - round: 0
+    verdict: null
+    action: revise-plan
+    reason: "Plan rewritten from a clean draft (user-approved after the round-3 oscillation escalation). Decisions settled once, up front, so no later step renegotiates them: analyzer binary is dart analyze, chosen because flutter analyze rewrites the committed analysis_options.yaml in place; one analyze invocation from the repository root covers the nested example package; analysis scope stated as an explicit include/exclude list rather than inherited from any tool default; example manifest declares publish_to none; no lock files committed and the Flutter version pinned as one literal in the CI workflow instead of a separate pin file; CI job independence asserted statically by the absence of a dependency key; README edited by inserting a new first level-one section above untouched existing content; every acceptance criterion given an injectable mutation as its negative case in one deliberate sweep."
 
 escalations:
+  - date: "2026-09-05"
+    reason: scope-change
+    question: "RESOLVED. The plan phase was rewritten from a clean draft after the round-3 oscillation escalation, producing new 01-plan.md/02-criteria.md that would need validation/plan-review-04.md — which tools/lint_wiki.py's check_reviews rejects outright (round cap of 3 per work-item folder, no in-place reset mechanism, and only research|plan|impl review-file prefixes are accepted). Resolution: per wiki/conventions/naming.md ('work items: numbers never reused, even for abandoned items') this rewrite now lives in a new work-item folder, wiki/work/0003-flutter-webmcp-skeleton/, which carries forward this item's already-PASSed 00-research.md unchanged and starts its own plan/validate cycle at round 1. This folder (0002-flutter-webmcp-stack) is left in place, untouched, as the historical record of the research work and the three failed plan attempts — not deleted, per the wiki's never-delete rule. phase set to 'superseded' above; see 0003's STATE.yaml for the reciprocal note."
   - date: "2026-09-04"
     reason: scope-change
     question: "wiki/work/ contained two work items numbered 0001 (this item and the completed quick-change 0001-add-build-dispatcher-skill). Resolved without further human input: renamed this item's folder from 0001-flutter-webmcp-stack to 0002-flutter-webmcp-stack (next unused number per wiki/conventions/naming.md), leaving the pre-existing completed item's identity untouched. tools/lint_wiki.py is clean after the rename."
+  - date: "2026-09-04"
+    reason: oscillating-loop
+    question: "Plan-phase validation round 3 of 3 (the cap) FAILed with 3 blockers, and validator plan-review-03.md explicitly flagged the loop as oscillating: three defect classes were reported in all three rounds at relocated locations rather than closed — (1) the check script's analysis stage and its relationship to AC-017 (round 1: scope left to implementer; round 2: false claim that a two-invocation design was needed; round 3: analysis binary left undecided, and the one candidate the plan implies, `flutter analyze`, was proven to rewrite the committed analysis_options.yaml in place, plus AC-017's own check method is self-contradictory), (2) criteria negative-cases that restate their positive assertion instead of naming a real injectable failure (flagged at different AC-IDs in all three rounds; the class was never swept, only patched row-by-row), and (3) 02-criteria.md line ~35 (AC-020, CI job independence) specifically, which drew a distinct finding in every single round. Per wiki/conventions/validation-rubrics.md's oscillation rule, escalating to the user rather than opening round 4 or silently rewriting the plan myself. Question put to the user: rewrite the plan from a clean draft (with an explicit instruction to sweep 02-criteria.md's negative-case column as a category, and to settle the analyzer-binary choice as a named, deliberate decision rather than letting it emerge from step-by-step patching) — or should the skeleton's scope be reduced first (e.g. drop the check-script's own analyzer-mutation and CI-independence guarantees to non-blocking follow-ups) to remove the parts of the design that keep re-opening?"

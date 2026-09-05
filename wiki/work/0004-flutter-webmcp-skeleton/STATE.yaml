@@ -1,0 +1,35 @@
+id: "0004-flutter-webmcp-skeleton"
+title: "Flutter WebMCP package skeleton (propagation fix of 0003-flutter-webmcp-skeleton)"
+route: full
+phase: plan
+round: 2
+verdict: PASS
+owner_agent: null
+created: "2026-09-05"
+updated: "2026-09-05"
+
+blockers: []
+
+followups:
+  - summary: "Line-by-line capability diff of webmcp_pilot against KickNext/flutter_webmcp v0.3.0 and intentcall_webmcp; prerequisite for the publishing work item, not for the skeleton."
+    severity: IMPORTANT
+    owner: "unassigned"
+
+decisions:
+  - round: 2
+    verdict: PASS
+    action: annotate-only
+    reason: "plan-review-02: PASS, 0 blockers, 5 IMPORTANT + 3 NIT. Per explicit user instruction, stopped the multi-round validator-agent cycle here (no round 3 spawned) and fixed the 5 IMPORTANT findings directly in a single pass rather than re-running a validator: F-001 WebMcpTransport's declaring file was misattributed to step 3 (webmcp_exceptions.dart) when it's actually written in step 4 (lib/src/transport/webmcp_transport.dart) - corrected step 3's wording and analysis-error accounting; F-002 03-tasks.md had several AC citations on tasks that didn't own the governing file (AC-020's call site is lib/src/webmcp.dart per task 2.1, not the transport files per 2.2; AC-008 belongs to task 4.1's example/pubspec.yaml, not 1.2's root manifest; AC-025 spans both 6.1's AGENTS.md and 6.2's workflow file; AC-028 is cross-cutting and moved to 7.1's final-verification task rather than any single content task) - all reassigned to their correct owners; F-003 AC-028 required LICENSE unconditionally with no pending clause even though step 9 gates LICENSE on a human decision - added the same pending-not-failing treatment AC-026 already has; F-004 step 5's hygiene-test description referenced example/lib/ before step 6 creates it - clarified the scan tolerates a not-yet-existing directory as zero files and only actually runs at full-suite time; F-005 'the verification artifact' and 'the implementation notes' were referenced repeatedly with no defined location - anchored both as sections of one new file, wiki/work/0004-flutter-webmcp-skeleton/04-notes.md, defined once at the top of the Steps section. Per user instruction, the plan phase stops here as PASS without further validator rounds and without proceeding to implementation."
+  - round: 1
+    verdict: CONDITIONAL
+    action: revise-plan
+    reason: "plan-review-01: CONDITIONAL, 1 blocker + 6 IMPORTANT + 2 NIT, no oscillation (first round in this folder). Fixed: F-001 Rollback section contradicted step 10/AC-026 by claiming the CI push was required — corrected to state it's conditional on separate human authorization; F-002 the plan claimed .dart_tool was excluded by explicit entries but no step wrote them (relied on the analyzer's hidden-directory default instead) — added .dart_tool/** as a written entry in both options files (9 entries root, 8 example); F-003 unified the forbidden-import scan scope (lib/, example/lib/ only, since only those hold Dart source) vs the secret-token scan's wider 4-directory scope, which step 5 had stated inconsistently from the Interfaces section; F-004 step 3's 'zero issues' completion condition was unmeetable since the transport seam it references doesn't exist until step 4 — rescoped to allow only transport-seam-shaped unresolved-reference errors at that point; F-005 pinned the Flutter version literal concretely as 3.47.0 (the actual installed/verified toolchain version) instead of leaving it undecided while step 2 depended on it; F-006 added 03-tasks.md (11 sequential tasks across 7 groups, no [P] markers since the plan has no parallelism, each citing its satisfied criteria); F-007 decoupled step 9's README/AGENTS.md/CHANGELOG edits from the LICENSE copyright-holder gate, so an unanswered licensing question no longer stalls three unrelated criteria; F-008/F-009 NITs closed (checksum wording no longer says 'as committed' before anything is committed; example's exclusion-list entry count and its relationship to the root's extra example/build/** entry spelled out precisely)."
+  - round: 0
+    verdict: null
+    action: revise-plan
+    reason: "This work item supersedes 0003-flutter-webmcp-skeleton. 0003's plan phase hit the 3-round validation cap on round 3 with 2 blockers, both flagged as oscillating by the validator, but the validator's own report and STATE.yaml's escalation note establish these were a propagation miss (round 2 correctly fixed AC-006's criterion and the format stage's path scope, but the matching prose in 01-plan.md's step 2, step 6, and Verification approach, and in the Documented-commands paragraph, was never updated to match) rather than a genuine design defect — every other mechanism in the plan (the analyzer-migration fix itself, the PATH/preflight check, the removed interop file, the bash tools/check.sh literal, all 33 criteria's negative cases) was independently re-verified as sound in round 3. User consulted and chose: open this new work item carrying forward the same validated design, with the two specific propagation fixes applied precisely, rather than a full rewrite from scratch. 00-research.md (unchanged, already PASSed) and 01-plan.md/02-criteria.md (carried forward from 0003's round-3 state, now being corrected in this folder before its own round 1) are copied in. Validation restarts at round 1 for the plan phase in this folder."
+
+escalations:
+  - date: "2026-09-05"
+    reason: scope-change
+    question: "RESOLVED. 0003-flutter-webmcp-skeleton's plan phase hit the 3-round cap with an oscillation verdict on round 3 (2 recurring findings, both propagation misses per the analysis above). Resolved without further human input beyond the prior consultation: opened this new work-item folder 0004-flutter-webmcp-skeleton per wiki/conventions/naming.md ('work items: numbers never reused, even for abandoned items') and because tools/lint_wiki.py hard-caps validation rounds per folder with no reset mechanism. 0003-flutter-webmcp-skeleton is left in place, untouched, as the historical record; not deleted per the wiki's never-delete rule."
