@@ -38,3 +38,6 @@ echo "Stage 5 passed: tests"
 (cd example && flutter build web) || stage_failed 6 "build"
 test -f example/build/web/index.html || stage_failed 6 "build"
 echo "Stage 6 passed: build"
+
+sh tools/test_bump_patch_version.sh || stage_failed 7 "version bump test"
+echo "Stage 7 passed: version bump test"

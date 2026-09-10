@@ -50,6 +50,7 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 |---|---|
 | [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. |
 | [product/webmcp-contract.md](product/webmcp-contract.md) | Working on explicit action declarations, scope ownership, name collisions, browser capability detection, or deferred WebMCP integrations. |
+| [product/release-pipeline.md](product/release-pipeline.md) | Touching the release or publish workflow, the version bump helper, or setting up the pub.dev and GitHub prerequisites a release needs. |
 
 ## Work items
 

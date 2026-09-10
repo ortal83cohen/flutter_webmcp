@@ -2,9 +2,10 @@
 
 ## Frozen
 
-- Frozen at: not yet.
-- Frozen by: not applicable; this work item delivers a plan only.
-- These are future implementation acceptance criteria. No runtime behavior, spike, test, benchmark, or generator compatibility result is claimed as completed by this planning artifact.
+- Frozen at: 2026-09-10, after the empirical gates in 04-semantics-spike.md and 05-transport-spike.md, the dispositions in 06-gate-decision.md, and plan review round 03.
+- Frozen by: main agent (root), recorded in STATE.yaml under revision_3.
+- These criteria are read together with 14-observation-criteria.md and 17-gate-revision-criteria.md. Where a later artifact states a clause-level supersession, that later wording governs; every clause not expressly superseded remains in force.
+- Changing a criterion from this point requires a recorded validation round, not a silent edit.
 
 ## Criteria
 

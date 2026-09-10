@@ -2,9 +2,10 @@
 
 ## Frozen
 
-- Frozen at: not yet; planning only, no runtime implementation authorized.
-- Frozen by: not applicable.
+- Frozen at: 2026-09-10, together with 02-criteria.md and 17-gate-revision-criteria.md.
+- Frozen by: main agent (root), recorded in STATE.yaml under revision_3.
 - These additional criteria retain AC-001 through AC-018 in 02-criteria.md. No original identifier is reused or renumbered.
+- Clause-level supersessions in 17-gate-revision-criteria.md govern where they apply; all other obligations here remain in force.
 
 ## Supersession mapping
 

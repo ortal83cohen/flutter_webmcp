@@ -43,6 +43,18 @@ void main() {
       expect(WebMcpScope, isNotNull);
       expect(WebMcpScreen, isNotNull);
       expect(WebMcpAction, isNotNull);
+      expect(WebMcpToolAnnotations, isNotNull);
+      expect(WebMcpAppSession, isNotNull);
+      expect(WebMcpNavigatorAdapter, isNotNull);
+      expect(WebMcpPage, isNotNull);
+      expect(WebMcpPagePolicy, isNotNull);
+      expect(WebMcpPageLimits, isNotNull);
+      expect(WebMcpNativePublisher, isNotNull);
+      expect(WebMcpNativePublisherStatus, isNotNull);
+      expect(WebMcpNativeCapabilities, isNotNull);
+      expect(WebMcpNativeSupport, isNotNull);
+      expect(WebMcpRegistryObserver, isNotNull);
+      expect(WebMcpRegistrySubscription, isNotNull);
       expect(WebMcpException, isNotNull);
       expect(WebMcpInvalidToolNameException, isNotNull);
       expect(WebMcpDuplicateToolException, isNotNull);

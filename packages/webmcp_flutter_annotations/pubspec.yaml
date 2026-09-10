@@ -1,0 +1,11 @@
+name: webmcp_flutter_annotations
+description: Compile-time annotations for explicitly exposed WebMCP domain actions.
+version: 0.1.0
+repository: https://github.com/ortal83cohen/flutter_webmcp
+
+environment:
+  sdk: ^3.13.0
+
+topics:
+  - webmcp
+  - codegen

@@ -42,32 +42,66 @@ final class _ExampleScreenState extends State<ExampleScreen>
     final String names = WebMcp.instance.tools
         .map((WebMcpTool tool) => tool.name)
         .join('\n');
-    return Scaffold(
-      appBar: AppBar(title: const Text('WebMCP Flutter')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text('Counter: ${_counter.value}'),
-            Text('Transport: ${WebMcp.instance.transportId}'),
-            const SizedBox(height: 16),
-            const Text('Registered tools:'),
-            Text(names),
-            const SizedBox(height: 16),
-            WebMcpAction(
-              name: 'example.screen.increment',
-              description: 'Increments the visible example counter.',
-              onInvoke: (Map<String, Object?> arguments) {
-                _increment();
-                return _counter.value;
-              },
-              child: ElevatedButton(
-                onPressed: _increment,
-                child: const Text('Increment'),
+    return WebMcpPage(
+      pageId: 'example.home',
+      child: Scaffold(
+        appBar: AppBar(title: const Text('WebMCP Flutter')),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text('Counter: ${_counter.value}'),
+              Text('Transport: ${WebMcp.instance.transportId}'),
+              const SizedBox(height: 16),
+              const Text('Registered tools:'),
+              Text(names),
+              const SizedBox(height: 16),
+              WebMcpAction(
+                name: 'example.screen.increment',
+                description: 'Increments the visible example counter.',
+                onInvoke: (Map<String, Object?> arguments) {
+                  _increment();
+                  return _counter.value;
+                },
+                child: ElevatedButton(
+                  onPressed: _increment,
+                  child: const Text('Increment'),
+                ),
               ),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) =>
+                          const _ExampleDetailsPage(),
+                    ),
+                  );
+                },
+                child: const Text('Open details'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+final class _ExampleDetailsPage extends StatelessWidget {
+  const _ExampleDetailsPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return WebMcpPage(
+      pageId: 'example.details',
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Details')),
+        body: Center(
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Return home'),
+          ),
         ),
       ),
     );

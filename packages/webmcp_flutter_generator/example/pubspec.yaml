@@ -1,0 +1,22 @@
+name: webmcp_generator_consumer_fixture
+description: Build and runtime fixture for generated WebMCP domain actions.
+version: 0.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webmcp_flutter:
+    path: ../../..
+  webmcp_flutter_annotations:
+    path: ../../webmcp_flutter_annotations
+
+dev_dependencies:
+  build_runner: ^2.16.0
+  flutter_test:
+    sdk: flutter
+  webmcp_flutter_generator:
+    path: ..
