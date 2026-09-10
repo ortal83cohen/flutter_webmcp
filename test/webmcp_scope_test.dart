@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 WebMcpTool _tool(String name, Object? value) => WebMcpTool(
   name: name,

@@ -59,7 +59,7 @@ The clean snapshot's committed blobs and files after the first dependency stage 
 
 ### Final isolated cold run
 
-The snapshot at `/private/tmp/webmcp-final-cold-warm.PSfBlW` was created without either `.dart_tool/` directory, either build directory, or either lock file. It was initialized as a synthetic local Git repository and was clean before the run. `bash tools/check.sh` exited zero. The command output was:
+The snapshot at `/private/tmp/webmcp-final-cold-warm.PSfBlW` was created without either `.dart_tool/` directory, either build directory, or either lock file. It was initialized as a synthetic local Git repository and was clean before the run. `bash tools/check.sh` exited zero. The relevant verbatim output excerpt was:
 
     Preflight: flutter and dart found
     lint_wiki: clean (0 warning(s)).
@@ -86,7 +86,7 @@ After the run, `example/build/web/index.html` existed, `git status --porcelain` 
 
 ### Final isolated warm timed run
 
-Command: `/usr/bin/time -p bash tools/check.sh`, with the pinned SDK first on `PATH`. It exited zero. The command output was:
+Command: `/usr/bin/time -p bash tools/check.sh`, with the pinned SDK first on `PATH`. It exited zero. The relevant verbatim output excerpt was:
 
     Preflight: flutter and dart found
     lint_wiki: clean (0 warning(s)).
@@ -113,6 +113,29 @@ Command: `/usr/bin/time -p bash tools/check.sh`, with the pinned SDK first on `P
     sys 4.78
 
 The measured wall-clock time was 29.34 seconds, below AC-031's 300-second ceiling.
+
+### AC-031 slowdown mutation
+
+In the isolated snapshot only, `sleep 400` was inserted after the preflight line and the same timed full suite was run. The command still exited zero, but the measured wall-clock time exceeded the criterion's ceiling, proving the limit detects this regression. The relevant verbatim output excerpt was:
+
+    Preflight: flutter and dart found
+    lint_wiki: clean (0 warning(s)).
+    Stage 1 passed: wiki lint
+    Stage 2 passed: dependencies
+    Formatted 23 files (0 changed) in 0.03 seconds.
+    Stage 3 passed: format
+    Analyzing webmcp-final-cold-warm.PSfBlW...
+    No issues found!
+    Stage 4 passed: analysis
+    00:00 +29: All tests passed!
+    00:00 +1: All tests passed!
+    Stage 5 passed: tests
+    Compiling lib/main.dart for the Web... 19.0s
+    Built build/web
+    Stage 6 passed: build
+    real 430.56
+    user 32.19
+    sys 4.97
 
 ### Structural proof
 

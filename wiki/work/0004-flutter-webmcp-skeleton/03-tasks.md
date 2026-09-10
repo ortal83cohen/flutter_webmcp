@@ -95,3 +95,18 @@ writes those lines up front, exactly as it already does for the transport seam.
 | T16 | AC-038, AC-039 | Mixin and wrapper register on mount and remove on unmount, with the literal name | Delete the mixin's `dispose` override; derive the name from the scope |
 | T17 | AC-040, AC-041, AC-042 | Child returned unchanged and tappable; late-bound handler across a rebuild; missing scope throws | Wrap the child in an absorbing pointer; capture the closure at registration; fall back to direct registration |
 | T18 | AC-044, AC-045 | No `package:flutter/` import under `lib/` outside `lib/src/widgets/`; scope test pumps nothing | Import `package:flutter/widgets.dart` in `lib/src/webmcp.dart`; add a `package:flutter_test/` import to the scope test |
+
+## Execution record — 2026-09-10
+
+All implementation task groups are resolved by [implementation review 04](validation/impl-review-04.md), which records a PASS for all 46 criteria. Historical task instructions above are retained unchanged.
+
+| Tasks | Disposition | Evidence |
+|---|---|---|
+| 1.1–1.2 | Complete: toolchain, ignore patterns, manifests and first-run configuration stability | [04-notes.md](04-notes.md), implementation review 04 |
+| 2.1–2.3 | Complete: registry, transport and widget lifecycle | Implementation review 04, AC-009–AC-021 and AC-034–AC-044 |
+| 3.1 | Complete: public API, behavior and hygiene tests; official parser amendments implemented | [10-parser-repair-evidence.md](10-parser-repair-evidence.md), implementation review 04 |
+| 4.1 | Complete: example tools, screen, tests and web build | Implementation review 04, AC-022, AC-023 and AC-046 |
+| 5.1–5.2 | Complete: full-suite command and demonstrated failure propagation | [05-negative-checks.md](05-negative-checks.md), implementation review 01 retained evidence |
+| 6.1 | Complete: README, checks documentation, changelog and authorized MIT holder | Implementation review 04, AC-027–AC-030 |
+| 6.2 | Complete local workflow; live run remains permitted pending under AC-026 | Implementation review 04, AC-024–AC-026 |
+| 7.1 | Complete: clean isolated cold/warm runs and real negative timing probe | [04-notes.md](04-notes.md), implementation reviews 01 and 04 |

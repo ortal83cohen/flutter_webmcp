@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 WebMcpTool _tool(String name, [Object? value]) => WebMcpTool(
   name: name,
@@ -47,6 +47,21 @@ void main() {
     );
   });
 
+  test('source registration retains tools added before a later failure', () {
+    WebMcp.instance.registerTool(_tool('collision'));
+
+    expect(
+      () => WebMcp.instance.registerSource(
+        _Source(<WebMcpTool>[_tool('added.first'), _tool('collision')]),
+      ),
+      throwsA(isA<WebMcpDuplicateToolException>()),
+    );
+    expect(WebMcp.instance.tools.map((WebMcpTool tool) => tool.name), <String>[
+      'added.first',
+      'collision',
+    ]);
+  });
+
   test('rejects duplicates without replacing the first handler', () async {
     WebMcp.instance.registerTool(_tool('same', 'first'));
     expect(
@@ -83,6 +98,59 @@ void main() {
     );
     expect(await WebMcp.instance.invokeTool('echo', const {'value': 42}), 42);
   });
+
+  test(
+    'passes handler result and exception objects through unchanged',
+    () async {
+      final Object result = <String, Object?>{'raw': Object()};
+      final StateError failure = StateError('handler failed');
+      WebMcp.instance
+        ..registerTool(_tool('raw.result', result))
+        ..registerTool(
+          WebMcpTool(
+            name: 'raw.failure',
+            description: 'Throws its original exception',
+            handler: (Map<String, Object?> arguments) => throw failure,
+          ),
+        );
+
+      expect(
+        await WebMcp.instance.invokeTool('raw.result', const {}),
+        same(result),
+      );
+      await expectLater(
+        WebMcp.instance.invokeTool('raw.failure', const {}),
+        throwsA(same(failure)),
+      );
+    },
+  );
+
+  test(
+    'input schema is shallow copied and is not runtime validation',
+    () async {
+      final List<Object?> required = <Object?>['value'];
+      final Map<String, Object?> schema = <String, Object?>{
+        'type': 'object',
+        'required': required,
+      };
+      final WebMcpTool tool = WebMcpTool(
+        name: 'schema.behavior',
+        description: 'Documents schema behavior',
+        inputSchema: schema,
+        handler: (Map<String, Object?> arguments) => 'invoked',
+      );
+      schema['type'] = 'string';
+      required.add('later');
+      WebMcp.instance.registerTool(tool);
+
+      expect(tool.inputSchema['type'], 'object');
+      expect(tool.inputSchema['required'], <Object?>['value', 'later']);
+      expect(
+        await WebMcp.instance.invokeTool('schema.behavior', const {}),
+        'invoked',
+      );
+    },
+  );
 
   test('throws for a missing tool without invoking another handler', () async {
     var calls = 0;

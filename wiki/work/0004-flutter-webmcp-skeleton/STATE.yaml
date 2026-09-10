@@ -1,9 +1,9 @@
 id: "0004-flutter-webmcp-skeleton"
 title: "Flutter WebMCP package skeleton (propagation fix of 0003-flutter-webmcp-skeleton)"
 route: full
-phase: implement
-round: 0
-verdict: null
+phase: done
+round: 4
+verdict: PASS
 owner_agent: "Codex"
 created: "2026-09-05"
 updated: "2026-09-10"
@@ -16,6 +16,50 @@ followups:
     owner: "unassigned"
 
 decisions:
+  - round: 4
+    verdict: PASS
+    action: retain-verbatim-evidence-whitespace
+    reason: "After tracking the append-only validator reports, default cached diff whitespace checking reports trailing spaces and space-before-tab only inside pasted command transcripts. Retain those exact outputs as required evidence rather than rewrite historical reports. Strict cached diff checking passes for all other files; report-only checking passes with just those two transcript whitespace rules disabled. This is an accepted evidence-format artifact, not a source/test defect. Final commands and disposition are appended to 11-completion.md."
+  - round: 4
+    verdict: PASS
+    action: complete-local-work
+    reason: "All implementation groups and all 46 criteria pass independent impl-review-04. Product contract, ADR 0003 and direct router links are complete. Documentation and final source corrections are delivered together in the working tree; no additional commit or push is required or performed by this orchestration. A concurrent user/external commit is preserved. Live CI remains explicitly permitted pending under AC-026, and browser publication remains outside scope. Completion evidence is indexed in 11-completion.md."
+  - round: 4
+    verdict: PASS
+    action: document
+    reason: "impl-review-04 independently passes all 46 criteria with no findings. Official AST parsing resolves the recurring boundary defect; full suite exits zero in 31.15 seconds with 39 root tests, one example test and web build. Proceed to product contract, ADR and router documentation. AC-026 remote run is explicitly permitted pending; local workflow verified."
+  - round: 3
+    verdict: FAIL
+    action: official-parser-implemented
+    reason: "The official analyzer AST replaces all handwritten import parsing. Analyzer is a direct development dependency only; runtime files and marker scanner remain unchanged. Eighteen valid forbidden imports compile independently and fail hygiene checks with decoded URI diagnostics. Full suite exits zero with 39 root tests, one example test and Stage 6 passed. Re-enter independent verification for the changed parser artifact; 10-parser-repair-evidence.md records implementation evidence."
+  - round: 4
+    verdict: PASS
+    action: implement-parser-replacement
+    reason: "plan-review-04 independently accepts 09-parser-plan-amendment.md with no findings and clean lint. Replace manual parsing with the official analyzer AST using a direct development dependency; preserve exact marker behavior, runtime code and frozen criteria. This removes the demonstrated language-semantics mismatch rather than extending it."
+  - round: 3
+    verdict: FAIL
+    action: replace-handwritten-parser
+    reason: "impl-review-03 F-001 proves another legal import string form bypasses handwritten parsing; its recurrence assessment explicitly says no oscillation and confirms previous fixes remain intact. Re-enter plan to replace manual language parsing with the official analyzer AST via a direct development dependency, rather than patch another string form. All public behavior and frozen criteria remain unchanged. Preserve the full prior reports."
+  - round: 2
+    verdict: FAIL
+    action: escape-repair-verified-locally
+    reason: "String decoding now handles fixed/braced Unicode, hex and standard escapes while preserving raw strings. Six isolated valid encoded import directives are rejected with decoded URI diagnostics. Full suite reports 39 root tests, one example test and successful web build; 08-escape-repair.md records evidence. Re-enter verify for one independent review of this reworked artifact; reuse unchanged independent evidence without repeating the 400-second timing probe."
+  - round: 2
+    verdict: FAIL
+    action: repair-string-decoding
+    reason: "impl-review-02 independently resolved prior F-001 and F-003 and ordinary multiline imports, but found valid Unicode-escaped import URIs bypass the scanner (AC-018/AC-044). This is a new concrete string-decoding defect, not an opposing requirement or plan change. Re-enter implementation to decode valid Dart string escapes while retaining raw-string semantics, then independently verify the changed artifact. Preserve both prior FAIL reports."
+  - round: 1
+    verdict: FAIL
+    action: implementation-reworked
+    reason: "F-001 now explicitly names WebMcpToolHandler. F-002 is addressed by full-source import token recognition across comments/newlines and conditional URIs. F-003 was routed to plan, independently clarified, then implemented with exhaustive fixed markers. Full suite reports 35 root tests and one example test passing with successful web build; isolated repair probes are recorded in 07-repair-evidence.md. Re-enter verify for one independent review of the reworked artifact (impl-review-02), preserving impl-review-01 and its original FAIL."
+  - round: 3
+    verdict: PASS
+    action: implement-amendment
+    reason: "plan-review-03 independently accepted 06-plan-amendment.md with no findings and clean wiki lint. Implement its exhaustive marker set and legal multiline/comment-separated import recognition, retaining all frozen criteria and prior evidence. F-001 explicit handler reference is already restored and awaits final independent verification."
+  - round: 1
+    verdict: FAIL
+    action: route-by-defect
+    reason: "impl-review-01 F-001 and F-002 belong to implementation: restore the explicit handler typedef reference and recognize legal multiline import directives. F-003 belongs to the plan: AC-032 refers to an unspecified literal marker set. Re-enter plan only to define that normative set in append-only 06-plan-amendment.md, independently validate that clarification, then repair implementation. Frozen criteria IDs and text remain unchanged; no code patch is used to conceal the plan defect."
   - round: 0
     verdict: null
     action: fix-directly

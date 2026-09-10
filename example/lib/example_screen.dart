@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 import 'example_tools.dart';
 
@@ -43,7 +43,7 @@ final class _ExampleScreenState extends State<ExampleScreen>
         .map((WebMcpTool tool) => tool.name)
         .join('\n');
     return Scaffold(
-      appBar: AppBar(title: const Text('WebMCP Pilot')),
+      appBar: AppBar(title: const Text('WebMCP Flutter')),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(

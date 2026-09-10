@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 final class _Source implements WebMcpToolSource {
   @override
@@ -22,10 +22,11 @@ void main() {
     'exports the complete public API and seven registry operations',
     () async {
       Object? handler(Map<String, Object?> arguments) => arguments['value'];
+      final WebMcpToolHandler typedHandler = handler;
       final WebMcpTool tool = WebMcpTool(
         name: 'public.tool',
         description: 'Public tool',
-        handler: handler,
+        handler: typedHandler,
       );
       final WebMcp registry = WebMcp.instance;
       registry.reset(_Transport());

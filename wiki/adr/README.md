@@ -3,7 +3,7 @@ id: adr-readme
 title: Architecture decision records
 status: active
 owner: unassigned
-last_verified: 2026-09-04
+last_verified: 2026-09-10
 applies_to: ["**"]
 summary: Why this project is shaped the way it is, one decision per file, never deleted.
 ---
@@ -39,3 +39,4 @@ Every ADR states how compliance is verified and how a violation would be detecte
 |---|---|---|
 | [0001](0001-use-a-phased-agent-pipeline.md) | Every change goes through a six-phase pipeline with blind adversarial validation | accepted |
 | [0002](0002-share-agent-config-between-claude-code-and-cursor.md) | Instructions, skills and subagents live in one shared location read by both tools | accepted |
+| [0003](0003-webmcp-detection-first-registry.md) | The initial WebMCP package uses a singleton registry and detection-only browser boundary | accepted |

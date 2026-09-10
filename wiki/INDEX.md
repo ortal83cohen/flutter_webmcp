@@ -3,7 +3,7 @@ id: index
 title: Wiki index
 status: active
 owner: unassigned
-last_verified: 2026-09-04
+last_verified: 2026-09-10
 applies_to: ["**"]
 summary: Router for the whole wiki. One line per document, stating when to read it.
 ---
@@ -42,12 +42,14 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 | [adr/README.md](adr/README.md) | Looking for why the project is shaped the way it is, or adding a decision. |
 | [adr/0001-use-a-phased-agent-pipeline.md](adr/0001-use-a-phased-agent-pipeline.md) | Questioning why the pipeline has six phases and blind validation. |
 | [adr/0002-share-agent-config-between-claude-code-and-cursor.md](adr/0002-share-agent-config-between-claude-code-and-cursor.md) | Questioning where instructions, skills and agents live. |
+| [adr/0003-webmcp-detection-first-registry.md](adr/0003-webmcp-detection-first-registry.md) | Questioning the singleton registry, ownership rules, or detection-only browser boundary. |
 
 ## Product knowledge
 
 | Document | Read it when |
 |---|---|
-| [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. Empty until the first feature ships. |
+| [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. |
+| [product/webmcp-contract.md](product/webmcp-contract.md) | Working on explicit action declarations, scope ownership, name collisions, browser capability detection, or deferred WebMCP integrations. |
 
 ## Work items
 

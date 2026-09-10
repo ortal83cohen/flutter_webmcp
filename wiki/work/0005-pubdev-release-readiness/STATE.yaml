@@ -1,0 +1,57 @@
+id: "0005-pubdev-release-readiness"
+title: "Plan pub.dev release readiness"
+route: full
+phase: implement
+round: 2
+verdict: PASS
+owner_agent: codex
+created: "2026-09-10"
+updated: "2026-09-10"
+blockers: []
+followups: []
+decisions:
+  - action: start-authorized-execution
+    reason: "User requested execution of the webmcp_flutter 0.1.0 publication plan. Freeze criteria 19 unchanged; preserve index and unrelated edits. See 30-release-execution.md."
+  - round: 2
+    verdict: PASS
+    action: complete-planning
+    reason: "Independent research-review-02 and plan-review-02 both PASS with no findings. Comparisons are complete and all design decisions are explicit in 21. Operative artifacts are 17/19/20. Phase implement identifies the next stage, not started work; implementation and upload are not authorized by this planning request."
+  - action: complete-publication-planning
+    reason: "User explicitly requested completing deployment planning. Finish comparison and consolidated release plan for already renamed webmcp_flutter; make technical defaults concrete and retain account verification as an execution gate, without claiming upload authorization."
+  - action: accepted-name-rename-extracted
+    reason: "User accepted webmcp_flutter. Local mechanical rename is implemented independently in work item 0006; full publication preparation and final upload remain pending."
+  - round: 1
+    verdict: PASS
+    action: accept-plan-review
+    reason: "Plan review has no findings. The later user-requested alternative name is recorded in append-only 13-name-selection.md; consolidated plan requires validation before implementation freeze. User requested planning only; no release readiness or implementation completion is claimed."
+  - round: 1
+    verdict: PASS
+    action: accept-research-review
+    reason: "Research review has no findings. Requested-name change is separately evidenced by 07-name-check.md and included in plan review. Planning is the deliverable; future release gates are not claimed complete."
+  - action: scope-planning-only
+    reason: "User requested a release gap assessment and plan; implementation and publication are not authorized by this request."
+escalations: []
+
+requested_package_name: webmcp_flutter
+name_gate: "Proposed alternative has no public registry record (HTTP 404); recheck before publishing. See 13-name-selection.md."
+
+planning_status: complete
+implementation_status: in_progress
+publication_status: requested_pending_launch_gates
+active_research: "08-capability-comparison.md"
+active_plan: "17-plan-consolidated.md"
+active_criteria: "19-criteria-consolidated.md"
+active_tasks: "20-tasks-consolidated.md"
+active_decisions: "21-release-decisions.md"
+planning_completion: "22-planning-completion.md"
+criteria_frozen: true
+criteria_frozen_at: "2026-09-10"
+criteria_frozen_by: codex
+next_action: "Authorized release implementation following 20-tasks-consolidated.md."
+execution_gates:
+  - "Prepare documentation, SDK metadata and consumer-only packaging."
+  - "Run full-source, browser, payload and clean-consumer verification."
+  - "Accept independent prepublication implementation review."
+  - "Recheck name/version and privately verify account and redistribution authority."
+  - "Obtain explicit approval for exact payload and publish interactively."
+  - "Verify hosted version, installation, web build and package presentation."
