@@ -71,19 +71,13 @@ Run two validators in parallel, in fresh contexts:
 
 A validator receives the artifact and the criteria. It does not receive the author's reasoning, transcript or intermediate notes. Blindness is what makes the review independent.
 
-A validator returns a verdict — `PASS`, `CONDITIONAL` or `FAIL` — with findings graded `BLOCKER`, `IMPORTANT`, `NIT` or `PRE_EXISTING`. Every finding cites a file and line. A validator never proposes the fix; proposing it turns the validator into a second author with a stake in its own suggestion.
+A validator returns a verdict — `PASS`, `CONDITIONAL` or `FAIL` — with findings graded `BLOCKER`, `IMPORTANT`, `NIT` or `PRE_EXISTING`. Every finding cites a file and line. A validator never proposes the fix; proposing it turns the validator into a second author with a stake in its own suggestion. It also never decides what happens next — that call belongs to the main agent.
 
-Handling the verdict:
+One round per phase. The validator reports once; it does not loop or re-check its own findings.
 
-- `PASS` — proceed to Phase 4.
-- `CONDITIONAL` — address the blockers, append a new numbered review, re-run.
-- `FAIL` — revise the artifact the finding actually blames. A research gap goes back to Phase 1; a plan gap to Phase 2.
+The main agent reads the verdict and decides, finding by finding: fix it directly, accept it as pre-existing or out of scope, or send the defect back to the phase that owns it — a research gap to Phase 1, a plan gap to Phase 2, for a genuine rewrite rather than a patch. The agent records every such decision in `STATE.yaml`, with the finding, the verdict and the reason.
 
-Round limits apply. Three rounds maximum. On the third `FAIL`, stop and rewrite the plan from scratch rather than patching it again. If an identical finding recurs in consecutive rounds, abort and escalate to a human — the loop is oscillating, not converging.
-
-The agent decides whether a finding changes the plan or merely annotates it, and records that decision in `STATE.yaml`.
-
-Gate: latest plan review is `PASS`, or `CONDITIONAL` with every blocker closed.
+Gate: the round has run and every finding it raised has a recorded decision.
 
 ## Phase 4 — Implement
 
@@ -105,7 +99,7 @@ Run the project's full check suite and paste the output. Then run an implementat
 
 Each criterion needs at least one negative test — a case that should fail and does. A suite that only proves the happy path proves very little.
 
-Verdict handling and round limits are identical to Phase 3. A `FAIL` naming a plan defect goes back to Phase 2, not to more code.
+Verdict handling is identical to Phase 3: one round, and the main agent decides what happens next. A `FAIL` naming a plan defect goes back to Phase 2, not to more code.
 
 Gate: implementation review is `PASS`, full check suite output pasted, `tools/lint_wiki.py` clean.
 

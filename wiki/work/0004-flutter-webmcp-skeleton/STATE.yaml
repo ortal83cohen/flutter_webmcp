@@ -1,12 +1,12 @@
 id: "0004-flutter-webmcp-skeleton"
 title: "Flutter WebMCP package skeleton (propagation fix of 0003-flutter-webmcp-skeleton)"
 route: full
-phase: plan
-round: 2
-verdict: PASS
-owner_agent: null
+phase: implement
+round: 0
+verdict: null
+owner_agent: "Codex"
 created: "2026-09-05"
-updated: "2026-09-05"
+updated: "2026-09-10"
 
 blockers: []
 
@@ -16,6 +16,22 @@ followups:
     owner: "unassigned"
 
 decisions:
+  - round: 0
+    verdict: null
+    action: fix-directly
+    reason: "Pre-validation execution found action disposal using an updated name instead of the mounted name, mutable action schema storage, missing package-internal import detection, and a callback regression test that did not distinguish immutable closures. Implementer corrected all four; focused checks and exact negative mutations were rerun. Evidence: 05-negative-checks.md, including retained initial failures and superseding reruns. No frozen criterion changed."
+  - round: 0
+    verdict: null
+    action: track-new-files
+    reason: "The authorized end-to-end plan explicitly requires tracked new package files in AC-028. Added only newly created package paths to the actual index as a reversible tracking step; preserved pre-existing unstaged modifications and made no commit or push."
+  - round: 0
+    verdict: null
+    action: implement
+    reason: "Declare package:test as a direct development dependency for AC-045 scope tests, avoiding a dependency on flutter_test or an undeclared transitive import. This is an implementation dependency needed by the frozen criterion; it changes no public interface or acceptance criterion."
+  - round: 2
+    verdict: PASS
+    action: implement
+    reason: "User authorized end-to-end implementation on 2026-09-10. Resume the approved plan with its recorded findings disposition; freeze criteria without changing their substance. Preserve all pre-existing dirty changes. Perform destructive negative probes in an isolated temporary snapshot. The user supplied the exact MIT copyright holder flutter_webmcp in this session; LICENSE is authorized. Live CI push remains pending explicit authorization."
   - round: 2
     verdict: PASS
     action: annotate-only

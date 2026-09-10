@@ -36,7 +36,7 @@ Every one of these, or the phase is not done:
 
 ## Verdict handling
 
-Identical to the validate phase, including the three-round cap and the oscillation check. Read `wiki/conventions/validation-rubrics.md`.
+Identical to the validate phase: one round, and the main agent decides what happens next. Read `wiki/conventions/validation-rubrics.md`.
 
 The one rule worth restating: a `FAIL` whose routing names a plan defect goes back to the plan phase. It does not go back to the implementer. Writing more code to satisfy a plan-level finding produces code that passes a test and solves the wrong problem.
 
