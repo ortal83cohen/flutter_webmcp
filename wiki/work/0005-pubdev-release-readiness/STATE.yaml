@@ -1,7 +1,7 @@
 id: "0005-pubdev-release-readiness"
 title: "Plan pub.dev release readiness"
 route: full
-phase: implement
+phase: verify
 round: 2
 verdict: PASS
 owner_agent: codex
@@ -36,7 +36,7 @@ requested_package_name: webmcp_flutter
 name_gate: "Proposed alternative has no public registry record (HTTP 404); recheck before publishing. See 13-name-selection.md."
 
 planning_status: complete
-implementation_status: in_progress
+implementation_status: technical_checks_passed_pending_review
 publication_status: requested_pending_launch_gates
 active_research: "08-capability-comparison.md"
 active_plan: "17-plan-consolidated.md"
@@ -47,7 +47,7 @@ planning_completion: "22-planning-completion.md"
 criteria_frozen: true
 criteria_frozen_at: "2026-09-10"
 criteria_frozen_by: codex
-next_action: "Authorized release implementation following 20-tasks-consolidated.md."
+next_action: "Blind prepublication implementation review, then private account and exact-candidate launch gates."
 execution_gates:
   - "Prepare documentation, SDK metadata and consumer-only packaging."
   - "Run full-source, browser, payload and clean-consumer verification."
