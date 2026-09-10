@@ -1,0 +1,112 @@
+[
+  {
+    "path": "CHANGELOG.md",
+    "size": 383,
+    "sha256": "6e5a5afbf7e0a1fd53c6e176a94ee5bdb7bb996edad633a4ccc50031a3471375"
+  },
+  {
+    "path": "LICENSE",
+    "size": 1071,
+    "sha256": "03da847fe3b1c3de80123eecdd6e591661982ead07c5ecf7671d4f3a79b9875e"
+  },
+  {
+    "path": "README.md",
+    "size": 3991,
+    "sha256": "2065e0ce4de29e236d72dd249044425dd9196d0647b9d36ac1c9e9f9760d7c4f"
+  },
+  {
+    "path": "example/analysis_options.yaml",
+    "size": 191,
+    "sha256": "057d9e7ac76d22002c3d152858da3f450165588ace6e55ccdf90662b70ff1432"
+  },
+  {
+    "path": "example/lib/example_screen.dart",
+    "size": 2156,
+    "sha256": "fd186adcbfa5bc01e44ebf51f9a31b039984dbc339115cff53502b6991217bbc"
+  },
+  {
+    "path": "example/lib/example_tools.dart",
+    "size": 858,
+    "sha256": "cf8c1328a6bc3d6d5fb06b99ad70585dda7b9765fc3c56e972653aed0bddfc9a"
+  },
+  {
+    "path": "example/lib/main.dart",
+    "size": 404,
+    "sha256": "8e4207ad7b48b9ec7070c83e5f06cb1a522a1ea78986d65a572e51d6d03be383"
+  },
+  {
+    "path": "example/pubspec.yaml",
+    "size": 345,
+    "sha256": "56543caef9acb59bb1dd3322e4a3789488063d3c8ddffa89e339b52360d2cf36"
+  },
+  {
+    "path": "example/web/index.html",
+    "size": 397,
+    "sha256": "6a64ebf75be267a6e3f6571a5ace88569eecff6ede26ed9ef93b5514fe17c166"
+  },
+  {
+    "path": "lib/src/transport/transport_noop.dart",
+    "size": 500,
+    "sha256": "a186e586040aac849cc64c5c7287802c2a6e1cab39fe11994701bed423a880aa"
+  },
+  {
+    "path": "lib/src/transport/transport_selector.dart",
+    "size": 80,
+    "sha256": "e7227a06a84a45fc0f34b55fb847873cc2e84bec043a7736cb94a97161846d26"
+  },
+  {
+    "path": "lib/src/transport/transport_web.dart",
+    "size": 1407,
+    "sha256": "4d32536fa44f83c933359e9ed0ad664398b75622e501ce7130f6efdbc0abeac1"
+  },
+  {
+    "path": "lib/src/transport/webmcp_transport.dart",
+    "size": 413,
+    "sha256": "95ff6e6dd4b757332fb6c2b77f56a6540bdb765e56e2ced7e588c3fb782d95ff"
+  },
+  {
+    "path": "lib/src/webmcp.dart",
+    "size": 2425,
+    "sha256": "faf662d7eba4ee706f693de8c42a6dbc8695995e1619ad7a1cb7c3639b33b1e5"
+  },
+  {
+    "path": "lib/src/webmcp_exceptions.dart",
+    "size": 1700,
+    "sha256": "bfc4bbb445aa2e025919f992f563d17432546ce6c3fb494290e91283db7350ec"
+  },
+  {
+    "path": "lib/src/webmcp_scope.dart",
+    "size": 2413,
+    "sha256": "65e332711bc560446ad7997395be88eb4d5fe427bbe0ba270333f80e42e73bd8"
+  },
+  {
+    "path": "lib/src/webmcp_tool.dart",
+    "size": 931,
+    "sha256": "6d331d724adee4dfd50296a1d6a9cc4ec3e2f1922b76776bdd5a7538718dad12"
+  },
+  {
+    "path": "lib/src/webmcp_tool_source.dart",
+    "size": 219,
+    "sha256": "b989272951455c982f69f56f4dfb18e1ec4c21ca4e4b7721d714f144175dfc81"
+  },
+  {
+    "path": "lib/src/widgets/webmcp_action.dart",
+    "size": 2175,
+    "sha256": "888f113ce9b2db489c202efb81e8b631afd7261f09075a4b6f0994b4502e0146"
+  },
+  {
+    "path": "lib/src/widgets/webmcp_screen.dart",
+    "size": 1100,
+    "sha256": "ceb46b9a2de0f0fc5cebb1224be737457acbb7bcab625cbfacd0c36221d3e37d"
+  },
+  {
+    "path": "lib/webmcp_flutter.dart",
+    "size": 292,
+    "sha256": "7c9c9aed4e054679c4e47267ae9d8a8fe2eaf7e232ebbafb773f66ba10e20fd3"
+  },
+  {
+    "path": "pubspec.yaml",
+    "size": 443,
+    "sha256": "c679a2ef1bac73032cb0f5b81f4f6918744fd3275531124998b3fced5acee8a8"
+  }
+]

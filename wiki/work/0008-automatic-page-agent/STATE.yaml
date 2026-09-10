@@ -1,0 +1,93 @@
+# Work item state. The only mutable file in a work item folder.
+# Copy this into wiki/work/NNNN-slug/STATE.yaml and keep it current.
+
+id: "0008-automatic-page-agent"
+title: "Automatic page content and actions - planning only"
+route: full            # full | quick
+phase: validate        # research | plan | validate | implement | verify | document | done
+round: 2               # validation rounds completed in the current phase (one per phase, unless the phase is revisited)
+verdict: PASS          # null | PASS | CONDITIONAL | FAIL
+owner_agent: root      # name of the agent currently holding the work item
+created: "2026-09-10"
+updated: "2026-09-10"
+
+blockers: []
+# - id: F-001
+#   from: validation/plan-review-01.md
+#   severity: BLOCKER
+#   status: open        # open | closed
+#   summary: "One line"
+
+followups: []
+# - summary: "One line"
+#   severity: IMPORTANT
+#   owner: "unassigned"
+
+decisions:
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "User requested planning only. Execute research, plan and blind validation; retain validate phase after delivery. Implementation, verification of runtime behavior, publication and product-contract changes are not authorized by this request."
+# Record here every time a validation verdict changed the plan, and every time
+# it was decided that a finding did not change the plan. Both are decisions.
+# - round: 1
+#   verdict: FAIL
+#   action: revise-plan   # revise-plan | revise-research | revise-implementation | annotate-only | escalate
+#   reason: "One line"
+
+research_review:
+  report: validation/research-review-01.md
+  verdict: PASS
+  findings:
+    - id: F-001
+      disposition: closed
+      reason: "Appended a superseding clarification distinguishing optional browser fields from proposed bridge policy; original artifact retained."
+    - id: F-002
+      disposition: not-applicable
+      reason: "wiki/conventions/naming.md explicitly states work-item artifacts carry no frontmatter. Their folder, filename and STATE provide metadata. No content change required."
+escalations: []
+# - date: "2026-09-10"
+#   reason: oscillating-loop   # oscillating-loop | high-impact-decision | scope-change
+#   question: "The specific question put to the human"
+
+plan_review:
+  report: validation/plan-review-01.md
+  verdict: PASS
+  findings: []
+delivery:
+  status: planning-revision-delivered
+  criteria_count: 28
+  implementation_started: false
+  criteria_frozen: false
+  reason: "User requested planning plus observation research. Baseline and revised research/plans independently reviewed in two rounds each. Retain validate phase; no implementation or runtime completion claimed."
+
+revision_2:
+  request: "Investigate navigation, action and state listeners as the best low-boilerplate integration approach."
+  implementation_authorized: false
+  artifacts:
+    research: 12-observation-research.md
+    plan: 13-observation-plan.md
+    criteria: 14-observation-criteria.md
+    tasks: 15-observation-tasks.md
+  supersession: "Append-only revision of original planning artifacts; originals remain available."
+  scope_note: "Research and plan revision only. Original unfrozen criteria and artifacts preserved; new criteria will append IDs rather than renumber AC-001 through AC-018."
+  observations:
+    - "Navigation identifies route lifecycle; semantic projection identifies page content; command completion needs distinct evidence."
+    - "Observer registration must compose with the consumer app and cannot infer every hidden navigator or arbitrary callback."
+  research_review:
+    report: validation/research-review-02.md
+    verdict: PASS
+    findings: []
+  plan_review:
+    report: validation/plan-review-02.md
+    verdict: PASS
+    findings: []
+  status: planning-delivered
+  additional_criteria_count: 10
+  current_artifacts:
+    research: [00-research.md, 12-observation-research.md]
+    plan: [01-plan.md, 13-observation-plan.md]
+    criteria: [02-criteria.md, 14-observation-criteria.md]
+    tasks: [03-tasks.md, 15-observation-tasks.md]
+  precedence: "Observation artifacts explicitly refine/supersede corresponding baseline sections per 14-observation-criteria.md; all other baseline obligations remain."
+  limitations: "No runtime, browser, release, generator or full-suite tests executed for this planning revision. Native waiting and supported-SDK behavior remain empirical gates."
