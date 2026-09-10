@@ -4,21 +4,45 @@
 id: "0008-automatic-page-agent"
 title: "Automatic page content and actions"
 route: full            # full | quick
-phase: implement       # research | plan | validate | implement | verify | document | done
-round: 3               # validation rounds completed in the current phase (one per phase, unless the phase is revisited)
-verdict: CONDITIONAL   # null | PASS | CONDITIONAL | FAIL
+phase: verify          # research | plan | validate | implement | verify | document | done
+round: 0               # validation rounds completed in the current phase (one per phase, unless the phase is revisited)
+verdict: null          # null | PASS | CONDITIONAL | FAIL
 owner_agent: root      # name of the agent currently holding the work item
 created: "2026-09-10"
 updated: "2026-09-10"
 
-blockers: []
+blockers:
+  - id: V-001
+    from: 19-implementation-evidence.md
+    severity: BLOCKER
+    status: open
+    summary: "The final Chrome 152 Wasm package retains the covered home scope in app observation after navigation."
+  - id: V-002
+    from: 05-transport-spike.md
+    severity: BLOCKER
+    status: open
+    summary: "The required authenticated Inspector/Gemini model-selected AC-035 trace has not run."
+  - id: V-003
+    from: 18-gate-revision-tasks.md
+    severity: BLOCKER
+    status: open
+    summary: "The one required blind implementation review against AC-001 through AC-035 remains pending."
 # - id: F-001
 #   from: validation/plan-review-01.md
 #   severity: BLOCKER
 #   status: open        # open | closed
 #   summary: "One line"
 
-followups: []
+followups:
+  - summary: "Add functional multiple-Flutter-view support."
+    severity: OPTIONAL
+    owner: "unassigned"
+  - summary: "Prove positive observation waits and Chrome platform-back gestures."
+    severity: OPTIONAL
+    owner: "unassigned"
+  - summary: "Evaluate generated route wrapping, framework state adapters, service proxies, and custom data providers."
+    severity: OPTIONAL
+    owner: "unassigned"
 # - summary: "One line"
 #   severity: IMPORTANT
 #   owner: "unassigned"
@@ -63,13 +87,14 @@ plan_review:
   verdict: PASS
   findings: []
 delivery:
-  status: implementation-in-progress
+  status: implementation-complete-verification-blocked
   criteria_count: 35
   implementation_started: true
   criteria_frozen: true
   criteria_frozen_at: "2026-09-10"
   criteria_artifacts: [02-criteria.md, 14-observation-criteria.md, 17-gate-revision-criteria.md]
-  reason: "Empirical gates ran on the verified supported SDK and Chrome 152. Plan review round 03 returned CONDITIONAL; its single blocker was closed in the plan phase. Criteria are frozen across all three artifacts using the clause-level supersession in 17-gate-revision-criteria.md. Native support, delivery and completion remain blocked until the authenticated Chrome-only trace passes."
+  implementation_evidence: 19-implementation-evidence.md
+  reason: "Runtime, generator, example and documentation implementation are present. The full repository check, Flutter 3.47.3 page suite and final JavaScript direct native API sequence pass. Verification remains blocked by the Wasm stale eligible scope, the unavailable authenticated Chrome-only model-selected trace, and the pending blind implementation review. Native support, release and work-item completion are not claimed."
 
 revision_2:
   request: "Investigate navigation, action and state listeners as the best low-boilerplate integration approach."
@@ -124,8 +149,9 @@ revision_3:
         reason: "Plan-phase fix. 16-gate-revision-plan.md clause 4 now separates landing the unsupported example from claiming example support, and 18-gate-revision-tasks.md records the superseded done-when of 03-tasks.md task 2.3 and 15-observation-tasks.md task O2.3."
   research_review:
     report: validation/research-review-03.md
-    verdict: pending
+    verdict: not-commissioned
     findings: []
+    reason: "The user capped validation overhead at one review per phase. The combined empirical gate evidence received one recorded main-agent disposition and no additional research review was commissioned."
   validation_policy: "One round per phase from 2026-09-10 by user instruction. Findings are fixed directly and recorded; a new round is commissioned only for a materially large change."
   blocked_claims:
     - "Native WebMCP support, delivery, release and work-item completion, until an authenticated Chrome-only discover-observe-read-act-navigate-receipt-observe-read trace with model-selected calls passes."

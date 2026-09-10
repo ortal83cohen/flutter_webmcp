@@ -680,6 +680,15 @@ final class _WebMcpPageState extends State<WebMcpPage>
     if (!_mountedOwner) {
       return webMcpPageError(WebMcpPageErrorCode.scopeGone);
     }
+    final WebMcpPageErrorCode? admissionError =
+        _revalidateAdmissionBeforeAccess();
+    if (admissionError != null) {
+      return webMcpPageError(
+        admissionError,
+        retryable: true,
+        refreshRequired: true,
+      );
+    }
     if (!_eligible) {
       return webMcpPageError(
         _unavailableReason ?? WebMcpPageErrorCode.inactiveScope,
@@ -973,6 +982,11 @@ final class _WebMcpPageState extends State<WebMcpPage>
     if (actionArguments['cancelled'] == true) {
       return webMcpPageError(WebMcpPageErrorCode.cancelled);
     }
+    final WebMcpPageErrorCode? admissionError =
+        _revalidateAdmissionBeforeAccess();
+    if (admissionError != null) {
+      return webMcpPageError(admissionError, refreshRequired: true);
+    }
     final _CapturedNode? captured = _window?.byHandle(handle);
     if (captured == null) {
       return webMcpPageError(WebMcpPageErrorCode.unknownHandle);
@@ -1056,6 +1070,50 @@ final class _WebMcpPageState extends State<WebMcpPage>
       _queueCapture();
     }
     return receipt;
+  }
+
+  WebMcpPageErrorCode? _revalidateAdmissionBeforeAccess() {
+    try {
+      return _revalidateAdmissionBeforeAccessUnsafe();
+    } on Object {
+      revokeForSession(WebMcpPageErrorCode.internalError);
+      return WebMcpPageErrorCode.internalError;
+    }
+  }
+
+  WebMcpPageErrorCode? _revalidateAdmissionBeforeAccessUnsafe() {
+    final WebMcpAppSession? session = _session;
+    if (!_mountedOwner || session == null || !session.isAttached) {
+      return WebMcpPageErrorCode.scopeGone;
+    }
+    if (!_activityIsProved()) {
+      revokeForSession(WebMcpPageErrorCode.inactiveScope);
+      return WebMcpPageErrorCode.inactiveScope;
+    }
+    final List<WebMcpViewBinding> views = session.viewProvider.getViews();
+    if (views.length != 1) {
+      revokeForSession(WebMcpPageErrorCode.unsupportedViewConfiguration);
+      return WebMcpPageErrorCode.unsupportedViewConfiguration;
+    }
+    final WebMcpViewBinding view = views.single;
+    if (view.pipelineOwner == null ||
+        view.semanticsOwner == null ||
+        !identical(view.pipelineOwner?.semanticsOwner, view.semanticsOwner)) {
+      revokeForSession(WebMcpPageErrorCode.boundaryUnavailable);
+      return WebMcpPageErrorCode.boundaryUnavailable;
+    }
+    if (!identical(_pipelineOwner, view.pipelineOwner) ||
+        !identical(_semanticsOwner, view.semanticsOwner)) {
+      _replaceOwner(view.pipelineOwner, view.semanticsOwner);
+      _dirty = true;
+      _queueCapture();
+      return WebMcpPageErrorCode.snapshotUnavailable;
+    }
+    if (_resolveBoundary(view.semanticsOwner!) == null) {
+      revokeForSession(WebMcpPageErrorCode.boundaryUnavailable);
+      return WebMcpPageErrorCode.boundaryUnavailable;
+    }
+    return null;
   }
 
   SemanticsNode? _findOwnedNode(SemanticsNode root, int nodeId) {

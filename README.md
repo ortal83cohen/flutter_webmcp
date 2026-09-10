@@ -175,6 +175,10 @@ The implementation targets Flutter web with a minimum of Flutter 3.47.0 and Dart
 JavaScript and Wasm page conformance proves registration, discovery, direct
 native invocation, registration-signal cleanup, cancel-before-dispatch, safe
 errors, immediate observation, cursor recovery, and navigation receipts.
+The integrated JavaScript automatic-page flow passes its covered-page and
+destination-observation checks. The equivalent Wasm flow currently retains the
+covered source scope after navigation, so automatic-page support on Wasm is not
+delivered.
 
 This is still experimental and is not a native-agent support claim. The
 required isolated official Chrome Inspector profile currently lacks Gemini

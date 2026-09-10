@@ -638,9 +638,9 @@ void main() {
     );
 
     provider.binding = replacement.binding;
-    final int capturesBeforeReplacement = provider.calls;
     active.value = false;
     expect((await _read('replacement'))['code'], 'inactiveScope');
+    final int capturesBeforeReplacement = provider.calls;
     active.value = true;
     await tester.pumpAndSettle();
     expect(provider.calls, capturesBeforeReplacement + 1);
@@ -798,6 +798,7 @@ void main() {
           ),
         ),
       );
+      expect((await _read('nested.home'))['code'], 'inactiveScope');
       await tester.pumpAndSettle();
 
       expect((await _read('nested.home'))['code'], 'inactiveScope');
