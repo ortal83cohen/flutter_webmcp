@@ -131,6 +131,13 @@ receipts for JavaScript and Wasm. It does not supply an invocation signal after
 callback start, so admitted work may continue; the library does not terminate
 or replay it. `toolchange` is not application-state delivery.
 
+The integrated release JavaScript fixture additionally completes
+discover-observe-read-act-navigate-receipt-observe-read and rejects the covered
+page after application observation identifies only the destination scope. The
+equivalent Wasm fixture currently fails because application observation retains
+the covered home scope. Wasm automatic-page lifecycle support is therefore not
+delivered, despite the lower-level Wasm publisher conformance results.
+
 Native-agent support remains unproven. The isolated official Inspector profile
 has no Gemini credential, and direct `executeTool` or WebDriver-selected calls
 cannot substitute for the required authenticated natural-language,

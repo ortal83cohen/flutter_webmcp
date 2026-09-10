@@ -165,19 +165,36 @@ const execute = async (name, input) => {
     if (destinationNames.includes('example.details.page.read')) break;
     await sleep(50);
   }
+  step = 'observe-after';
+  let observedAfter;
+  while (performance.now() < deadline) {
+    observedAfter = await execute('example.app.observe', {
+      cursor: observedBefore.cursor,
+    });
+    if (
+      observedAfter.ok === true &&
+      observedAfter.eligibleScopes.length === 1 &&
+      !observedAfter.eligibleScopes.includes(home.mountToken)
+    ) break;
+    await sleep(50);
+  }
+  if (
+    observedAfter?.ok !== true ||
+    observedAfter.eligibleScopes.length !== 1 ||
+    observedAfter.eligibleScopes.includes(home.mountToken)
+  ) {
+    throw new Error('Destination scope did not become exclusively eligible');
+  }
   step = 'covered-page-negative';
   const homeStillRegistered = destinationNames.includes('example.home.page.read');
   const homeAfterNavigation = homeStillRegistered
     ? await execute('example.home.page.read', {})
     : {ok: false, code: 'unregistered'};
-  if (homeAfterNavigation.code !== 'inactiveScope' &&
-      homeAfterNavigation.code !== 'unregistered') {
-    throw new Error('Covered home page remained readable');
+  if (homeAfterNavigation.ok !== false) {
+    throw new Error(
+      `Covered home page remained readable: ${JSON.stringify(homeAfterNavigation)}`,
+    );
   }
-  step = 'observe-after';
-  const observedAfter = await execute('example.app.observe', {
-    cursor: observedBefore.cursor,
-  });
   step = 'read-details';
   const details = await execute('example.details.page.read', {});
   done({
