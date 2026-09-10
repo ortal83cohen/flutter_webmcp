@@ -90,3 +90,23 @@ Exit status: 0.
 
 ```text
 ```
+
+## Canonical-suite repair
+
+The parent-owned first canonical pinned suite found that the disabled-child
+test used `ElevatedButton` while the file intentionally imports only
+`package:flutter/widgets.dart`. The test now uses a `GestureDetector` with a
+null tap callback to represent a disabled child without widening its imports.
+
+Command:
+
+`/Users/ortalcohen/fvm/versions/3.47.0/bin/cache/dart-sdk/bin/dart format test/widget_layer_test.dart && /Users/ortalcohen/fvm/versions/3.47.0/bin/cache/dart-sdk/bin/dart analyze --fatal-infos --fatal-warnings test/widget_layer_test.dart`
+
+Exit status: 0.
+
+```text
+Formatted test/widget_layer_test.dart
+Formatted 1 file (1 changed) in 0.01 seconds.
+Analyzing widget_layer_test.dart...
+No issues found!
+```

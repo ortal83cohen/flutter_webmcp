@@ -127,10 +127,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _host(
-        const _Screen(
+        _Screen(
           actionName: 'disabled.child',
           actionResult: 'invoked',
-          child: ElevatedButton(onPressed: null, child: Text('Disabled')),
+          child: GestureDetector(onTap: null, child: const Text('Disabled')),
         ),
       ),
     );
