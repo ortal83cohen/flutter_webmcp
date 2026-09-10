@@ -286,6 +286,7 @@ import r"package:\x66lutter/widgets.dart";
       '--',
       'lib',
       'example/lib',
+      'packages',
       'tools',
       '.github',
     ]);

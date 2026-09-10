@@ -1,7 +1,8 @@
 ---
 id: adr-0003-webmcp-detection-first-registry
 title: "ADR 0003: Use a singleton registry with a detection-only browser boundary"
-status: active
+status: superseded
+superseded_by: adr-0004-use-semantic-page-boundaries-and-app-observation
 owner: unassigned
 last_verified: 2026-09-10
 applies_to: ["lib/**"]
@@ -10,7 +11,7 @@ summary: The initial package keeps a singleton registry and limits browser integ
 
 # ADR 0003: Use a singleton registry with a detection-only browser boundary
 
-- Status: accepted
+- Status: superseded by ADR 0004
 - Date: 2026-09-10
 - Deciders: unassigned
 

@@ -6,7 +6,10 @@ import 'example_tools.dart';
 /// Displays registry state and demonstrates lifecycle-based tool exposure.
 final class ExampleScreen extends StatefulWidget {
   /// Creates the example screen.
-  const ExampleScreen({super.key});
+  const ExampleScreen({required this.publisher, super.key});
+
+  /// Publisher used only for safe capability diagnostics.
+  final WebMcpNativePublisher publisher;
 
   @override
   State<ExampleScreen> createState() => _ExampleScreenState();
@@ -53,6 +56,11 @@ final class _ExampleScreenState extends State<ExampleScreen>
             children: <Widget>[
               Text('Counter: ${_counter.value}'),
               Text('Transport: ${WebMcp.instance.transportId}'),
+              Text('Native publisher: ${widget.publisher.status.support.name}'),
+              Text(
+                'Positive observe wait: '
+                '${widget.publisher.status.capabilities.positiveWait}',
+              ),
               const SizedBox(height: 16),
               const Text('Registered tools:'),
               Text(names),

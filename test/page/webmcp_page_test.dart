@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' show SemanticsUpdate;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -253,6 +254,66 @@ void main() {
       expect((await _read('evidence')).toString(), contains('count=1'));
     },
   );
+
+  testWidgets('unchanged activity notification emits no content event', (
+    WidgetTester tester,
+  ) async {
+    final _Harness harness = _Harness();
+    final _ActivitySignal activity = _ActivitySignal();
+    await harness.pump(
+      tester,
+      WebMcpPage(
+        pageId: 'unchanged',
+        activity: activity,
+        child: const Text('stable-content'),
+      ),
+    );
+    final Map<String, Object?> before = await _read('unchanged');
+    final Map<String, Object?> observedBefore =
+        await WebMcp.instance.invokeTool(
+          'fixture.app.observe',
+          const <String, Object?>{},
+        ) as Map<String, Object?>;
+
+    activity.emit();
+    await tester.pumpAndSettle();
+
+    final Map<String, Object?> after = await _read('unchanged');
+    final Map<String, Object?> observedAfter = await WebMcp.instance.invokeTool(
+      'fixture.app.observe',
+      <String, Object?>{'cursor': observedBefore['cursor']},
+    ) as Map<String, Object?>;
+    expect(after['revision'], before['revision']);
+    expect(observedAfter['events'], isEmpty);
+    expect(observedAfter['unchanged'], isTrue);
+  });
+
+  testWidgets('dirty page without a serviced frame stays unavailable', (
+    WidgetTester tester,
+  ) async {
+    final _ActivitySignal activity = _ActivitySignal();
+    final _Harness harness = _Harness(
+      limits: WebMcpPageLimits(
+        captureDeadline: const Duration(milliseconds: 10),
+      ),
+    );
+    await harness.pump(
+      tester,
+      WebMcpPage(
+        pageId: 'deadline',
+        activity: activity,
+        child: const Text('deadline-content'),
+      ),
+    );
+    expect((await _read('deadline'))['ok'], isTrue);
+
+    activity.emit();
+    await tester.runAsync<void>(
+      () => Future<void>.delayed(const Duration(milliseconds: 30)),
+    );
+
+    expect((await _read('deadline'))['code'], 'snapshotUnavailable');
+  });
 
   testWidgets('privacy omits obscured and excluded subtrees', (
     WidgetTester tester,
@@ -693,6 +754,63 @@ void main() {
     },
   );
 
+  testWidgets(
+    'nested Navigator uses its forwarding observer and current route',
+    (WidgetTester tester) async {
+      final WebMcpAppSession session = WebMcpAppSession();
+      session.attach(appId: 'nested-app');
+      final WebMcpNavigatorAdapter rootAdapter = WebMcpNavigatorAdapter(
+        session: session,
+        navigatorId: 'root',
+      );
+      final WebMcpNavigatorAdapter nestedAdapter = WebMcpNavigatorAdapter(
+        session: session,
+        navigatorId: 'nested',
+        parentNavigatorId: 'root',
+      );
+      late BuildContext nestedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorObservers: <NavigatorObserver>[rootAdapter],
+          home: Navigator(
+            observers: <NavigatorObserver>[nestedAdapter],
+            onGenerateRoute: (RouteSettings settings) =>
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) {
+                    nestedContext = context;
+                    return WebMcpPage(
+                      pageId: 'nested.home',
+                      child: const Text('nested-home'),
+                    );
+                  },
+                ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect((await _read('nested.home'))['ok'], isTrue);
+
+      nestedContext.findAncestorStateOfType<NavigatorState>()!.push<void>(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) => WebMcpPage(
+            pageId: 'nested.details',
+            child: const Text('nested-details'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect((await _read('nested.home'))['code'], 'inactiveScope');
+      expect(
+        (await _read('nested.details')).toString(),
+        contains('nested-details'),
+      );
+      nestedAdapter.dispose();
+      rootAdapter.dispose();
+      session.detach();
+    },
+  );
+
   testWidgets('navigation action returns receipt and observes destination', (
     WidgetTester tester,
   ) async {
@@ -899,6 +1017,16 @@ final class _MutableProvider implements WebMcpViewProvider {
   List<WebMcpViewBinding> getViews() {
     calls++;
     return <WebMcpViewBinding>[binding];
+  }
+}
+
+final class _ActivitySignal extends ChangeNotifier
+    implements ValueListenable<bool> {
+  @override
+  bool get value => true;
+
+  void emit() {
+    notifyListeners();
   }
 }
 

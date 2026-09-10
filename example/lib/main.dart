@@ -58,7 +58,7 @@ final class _WebMcpPilotExampleState extends State<WebMcpPilotExample> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: <NavigatorObserver>[_rootNavigator],
-      home: const ExampleScreen(),
+      home: ExampleScreen(publisher: widget.publisher),
     );
   }
 }

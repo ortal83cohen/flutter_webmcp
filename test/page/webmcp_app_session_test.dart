@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:webmcp_flutter/src/page/webmcp_app_session.dart';
 import 'package:webmcp_flutter/src/page/webmcp_page_protocol.dart';
@@ -113,6 +113,29 @@ void main() {
     expect(foreign['gap'], isTrue);
   });
 
+  test('ring byte overflow drops whole events and reports a gap', () async {
+    final WebMcpAppSession session = WebMcpAppSession(
+      limits: WebMcpPageLimits(ringBytes: 256),
+    );
+    session.attach(appId: 'fixture');
+    final _FakePage page = _FakePage('s${'x' * 300}');
+    session.registerPage(page);
+    final Map<String, Object?> before = await WebMcp.instance.invokeTool(
+      'fixture.app.observe',
+      const <String, Object?>{},
+    ) as Map<String, Object?>;
+
+    session.publishPageState(page, kind: 'contentChanged');
+    final Map<String, Object?> after = await WebMcp.instance.invokeTool(
+      'fixture.app.observe',
+      <String, Object?>{'cursor': before['cursor']},
+    ) as Map<String, Object?>;
+
+    expect(session.retainedEventCount, 0);
+    expect(after['gap'], isTrue);
+    expect(after['refreshRequired'], isTrue);
+  });
+
   test(
     'observe returns 32 whole events and marks remaining history partial',
     () async {
@@ -222,6 +245,30 @@ void main() {
     }
   });
 
+  test(
+    'known user gesture revokes immediately and stop does not reactivate',
+    () {
+      final WebMcpAppSession session = WebMcpAppSession();
+      session.attach(appId: 'fixture');
+      final _FakePage page = _FakePage(session.allocateScopeReference());
+      session.registerPage(page);
+      final WebMcpNavigatorAdapter adapter = WebMcpNavigatorAdapter(
+        session: session,
+        navigatorId: 'root',
+      );
+      final MaterialPageRoute<void> route = MaterialPageRoute<void>(
+        builder: (BuildContext context) => const SizedBox.shrink(),
+      );
+
+      adapter.didStartUserGesture(route, null);
+      expect(page.eligible, isFalse);
+      final int revokedRevision = page.revision;
+      adapter.didStopUserGesture();
+      expect(page.eligible, isFalse);
+      expect(page.revision, revokedRevision);
+    },
+  );
+
   test('operation and execution caps refuse before side effects', () {
     final WebMcpAppSession session = WebMcpAppSession();
     session.attach(appId: 'fixture');
@@ -295,7 +342,43 @@ void main() {
       session.operationReceipt(operationId)!['evidence'],
       'backendConfirmed',
     );
+    expect(
+      session.operationReceipt(operationId)!['backendOutcome'],
+      'succeeded',
+    );
   });
+
+  test(
+    'operation evidence survives page disposal without scope identity',
+    () async {
+      final WebMcpAppSession session = WebMcpAppSession();
+      session.attach(appId: 'fixture');
+      final _FakePage page = _FakePage(session.allocateScopeReference());
+      session.registerPage(page);
+      final String operationId = session.beginOperation(
+        scopeReference: page.scopeReference,
+        requestId: 1,
+      )!;
+      final Map<String, Object?> before = await WebMcp.instance.invokeTool(
+        'fixture.app.observe',
+        const <String, Object?>{},
+      ) as Map<String, Object?>;
+
+      session.unregisterPage(page);
+      session.recordEvidence(
+        operationId,
+        WebMcpEvidenceKind.domainFutureCompleted,
+      );
+      final Map<String, Object?> after = await WebMcp.instance.invokeTool(
+        'fixture.app.observe',
+        <String, Object?>{'cursor': before['cursor']},
+      ) as Map<String, Object?>;
+
+      expect(after.toString(), contains('domainFutureCompleted'));
+      expect(after.toString(), contains(operationId));
+      expect(after.toString(), isNot(contains(page.scopeReference)));
+    },
+  );
 
   test('limits reject every configured value above its hard ceiling', () {
     expect(() => WebMcpPageLimits(liveScopes: 129), throwsArgumentError);

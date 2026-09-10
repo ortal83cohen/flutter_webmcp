@@ -20,3 +20,7 @@ dev_dependencies:
     sdk: flutter
   webmcp_flutter_generator:
     path: ..
+
+dependency_overrides:
+  webmcp_flutter_annotations:
+    path: ../../webmcp_flutter_annotations

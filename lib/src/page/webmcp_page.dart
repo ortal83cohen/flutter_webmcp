@@ -85,6 +85,7 @@ final class _WebMcpPageState extends State<WebMcpPage>
   bool _dirty = true;
   bool _captureQueued = false;
   bool _toolsAttempted = false;
+  bool? _lastActivityValue;
   WebMcpPageErrorCode? _unavailableReason;
 
   @override
@@ -106,6 +107,7 @@ final class _WebMcpPageState extends State<WebMcpPage>
     _marker = '$_markerPrefix$_scopeReference';
     _semanticsHandle = SemanticsBinding.instance.ensureSemantics();
     _mountedOwner = true;
+    _lastActivityValue = widget.activity?.value;
     widget.activity?.addListener(_activityChanged);
     WebMcpPageErrorCode? registration;
     if (_session == null) {
@@ -130,6 +132,7 @@ final class _WebMcpPageState extends State<WebMcpPage>
     if (!identical(oldWidget.activity, widget.activity)) {
       oldWidget.activity?.removeListener(_activityChanged);
       widget.activity?.addListener(_activityChanged);
+      _lastActivityValue = widget.activity?.value;
       _invalidateAdmission();
     }
     if (!identical(oldWidget.policy, widget.policy)) {
@@ -208,7 +211,13 @@ final class _WebMcpPageState extends State<WebMcpPage>
   }
 
   void _activityChanged() {
-    _invalidateAdmission();
+    final bool? current = widget.activity?.value;
+    if (current != _lastActivityValue) {
+      _lastActivityValue = current;
+      _invalidateAdmission();
+    } else {
+      _dirty = true;
+    }
     _queueCapture();
   }
 
@@ -239,7 +248,13 @@ final class _WebMcpPageState extends State<WebMcpPage>
         _queueCapture();
         return;
       }
-      _captureNow();
+      try {
+        _captureNow();
+      } on Object {
+        _captureTimer?.cancel();
+        _captureTimer = null;
+        revokeForSession(WebMcpPageErrorCode.internalError);
+      }
     });
     WidgetsBinding.instance.scheduleFrame();
     _captureTimer?.cancel();
@@ -316,14 +331,12 @@ final class _WebMcpPageState extends State<WebMcpPage>
         _pendingVisibleOperationId = null;
       }
     }
-    _session?.publishPageState(
-      this,
-      kind: oldProjection == null
-          ? 'scopeChanged'
-          : oldProjection == newProjection
-          ? 'scopeChanged'
-          : 'contentChanged',
-    );
+    if (oldProjection == null || oldProjection != newProjection) {
+      _session?.publishPageState(
+        this,
+        kind: oldProjection == null ? 'scopeChanged' : 'contentChanged',
+      );
+    }
   }
 
   bool _activityIsProved() {
