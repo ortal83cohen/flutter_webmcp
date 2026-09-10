@@ -1,0 +1,23 @@
+id: "0006-rename-webmcp-flutter"
+title: "Rename package to webmcp_flutter"
+route: full
+phase: done
+round: 1
+verdict: PASS
+owner_agent: codex
+created: "2026-09-10"
+updated: "2026-09-10"
+blockers: []
+followups: []
+decisions:
+  - round: 1
+    verdict: PASS
+    action: document
+    reason: "Independent impl-review-01 passes AC-001 through AC-004 with full-suite exit zero and four negative probes. Initial generated-cache failure was resolved by rebuilding example artifacts. Index and historical records preserved; documentation audit complete."
+  - round: 1
+    verdict: PASS
+    action: implement
+    reason: "Plan review has no findings. Research F-001 is covered by AC-003 and the product-doc task; F-002 is accepted as display-copy discretion, using the current plan wording WebMCP Flutter. Both are nonblocking nits. Criteria freeze for approved rename only."
+  - action: isolate-approved-rename
+    reason: "User accepted webmcp_flutter after requesting an alternative without pilot. Implement only the mechanical rename; broader publication prerequisites remain in work item 0005 and no publication is authorized."
+escalations: []

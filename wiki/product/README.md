@@ -3,14 +3,20 @@ id: product-readme
 title: Product knowledge
 status: active
 owner: unassigned
-last_verified: 2026-09-04
+last_verified: 2026-09-10
 applies_to: ["**"]
 summary: What the product does, its domain rules and its constraints. Grown one shipped feature at a time.
 ---
 
 # Product knowledge
 
-Nothing has shipped yet. This directory is empty by design, and it stays empty until the first feature completes phase 6.
+The repository contains a detection-first local WebMCP-style registry for
+Flutter web. Read [webmcp-contract.md](webmcp-contract.md) for the product
+boundary: explicit action declarations, lifetime-bounded exposure, globally
+unique names, local invocation semantics, custom transport failure behavior,
+and detection-only browser integration. The browser API is experimental. The
+package does not publish tools to the browser or accept browser-originated
+invocations.
 
 ## What belongs here
 
@@ -36,4 +42,4 @@ If you find yourself writing a paragraph that describes what the code already sa
 
 ## Structure, once there is content
 
-One file per domain area, named after the area. Each carries the frontmatter from `../conventions/naming.md`, and each is listed in `../INDEX.md` with a line saying when to read it. The index line matters more than the document: an agent decides whether to open a file based on that one sentence.
+One file per domain area, named after the area. Each carries the frontmatter from `../conventions/naming.md`, and each is listed in `../INDEX.md` with a line saying when to read it. The index line matters more than the document: an agent decides whether to open a file based on that one sentence. The initial domain document is [webmcp-contract.md](webmcp-contract.md).

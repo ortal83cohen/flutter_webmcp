@@ -13,12 +13,17 @@ WebMcpTransport createDefaultTransport() => WebDetectionTransport();
 /// Detects browser WebMCP support and logs registry changes.
 final class WebDetectionTransport implements WebMcpTransport {
   /// Creates a transport and records whether WebMCP appears available.
-  WebDetectionTransport()
-    : _isAvailable = document.hasProperty('modelContext'.toJS).toDart {
+  WebDetectionTransport({void Function(String)? logger})
+    : _isAvailable = document.hasProperty('modelContext'.toJS).toDart,
+      _logger = logger ?? _writeToDeveloperLog {
     _write('modelContext detected: $_isAvailable; tools not published');
   }
 
   final bool _isAvailable;
+  final void Function(String) _logger;
+
+  /// Whether `document.modelContext` was present when this transport started.
+  bool get isAvailable => _isAvailable;
 
   @override
   String get id => 'web-detection';
@@ -34,6 +39,10 @@ final class WebDetectionTransport implements WebMcpTransport {
   }
 
   void _write(String message) {
-    developer.log(message, name: 'webmcp_pilot');
+    _logger(message);
+  }
+
+  static void _writeToDeveloperLog(String message) {
+    developer.log(message, name: 'webmcp_flutter');
   }
 }

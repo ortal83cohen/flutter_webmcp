@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
-import 'package:webmcp_pilot_example/example_tools.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
+import 'package:webmcp_flutter_example/example_tools.dart';
 
 void main() {
   setUp(WebMcp.instance.reset);

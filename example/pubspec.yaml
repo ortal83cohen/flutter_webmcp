@@ -1,5 +1,5 @@
-name: webmcp_pilot_example
-description: Demonstrates the webmcp_pilot Flutter web package.
+name: webmcp_flutter_example
+description: Demonstrates the webmcp_flutter Flutter web package.
 publish_to: none
 version: 1.0.0
 
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  webmcp_pilot:
+  webmcp_flutter:
     path: ..
 
 dev_dependencies:

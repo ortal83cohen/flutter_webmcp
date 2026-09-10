@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 WebMcpTool _tool(String name, Object? result) => WebMcpTool(
   name: name,
@@ -120,6 +120,25 @@ void main() {
       _host(_Screen(actionName: 'changing', actionHandler: secondHandler)),
     );
     expect(await WebMcp.instance.invokeTool('changing', const {}), 'second');
+  });
+
+  testWidgets('disabled child does not disable direct tool invocation', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const _Screen(
+          actionName: 'disabled.child',
+          actionResult: 'invoked',
+          child: ElevatedButton(onPressed: null, child: Text('Disabled')),
+        ),
+      ),
+    );
+
+    expect(
+      await WebMcp.instance.invokeTool('disabled.child', const {}),
+      'invoked',
+    );
   });
 
   testWidgets(

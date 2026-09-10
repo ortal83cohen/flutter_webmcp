@@ -1,83 +1,109 @@
-# webmcp_pilot
+# webmcp_flutter
 
-`webmcp_pilot` is a detection-first WebMCP tool registry and optional widget lifecycle layer for Flutter web applications.
+`webmcp_flutter` is a local WebMCP-style tool registry and optional Flutter
+widget lifecycle layer for web applications. It lets an application declare,
+invoke, and remove named asynchronous tools in Dart. The current release only
+detects the browser's experimental WebMCP entry point; it does not publish
+tools to the browser or accept browser-originated invocations.
 
-Add `webmcp_pilot` to a Flutter package with a path dependency while this package is under development. The package currently targets Flutter 3.47.0 and web only.
+## Installation
 
-Register imperative tools through the `WebMcp.instance` singleton, or mix `WebMcpScreen` into a screen's `State` and wrap an action with `WebMcpAction`. The singleton registry is the single source of truth; the mixin and wrapper are lifecycle sugar over its public methods. To expose an existing button callback, put the behavior in one named method and pass that method to both the button and the wrapper because the package never inspects its child. Tool names are globally unique: when a second live screen registers the same name, its scope records the name as skipped rather than shadowing the first registration.
+Add the package to a Flutter application:
 
-This skeleton detects whether the browser document has the WebMCP origin-trial entry point and logs registry changes. It does not publish tools to the browser or call the WebMCP API.
-
-# Agent workflow scaffold
-
-An empty repository preconfigured to take a product idea from research to shipped code through a repeatable agent pipeline. Works in both Claude Code and Cursor. No product code yet — that is the first thing you build.
-
-## Start here
-
-```
-/bootstrap-product a tool that does X for Y
+```sh
+flutter pub add webmcp_flutter
 ```
 
-This runs once, on the empty repository. It picks a stack through the normal research-and-validation pipeline, sets up the toolchain and the check suite, wires the linter into CI, and records the founding decisions as ADRs.
+Import its public library as
+`package:webmcp_flutter/webmcp_flutter.dart`.
 
-After that, every change goes through one of two routes:
+## Minimal Flutter example
 
+This complete `lib/main.dart` registers an action while `CounterPage` is
+mounted. The button and tool call the same method because `WebMcpAction` keeps
+its child unchanged and does not inspect the widget tree.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
+
+void main() {
+  runApp(const MaterialApp(home: CounterPage()));
+}
+
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key});
+
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage>
+    with WebMcpScreen<CounterPage> {
+  int _count = 0;
+
+  int _increment() {
+    setState(() => _count++);
+    return _count;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: WebMcpAction(
+          name: 'counter.increment',
+          description: 'Increments the visible counter.',
+          onInvoke: (Map<String, Object?> arguments) => _increment(),
+          child: ElevatedButton(
+            onPressed: _increment,
+            child: Text('Count: $_count'),
+          ),
+        ),
+      ),
+    );
+  }
+}
 ```
-/feature       add or change anything non-trivial — the full six-phase pipeline
-/quick-change  one file, no interface, dependency or data-model impact
-```
 
-Individual phases can be run on their own to resume an interrupted work item: `/research`, `/plan`, `/validate`, `/implement`, `/verify`, `/document`.
+Imperative tools can instead be registered through
+`WebMcp.instance.registerTool`. Local callers invoke either kind with
+`await WebMcp.instance.invokeTool(name, arguments)`.
 
-## The pipeline
+## Current contract
 
-Research → plan → validate → implement → verify → document.
+Tool names must contain 1 to 128 ASCII letters, digits, underscores, hyphens,
+or periods. Names share one process-wide namespace. The first live
+registration owns a name; a later `WebMcpScope` records the duplicate as
+skipped and cannot remove the first owner's tool. Closing a scope removes its
+owned tools, is idempotent, and permanently prevents further additions.
 
-Each phase writes one numbered artifact into `wiki/work/NNNN-slug/` and hands off through a gate. Validation is adversarial and blind: the validator sees the acceptance criteria and the artifact, never the author's reasoning. Acceptance criteria freeze before any code exists, which is what makes verification independent.
+`WebMcpAction` registers for its mounted lifetime. Its registered name,
+description, and input schema remain the values from the initial mount until
+the action is unmounted and mounted again. Its handler calls the latest
+`onInvoke` callback. A disabled child does not disable the registered tool or
+grant invocation authority; omit or unmount the wrapper when invocation should
+be unavailable.
 
-Loops are capped at three rounds with an oscillation check, because a fourth review does not find what three missed.
+Input schemas are descriptive only. The outer map is copied and exposed as
+unmodifiable, while nested values remain shared. The package does not validate
+arguments against the schema at runtime. Registering a source is sequential,
+so tools registered before a later failure remain registered.
 
-`wiki/conventions/workflow.md` is the full definition. `wiki/INDEX.md` is the router for everything else.
+Local handler results and exceptions pass through unchanged. They are not
+normalized into a browser-safe result or error envelope. With a custom
+transport, registry mutations happen before registration and unregistration
+notifications; a notification exception propagates without rolling the
+mutation back. `reset` clears local tools and replaces the transport without
+notifying, unregistering from, or disposing the previous transport. Callers
+that provide stateful transports must clean up their external state.
 
-## Setup
+## Browser and platform support
 
-**Claude Code** works with no configuration. `CLAUDE.md` imports `AGENTS.md`; skills, subagents, rules and hooks are read from `.claude/`.
+Version 0.1.0 supports Flutter web with a minimum of Flutter 3.47.0 and Dart
+3.13.0. Other Flutter platforms are not supported by this release.
 
-**Cursor** reads `AGENTS.md` natively. To also pick up the skills and subagents in `.claude/`, enable **Cursor Settings → Rules, Skills, Subagents → include third-party plugins, skills and other configs**. Without it you keep the instructions, the wiki and the workflow definition — only the automation is lost.
-
-**Python 3** is required for `tools/lint_wiki.py`, which enforces the conventions in-session and in CI. Nothing else is needed until a stack is chosen.
-
-Verify the setup:
-
-```
-python3 tools/lint_wiki.py
-```
-
-## Layout
-
-| Path | What it is |
-|---|---|
-| `AGENTS.md` | The single source of always-on agent instructions |
-| `CLAUDE.md` | Imports `AGENTS.md`, plus a few Claude-only notes |
-| `.claude/skills/` | The invocable workflow. Read by both tools |
-| `.claude/agents/` | Subagent definitions with their model tiers. Read by both tools |
-| `.claude/rules/`, `.cursor/rules/` | Path-scoped rules. The only content duplicated between the tools |
-| `.claude/hooks/`, `.cursor/hooks/` | Enforcement that runs whether or not the agent remembers the rule |
-| `wiki/conventions/` | Workflow, naming, validation rubrics, model routing, parallelism, definition of done |
-| `wiki/templates/` | The artifact templates. Copy them; do not improvise |
-| `wiki/adr/` | Architecture decision records. Never deleted, only superseded |
-| `wiki/product/` | Product knowledge. Empty until the first feature ships |
-| `wiki/work/` | One folder per change |
-| `tools/lint_wiki.py` | Enforces all of the above |
-
-## Why it is shaped this way
-
-Three findings drove the design, and two of them are counter-intuitive:
-
-**Prose overviews of a repository make agents worse.** They do not improve task success and they raise cost by more than a fifth — the agent reads the summary, then reads the source anyway. So `wiki/product/` explicitly excludes directory layouts, dependency lists and architecture narratives. Knowledge that triggers when relevant — a skill, a path-scoped rule — is where documentation pays.
-
-**Instruction file structure barely matters; enforcement does.** Size, position and file count have no measurable effect on compliance. What does have an effect is decay across a long session. That is why the conventions are backed by a linter, a write hook, a stop hook and a CI job rather than by more carefully arranged prose.
-
-**Self-review is worth roughly nothing, and a weak reviewer is worth less than none.** Hence blind validators on the strongest model tier, criteria frozen before implementation, and evidence rules that require pasted command output instead of a claim.
-
-`wiki/adr/0001` and `wiki/adr/0002` record the decisions in full.
+The built-in web transport checks whether `document.modelContext` is present
+and logs registry changes. Detection and logs do not publish, invoke, discover,
+or unregister browser tools. Browser interoperability and the experimental
+WebMCP API remain outside the current package contract.

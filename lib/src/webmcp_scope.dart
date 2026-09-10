@@ -29,7 +29,7 @@ final class WebMcpScope {
       _skippedNames.add(tool.name);
       developer.log(
         'Skipped duplicate tool ${tool.name} in scope $scopeName.',
-        name: 'webmcp_pilot',
+        name: 'webmcp_flutter',
       );
       return false;
     }

@@ -1,4 +1,4 @@
-import 'package:webmcp_pilot/webmcp_pilot.dart';
+import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 /// Mutable state used by the example's imperative tools.
 final class ExampleCounter {
