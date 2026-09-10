@@ -1,3 +1,13 @@
+# webmcp_pilot
+
+`webmcp_pilot` is a detection-first WebMCP tool registry and optional widget lifecycle layer for Flutter web applications.
+
+Add `webmcp_pilot` to a Flutter package with a path dependency while this package is under development. The package currently targets Flutter 3.47.0 and web only.
+
+Register imperative tools through the `WebMcp.instance` singleton, or mix `WebMcpScreen` into a screen's `State` and wrap an action with `WebMcpAction`. The singleton registry is the single source of truth; the mixin and wrapper are lifecycle sugar over its public methods. To expose an existing button callback, put the behavior in one named method and pass that method to both the button and the wrapper because the package never inspects its child. Tool names are globally unique: when a second live screen registers the same name, its scope records the name as skipped rather than shadowing the first registration.
+
+This skeleton detects whether the browser document has the WebMCP origin-trial entry point and logs registry changes. It does not publish tools to the browser or call the WebMCP API.
+
 # Agent workflow scaffold
 
 An empty repository preconfigured to take a product idea from research to shipped code through a repeatable agent pipeline. Works in both Claude Code and Cursor. No product code yet — that is the first thing you build.

@@ -25,3 +25,25 @@ jobs:
   # Add the product's own check job here once bootstrap-product has run, and
   # name the same command in AGENTS.md under "## Checks" so every pipeline phase
   # runs what CI runs.
+
+  package:
+    name: Flutter package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.0
+
+      - name: Print resolved Flutter version
+        run: flutter --version
+
+      - name: Run package check suite
+        run: bash tools/check.sh

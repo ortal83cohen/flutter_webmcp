@@ -49,7 +49,7 @@ Option C, with two amendments learned from option D's history:
 - Positive: token spend concentrates where leverage is highest — planning and reviewing get the strongest model, mechanical work gets the cheapest.
 - Negative: a full-route change costs several times a single-pass change in tokens and wall-clock time. Mitigated by the quick route, and by the fact that a defect found in phase 5 costs more than the whole of phase 3.
 - Negative: the pipeline can be gamed by an agent that files artifacts without doing the thinking. Mitigated by the evidence rules — pasted output, file-and-line citations, per-criterion verdicts — and by lint.
-- Negative: a validation loop can oscillate. Mitigated by a three-round cap, a recurrence check, and escalation instead of a fourth round.
+- Negative: a validation loop can oscillate. Mitigated by capping each phase to one validation round and having the main agent, not an automatic rule, decide from the recurrence check whether a repeated finding warrants escalation.
 
 ## Confirmation
 

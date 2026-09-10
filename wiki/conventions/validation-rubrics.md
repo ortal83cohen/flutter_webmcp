@@ -5,7 +5,7 @@ status: active
 owner: unassigned
 last_verified: 2026-09-04
 applies_to: ["**"]
-summary: Verdicts, severities, evidence requirements and loop limits that every validator obeys.
+summary: Verdicts, severities and evidence requirements that every validator obeys.
 ---
 
 # Validation rubrics
@@ -23,8 +23,8 @@ A validator has read and execute access. It has no write access to source files.
 | Verdict | Meaning |
 |---|---|
 | `PASS` | Every criterion is met. No blockers. Proceed. |
-| `CONDITIONAL` | Criteria are met but named blockers must close first. Author closes them, appends a new numbered round. |
-| `FAIL` | At least one criterion is unmet, or a blocker invalidates the approach. Return to the phase the defect belongs to. |
+| `CONDITIONAL` | Criteria are met but named blockers must close first. The main agent closes them or records why not, on this same round. |
+| `FAIL` | At least one criterion is unmet, or a blocker invalidates the approach. The main agent decides: fix directly, or return to the phase the defect belongs to. |
 
 ## Severities
 
@@ -32,7 +32,7 @@ A validator has read and execute access. It has no write access to source files.
 |---|---|
 | `BLOCKER` | Violates a criterion, or is a correctness, security or data-loss defect. Must close before proceeding. |
 | `IMPORTANT` | Will cause a real problem soon but violates no stated criterion. Close now or record as follow-up with an owner. |
-| `NIT` | Style, naming, phrasing. Never blocks. Never a reason to open a round two. |
+| `NIT` | Style, naming, phrasing. Never blocks. |
 | `PRE_EXISTING` | The defect is real and predates this change. Record it; do not expand this work item to fix it. |
 
 ## Evidence rules
@@ -52,12 +52,12 @@ A validator is never instructed to find a minimum number of problems. A reviewer
 
 Flag as `BLOCKER` or `IMPORTANT` only what affects correctness or a stated criterion. Everything else is a `NIT`. A review of sound work correctly returns `PASS` with a short `NIT` list or nothing at all.
 
-## Loop limits
+## After the round
 
-- Three rounds maximum per phase. On the third `FAIL`, stop iterating and rewrite the plan from scratch.
-- Findings accumulate. A round-two report appends to the record; it never replaces round one.
-- Oscillation check: before opening a new round, compare the finding set to the previous round. If a finding is materially identical, the loop is not converging. Abort and escalate to a human.
-- Route the loop-back by defect class. A plan defect goes to the plan phase. An implementation defect goes to the implement phase. Patching code to satisfy a plan-level finding buries the defect instead of fixing it.
+- One validation round per phase. A validator reports once; it does not loop or re-check its own findings.
+- The validator reports; the main agent decides what happens next — fix a finding directly, accept it as pre-existing or out of scope, or send it back to the phase that owns it. Record the decision and the reason.
+- If a phase is revisited (a rewritten plan, a reworked implementation), a new numbered report is appended; it never replaces the previous one.
+- Route the send-back by defect class. A plan defect goes to the plan phase. An implementation defect goes to the implement phase. Patching code to satisfy a plan-level finding buries the defect instead of fixing it.
 
 ## Reviewer strength
 

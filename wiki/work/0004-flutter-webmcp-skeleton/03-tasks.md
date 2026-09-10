@@ -7,9 +7,10 @@
 - Every task cites the criteria it satisfies. A task satisfying no criterion does not belong here.
 - Owned files are exclusive. Two tasks never list the same file.
 
-This work item's eleven plan steps are strictly sequential: each later step's files depend on
-an earlier step's output (the public library on the transport seam, the check script on the
-package existing, CI on the check script). No task here is marked `[P]`.
+This work item's twelve plan steps are strictly sequential: each later step's files depend on
+an earlier step's output (the public library on the transport seam and the widget-lifecycle
+layer, the widget layer on the registry, the check script on the package existing, CI on the
+check script). No task here is marked `[P]`.
 
 ## Groups
 
@@ -24,45 +25,49 @@ package existing, CI on the check script). No task here is marked `[P]`.
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 2.1 | Write the registry and its public library | AC-009–AC-017, AC-020 (the notification call sites live in `lib/src/webmcp.dart`, owned here) | `lib/webmcp_pilot.dart`, `lib/src/webmcp.dart`, `lib/src/webmcp_tool.dart`, `lib/src/webmcp_tool_source.dart`, `lib/src/webmcp_exceptions.dart` | | Plan step 3's completion condition holds |
+| 2.1 | Write the registry, the exception hierarchy (all five types, including the scope-missing one the widget layer throws) and the public library's full export list | AC-009–AC-017, AC-020 (the notification call sites live in `lib/src/webmcp.dart`, owned here) | `lib/webmcp_pilot.dart`, `lib/src/webmcp.dart`, `lib/src/webmcp_tool.dart`, `lib/src/webmcp_tool_source.dart`, `lib/src/webmcp_exceptions.dart` | | Plan step 3's completion condition holds |
 | 2.2 | Write the transport seam | AC-019, AC-021 | `lib/src/transport/webmcp_transport.dart`, `lib/src/transport/transport_noop.dart`, `lib/src/transport/transport_web.dart`, `lib/src/transport/transport_selector.dart` | | Plan step 4's completion condition holds |
+| 2.3 | Write the widget-lifecycle layer: the scope object, the `State` mixin and the wrapper widget | AC-034–AC-043 (behaviour), AC-044 (the two files under `lib/src/widgets/` are the only permitted `package:flutter/` importers) | `lib/src/webmcp_scope.dart`, `lib/src/widgets/webmcp_screen.dart`, `lib/src/widgets/webmcp_action.dart` | | Plan step 5's completion condition holds |
 
 ### Group 3 — Root test suite
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 3.1 | Write the root test suite (five files) | AC-009–AC-021, AC-018, AC-032 | `test/webmcp_public_surface_test.dart`, `test/registry_test.dart`, `test/transport_selection_test.dart`, `test/repo_hygiene_test.dart`, `test/transport_web_source_test.dart` | | Plan step 5's completion condition holds |
+| 3.1 | Write the root test suite (seven files) | AC-009–AC-021, AC-032, AC-034–AC-045 | `test/webmcp_public_surface_test.dart`, `test/registry_test.dart`, `test/transport_selection_test.dart`, `test/webmcp_scope_test.dart`, `test/widget_layer_test.dart`, `test/repo_hygiene_test.dart`, `test/transport_web_source_test.dart` | | Plan step 6's completion condition holds |
 
 ### Group 4 — Example package
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 4.1 | Create and trim the example package | AC-001 (example half), AC-006 (example half), AC-007, AC-008, AC-022, AC-023 | `example/pubspec.yaml`, `example/analysis_options.yaml`, `example/web/`, `example/lib/main.dart`, `example/lib/example_tools.dart`, `example/test/example_tools_test.dart` | | Plan step 6's completion condition holds |
+| 4.1 | Create and trim the example package, including the screen that demonstrates the widget-lifecycle layer | AC-001 (example half), AC-006 (example half), AC-007, AC-008, AC-022, AC-023, AC-046 | `example/pubspec.yaml`, `example/analysis_options.yaml`, `example/web/`, `example/lib/main.dart`, `example/lib/example_tools.dart`, `example/lib/example_screen.dart`, `example/test/example_tools_test.dart` | | Plan step 7's completion condition holds |
 
-### Group 5 — Check script, failure proof, CI
+### Group 5 — Check script and failure proof
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 5.1 | Write `tools/check.sh` | AC-001, AC-002, AC-003, AC-004 | `tools/check.sh` | | Plan step 7's completion condition holds |
-| 5.2 | Prove the suite reports failure | AC-003 (evidence) | none (transient) | | Plan step 8's completion condition holds |
+| 5.1 | Write `tools/check.sh` | AC-001, AC-002, AC-003, AC-004 | `tools/check.sh` | | Plan step 8's completion condition holds |
+| 5.2 | Prove the suite reports failure | AC-003 (evidence) | none (transient) | | Plan step 9's completion condition holds |
 
 ### Group 6 — Documentation and CI
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 6.1 | Write the documentation set (README/AGENTS.md/CHANGELOG unconditional; LICENSE gated on the human-supplied copyright holder) | AC-025 (AGENTS.md half), AC-027, AC-030 | `README.md`, `AGENTS.md`, `CHANGELOG.md`, `LICENSE` | | Plan step 9's completion condition holds |
-| 6.2 | Add the CI job | AC-024, AC-025 (workflow half), AC-026 (first half unconditionally; second half only if a human authorizes the push) | `.github/workflows/checks.yml` | | Plan step 10's completion condition holds |
+| 6.1 | Write the documentation set (README/AGENTS.md/CHANGELOG unconditional; LICENSE gated on the human-supplied copyright holder) | AC-025 (AGENTS.md half), AC-027, AC-030 | `README.md`, `AGENTS.md`, `CHANGELOG.md`, `LICENSE` | | Plan step 10's completion condition holds |
+| 6.2 | Add the CI job | AC-024, AC-025 (workflow half), AC-026 (first half unconditionally; second half only if a human authorizes the push) | `.github/workflows/checks.yml` | | Plan step 11's completion condition holds |
 
 ### Group 7 — Final verification
 
 | # | Task | Satisfies | Files owned | Parallel | Done when |
 |---|---|---|---|---|---|
-| 7.1 | Run the suite from a clean checkout, cold and warm | AC-001, AC-028 (cross-cutting: checked once against the whole tree rather than owned by any single content task), AC-031 | none | | Plan step 11's completion condition holds |
+| 7.1 | Run the suite from a clean checkout, cold and warm | AC-001, AC-028 (cross-cutting: checked once against the whole tree rather than owned by any single content task), AC-031 | none | | Plan step 12's completion condition holds |
 
 ## Serialised files
 
 No file is touched by more than one task; each plan step owns a disjoint file set, per the plan's
-own "Touches" clause for each step.
+own "Touches" clause for each step. In particular, `lib/webmcp_pilot.dart` and
+`lib/src/webmcp_exceptions.dart` stay owned by task 2.1 even though the widget layer written in
+task 2.3 supplies two of the exported declarations and throws one of the exception types: task 2.1
+writes those lines up front, exactly as it already does for the transport seam.
 
 | File | Owning task |
 |---|---|
@@ -77,7 +82,7 @@ own "Touches" clause for each step.
 | T3 | AC-007 | Bad file under `example/build/` not reported | Remove `example/build/**` from `example/analysis_options.yaml` |
 | T4 | AC-008 | No invalid-dependency issue | Remove `publish_to: none` from `example/pubspec.yaml` |
 | T5 | AC-009–AC-016 | Each registry operation's happy path | Each operation's stated mutation (see `02-criteria.md`) |
-| T6 | AC-017 | Public-surface test compiles and passes | (a) delete an export — compile fails; (b) add a `lib/src/` import to the test — hygiene scan fails |
+| T6 | AC-017 | Public-surface test compiles and passes | (a) delete an exception export; (b) delete the `WebMcpAction` export; (c) add a `lib/src/` import to the test |
 | T7 | AC-018 | Hygiene scan reports zero offending files | Add `dart:html` import to `example/lib/example_tools.dart` |
 | T8 | AC-019 | VM selects the non-web transport | Swap conditional-export branches |
 | T9 | AC-020 | Two ordered notifications | Delete the unregister notification call |
@@ -85,3 +90,8 @@ own "Touches" clause for each step.
 | T11 | AC-022 | Example registers its two tools, counter increments | Rename one tool without updating the test |
 | T12 | AC-032 | Zero secret-marker matches | Add a synthetic AWS-key-prefix string to a workflow file |
 | T13 | AC-003 (failure proof) | Suite exits zero | Invert one assertion in `test/registry_test.dart` |
+| T14 | AC-034, AC-036, AC-037 | Scope add, close, double close, use-after-close, invalid name, all without a widget tree | Clear the owned set without unregistering; delete the closed guard; catch every package exception |
+| T15 | AC-035, AC-043 | Duplicate name is skipped, first owner keeps the tool, second scope's teardown removes nothing | Record a skipped name as owned; let the duplicate exception propagate |
+| T16 | AC-038, AC-039 | Mixin and wrapper register on mount and remove on unmount, with the literal name | Delete the mixin's `dispose` override; derive the name from the scope |
+| T17 | AC-040, AC-041, AC-042 | Child returned unchanged and tappable; late-bound handler across a rebuild; missing scope throws | Wrap the child in an absorbing pointer; capture the closure at registration; fall back to direct registration |
+| T18 | AC-044, AC-045 | No `package:flutter/` import under `lib/` outside `lib/src/widgets/`; scope test pumps nothing | Import `package:flutter/widgets.dart` in `lib/src/webmcp.dart`; add a `package:flutter_test/` import to the scope test |

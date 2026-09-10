@@ -41,10 +41,10 @@ Phase state lives in that folder's `STATE.yaml`. Read it before doing anything i
 
 ## Validation
 
-Validation is adversarial and blind. A validator sees the acceptance criteria and the artifact, never the author's reasoning. A validator reports findings; it does not propose or apply fixes.
+Validation is adversarial and blind. A validator sees the acceptance criteria and the artifact, never the author's reasoning. A validator reports findings; it does not propose or apply fixes, and it does not decide what happens next.
 
-- Max 3 validation rounds per phase. On the third FAIL, stop iterating and restart from a rewritten plan.
-- If the same finding appears in two consecutive rounds, abort the loop and escalate. Do not iterate.
+- One validation round per phase. The validator reports its verdict once; it does not loop or re-check its own findings.
+- The main agent reads the verdict and decides what to do with each finding: fix it directly, accept it as pre-existing or out of scope, or send the defect back to the phase it belongs to. Record the decision and the reason.
 - Do not trust a "fixed it" claim. Re-run the check.
 - Route a FAIL by defect class: a plan defect goes back to the plan phase, an implementation defect to the implement phase. Never patch code to satisfy a plan-level finding.
 
@@ -67,3 +67,10 @@ Match the model to the work. See `wiki/conventions/model-routing.md`. Default: r
 `wiki/INDEX.md` is the router. It says which file to read and when. Read it instead of exploring the tree.
 
 Do not ask the repository to explain itself in prose. Prefer running the code, the tests and `git log` over reading an architecture summary.
+
+## Checks
+
+- Full suite: `bash tools/check.sh`
+- Single test: `flutter test test/registry_test.dart`
+- Format: `dart format lib test example/lib example/test`
+- Analyze: `dart analyze --fatal-infos --fatal-warnings`

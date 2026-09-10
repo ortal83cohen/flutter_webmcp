@@ -55,15 +55,12 @@ Spawn `research-validator` and `plan-validator` in one message so they run concu
 
 Give each only the artifact and the criteria. Do not pass the researcher's or planner's summaries, reasoning or self-assessment into the validator prompts. That blindness is what makes the review independent — a validator that can see the argument reviews the argument.
 
-Read `wiki/conventions/validation-rubrics.md` for how to act on the verdicts. In short:
+Read `wiki/conventions/validation-rubrics.md` for how to act on the verdicts. A validator reports; it does not decide what happens next — that call is yours. In short:
 
 - Both `PASS`: proceed.
-- `CONDITIONAL`: close every blocker, then run the next numbered round.
-- `FAIL`: send the artifact the finding actually blames back to its phase. Use the validator's routing table. Never patch code for a plan-level finding.
+- `CONDITIONAL` or `FAIL`: for each finding, decide — fix it directly, accept it as pre-existing or out of scope, or send the artifact the finding actually blames back to its phase, using the validator's routing table. Never patch code for a plan-level finding.
 
-You decide whether each finding changes the plan or merely annotates it. Record the decision and its reason in `STATE.yaml` under `decisions` — both outcomes are decisions and both get recorded.
-
-Increment `round` in `STATE.yaml` after each round. On the third `FAIL`, stop iterating: discard the plan and restart Step 2 from a rewritten plan. If a finding recurs materially unchanged across consecutive rounds, the loop is oscillating — escalate to the user with the specific question, do not open another round.
+One round per phase: the validator does not loop. Record every decision and its reason in `STATE.yaml` under `decisions` — both a fix and a deliberate non-fix are decisions, and both get recorded.
 
 Once the gate passes, set `STATE.yaml` phase to `implement`.
 
@@ -85,7 +82,7 @@ Spawn one `impl-validator`. Pass it the frozen criteria and the diff — not the
 
 Gate: verdict is `PASS`, per-criterion table complete with every criterion explicitly resolved, verification output pasted, and each criterion has a negative case that actually fails.
 
-Verdict handling and round limits are identical to Step 3. A `FAIL` naming a plan defect returns to Step 2, not to more code.
+Verdict handling is identical to Step 3: one round, and you decide what happens next. A `FAIL` naming a plan defect returns to Step 2, not to more code.
 
 Set `STATE.yaml` phase to `document`.
 

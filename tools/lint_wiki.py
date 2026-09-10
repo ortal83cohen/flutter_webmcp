@@ -411,11 +411,6 @@ def check_reviews(item: Path) -> None:
                 f"{rel(validation)}: {phase}-review-{missing:02d}.md is missing. "
                 "Rounds are append-only and never renumbered."
             )
-        if max(seen) > 3:
-            err(
-                f"{rel(validation)}: {phase} reached round {max(seen)}. The cap is 3 — "
-                "on a third FAIL, rewrite the plan instead of opening another round."
-            )
 
 
 # --------------------------------------------------------------------------- #

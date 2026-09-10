@@ -25,3 +25,11 @@ Thumbs.db
 
 # Add the product's build and dependency directories here once
 # bootstrap-product has chosen a stack.
+
+# Flutter and Dart generated files
+/build/
+/.dart_tool/
+/pubspec.lock
+/example/build/
+/example/.dart_tool/
+/example/pubspec.lock

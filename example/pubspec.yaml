@@ -1,0 +1,21 @@
+name: webmcp_pilot_example
+description: Demonstrates the webmcp_pilot Flutter web package.
+publish_to: none
+version: 1.0.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webmcp_pilot:
+    path: ..
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

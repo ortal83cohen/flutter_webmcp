@@ -1,6 +1,6 @@
 ---
 name: validate
-description: Runs a validation round - spawns blind adversarial validators against an artifact and its criteria, then routes the verdict back to the phase the defect belongs to.
+description: Runs a validation round - spawns blind adversarial validators against an artifact and its criteria, then the main agent decides what happens next.
 when_to_use: Use to validate research, a plan, or an implementation for an existing work item, or when the user asks to review or check a phase before proceeding. Invoked automatically by the feature pipeline.
 argument-hint: "[work-item-id] [research|plan|impl]"
 arguments: [item, phase]
@@ -15,9 +15,7 @@ Read `wiki/conventions/validation-rubrics.md`. It is the authority on verdicts, 
 
 ## Before spawning
 
-Read `STATE.yaml`. Note the current `round`. The report you are about to create is round `round + 1`, and it is a new numbered file — never an overwrite.
-
-If `round` is already 3, do not run another round. For a plan phase, discard the plan and restart it from scratch. For an implementation phase, return to the plan phase. Three failed reviews mean the artifact is wrong in a way a fourth review will not locate.
+Read `STATE.yaml`. This phase gets one validation round. If a round has already run for `$phase`, do not spawn another validator — read its report and act on it instead of re-validating.
 
 ## Spawn
 
@@ -27,24 +25,21 @@ Each prompt passes only: the artifact or diff, the acceptance criteria, and the 
 
 It must not pass the author's summary, reasoning, transcript, self-assessment, or any claim that a previous finding was fixed. A validator that can see the argument reviews the argument instead of the artifact, and that is precisely the failure this blindness prevents.
 
-## Read the verdict
+## Read the verdict, then decide
+
+A validator reports findings; it does not decide what happens next. That call belongs to the main agent, using the report as evidence, not as a verdict to execute mechanically:
 
 - `PASS` — proceed to the next phase.
-- `CONDITIONAL` — close every blocker, then run the next numbered round. Do not proceed on the strength of the blockers being closed; the next round confirms it.
-- `FAIL` — act on the report's routing table. A research defect goes to the research phase, a plan defect to the plan phase, an implementation defect to the implement phase. Never close a plan-level finding by changing code; that buries the defect rather than fixing it.
+- `CONDITIONAL` or `FAIL` — for each finding, decide: fix it directly, accept it as pre-existing or out of scope, or send it back to the phase that owns it (a research defect to the research phase, a plan defect to the plan phase, an implementation defect to the implement phase). Never close a plan-level finding by changing code; that buries the defect rather than fixing it.
 
-Do not accept a claim that a finding was fixed. Re-run the check that found it.
+Do not accept a claim that a finding was fixed without re-running the check that found it. If several findings together put the whole artifact in doubt, judge whether targeted fixes are enough or the phase needs a genuine rewrite — that is the main agent's call to make, not a rule that fires automatically.
 
 ## Decide and record
 
-For each finding, decide whether it changes the plan or merely annotates it. Both are decisions. Record each in `STATE.yaml` under `decisions` with the round, the verdict, the action taken, and the reason.
+For each finding, record the decision in `STATE.yaml` under `decisions`: the verdict, the action taken, and the reason.
 
-Increment `round`. Set `verdict`. Move open blockers into `blockers` with their source report and severity.
-
-## Oscillation
-
-Read the report's recurrence check. If a finding is materially identical to one from the previous round, the loop is not converging — it is oscillating. Stop. Escalate to the user with the specific question the loop cannot settle, and record the escalation in `STATE.yaml`. Do not open another round.
+Set `verdict`. Move any finding you chose not to fix into `blockers`, with its source report and severity, so it stays visible.
 
 ## Report
 
-Two or three lines: the verdict, the blocker count, and the phase you are routing to next. Name the report path; do not paste it.
+Two or three lines: the verdict, the finding count, and what you decided to do about them. Name the report path; do not paste it.

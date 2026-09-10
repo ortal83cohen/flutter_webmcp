@@ -5,7 +5,7 @@ id: "NNNN-kebab-slug"
 title: "One line describing the change"
 route: full            # full | quick
 phase: research        # research | plan | validate | implement | verify | document | done
-round: 0               # validation rounds completed in the current phase
+round: 0               # validation rounds completed in the current phase (one per phase, unless the phase is revisited)
 verdict: null          # null | PASS | CONDITIONAL | FAIL
 owner_agent: null      # name of the agent currently holding the work item
 created: "YYYY-MM-DD"

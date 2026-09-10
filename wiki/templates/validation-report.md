@@ -52,8 +52,8 @@
 ## Recurrence check
 
 <!-- Compare this round's findings to the previous round's. Name any finding that is materially
-     identical to one already reported. If any recurs, the loop is oscillating: stop, do not
-     open another round, escalate. -->
+     identical to one already reported. This is evidence for the main agent, not a verdict:
+     it decides whether recurrence means the loop is oscillating and escalation is warranted. -->
 
 - Previous round: <path, or "none — first round">
 - Recurring findings: <IDs, or "none">
