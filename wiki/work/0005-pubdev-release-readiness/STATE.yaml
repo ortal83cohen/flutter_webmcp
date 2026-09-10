@@ -1,15 +1,21 @@
 id: "0005-pubdev-release-readiness"
 title: "Plan pub.dev release readiness"
 route: full
-phase: verify
+phase: document
 round: 2
 verdict: PASS
 owner_agent: codex
 created: "2026-09-10"
 updated: "2026-09-10"
-blockers: []
+blockers:
+  - "Official dart pub login is waiting for user authentication and selection of the authorized publishing account."
+  - "Exact candidate/account and redistribution authority launch confirmation remains pending; no upload has occurred."
 followups: []
 decisions:
+  - round: 1
+    verdict: PASS
+    action: accept-prepublication-review
+    reason: "Independent impl-review-01 has no findings; all applicable technical preupload gates pass. Account/authority/launch confirmation and hosted checks remain deferred, not complete. No payload bytes changed."
   - action: start-authorized-execution
     reason: "User requested execution of the webmcp_flutter 0.1.0 publication plan. Freeze criteria 19 unchanged; preserve index and unrelated edits. See 30-release-execution.md."
   - round: 2
@@ -36,8 +42,8 @@ requested_package_name: webmcp_flutter
 name_gate: "Proposed alternative has no public registry record (HTTP 404); recheck before publishing. See 13-name-selection.md."
 
 planning_status: complete
-implementation_status: technical_checks_passed_pending_review
-publication_status: requested_pending_launch_gates
+implementation_status: prepublication_review_passed
+publication_status: awaiting_account_and_exact_candidate_confirmation
 active_research: "08-capability-comparison.md"
 active_plan: "17-plan-consolidated.md"
 active_criteria: "19-criteria-consolidated.md"
@@ -47,7 +53,7 @@ planning_completion: "22-planning-completion.md"
 criteria_frozen: true
 criteria_frozen_at: "2026-09-10"
 criteria_frozen_by: codex
-next_action: "Blind prepublication implementation review, then private account and exact-candidate launch gates."
+next_action: "Complete account authentication and exact candidate launch confirmation, publish interactively from the unchanged payload, then verify hosted version and presentation."
 execution_gates:
   - "Prepare documentation, SDK metadata and consumer-only packaging."
   - "Run full-source, browser, payload and clean-consumer verification."
