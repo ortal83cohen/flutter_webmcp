@@ -160,7 +160,13 @@ void main() {
       annotations.getProperty<JSBoolean>('consequentialHint'.toJS).toDart,
       isTrue,
     );
-    expect(definition.getProperty<JSAny?>('execute'.toJS), isNotNull);
+    final JSFunction execute = definition.getProperty<JSFunction>(
+      'execute'.toJS,
+    );
+    final JSPromise<JSAny?> invocation =
+        execute.callAsFunction(null, <String, JSAny?>{'value': 1.toJS}.jsify())!
+            as JSPromise<JSAny?>;
+    expect(((await invocation.toDart)! as JSString).toDart, '{}');
 
     final AbortSignal signal = capturedOptions!.getProperty<AbortSignal>(
       'signal'.toJS,

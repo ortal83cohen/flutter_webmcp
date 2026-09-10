@@ -7,6 +7,7 @@
 
 import 'package:webmcp_flutter/webmcp_flutter.dart' as _webmcp;
 
+// ignore: unused_import
 import 'inventory_service.dart';
 import 'inventory_service.dart' as _input;
 

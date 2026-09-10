@@ -51,7 +51,7 @@ final class BrowserWebMcpNativeBoundary implements WebMcpNativeBoundary {
     }
 
     final AbortController controller = AbortController();
-    final JSFunction execute = ((JSAny? input, JSAny? executionContext) {
+    final JSFunction execute = ((JSAny? input) {
       return _executeSafely(input, invoke).toJS;
     }).toJS;
     final JSObject definition =

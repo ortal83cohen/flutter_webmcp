@@ -66,6 +66,7 @@ final class WebMcpDomainActionGenerator extends Generator {
       ..writeln(
         "import 'package:webmcp_flutter/webmcp_flutter.dart' as _webmcp;",
       )
+      ..writeln('// ignore: unused_import')
       ..writeln("import '$inputName';")
       ..writeln("import '$inputName' as _input;")
       ..writeln()

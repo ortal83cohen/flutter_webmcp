@@ -288,6 +288,7 @@ final class WebMcpAppSession {
           ? operation.scopeReference
           : null,
       operationId: operationId,
+      outcome: operation.backendOutcome,
     );
   }
 
@@ -297,6 +298,7 @@ final class WebMcpAppSession {
     if (!outcomes.contains(outcome) || !_operations.containsKey(operationId)) {
       return false;
     }
+    _operations[operationId]!.backendOutcome = outcome;
     recordEvidence(operationId, WebMcpEvidenceKind.backendConfirmed);
     return true;
   }
@@ -312,6 +314,8 @@ final class WebMcpAppSession {
       'operationId': operation.operationId,
       'requestId': operation.requestId,
       'evidence': operation.latestEvidence?.name,
+      if (operation.backendOutcome != null)
+        'backendOutcome': operation.backendOutcome,
     };
   }
 
@@ -521,6 +525,7 @@ final class WebMcpAppSession {
     String? scopeReference,
     int? revision,
     String? operationId,
+    String? outcome,
   }) {
     if (!_attached) {
       return;
@@ -531,6 +536,7 @@ final class WebMcpAppSession {
       scopeReference: scopeReference,
       revision: revision,
       operationId: operationId,
+      outcome: outcome,
     );
     final int bytes = utf8.encode(jsonEncode(event.toStored())).length;
     while (_events.isNotEmpty &&
@@ -845,6 +851,7 @@ final class _BrokerEvent {
     this.scopeReference,
     this.revision,
     this.operationId,
+    this.outcome,
   });
 
   final int sequence;
@@ -852,6 +859,7 @@ final class _BrokerEvent {
   final String? scopeReference;
   final int? revision;
   final String? operationId;
+  final String? outcome;
   int encodedBytes = 0;
 
   Map<String, Object?> toStored() {
@@ -861,6 +869,7 @@ final class _BrokerEvent {
       if (scopeReference != null) 'scopeReference': scopeReference,
       if (revision != null) 'revision': revision,
       if (operationId != null) 'operationId': operationId,
+      if (outcome != null) 'outcome': outcome,
     };
   }
 
@@ -870,12 +879,14 @@ final class _BrokerEvent {
   }) {
     final bool exposeScope =
         scopeReference != null && eligible.contains(scopeReference);
+    final bool exposeOperation = operationId != null;
     return <String, Object?>{
       'sequence': sequence,
-      'kind': exposeScope ? kind : 'scopeChanged',
+      'kind': exposeScope || exposeOperation ? kind : 'scopeChanged',
       if (exposeScope) 'scopeReference': scopeReference,
       if (exposeScope && revision != null) 'revision': revision,
-      if (exposeScope && operationId != null) 'operationId': operationId,
+      if (exposeOperation) 'operationId': operationId,
+      if (exposeOperation && outcome != null) 'outcome': outcome,
     };
   }
 }
@@ -893,4 +904,5 @@ final class _TrackedOperation {
   final int requestId;
   final DateTime expiresAt;
   WebMcpEvidenceKind? latestEvidence;
+  String? backendOutcome;
 }

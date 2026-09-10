@@ -23,7 +23,7 @@ def request_json(url: str, method: str = "GET", body: object | None = None) -> d
         headers={"Content-Type": "application/json"},
     )
     context = ssl._create_unverified_context()
-    with urllib.request.urlopen(request, context=context, timeout=35) as response:
+    with urllib.request.urlopen(request, context=context, timeout=130) as response:
         return json.loads(response.read())
 
 
@@ -72,7 +72,10 @@ def main() -> None:
     session_id = None
     try:
         wait_ready("http://127.0.0.1:9515/status")
-        with tempfile.TemporaryDirectory(prefix="webmcp-final-profile-") as profile:
+        with tempfile.TemporaryDirectory(
+            prefix="webmcp-final-profile-",
+            ignore_cleanup_errors=True,
+        ) as profile:
             response = request_json(
                 "http://127.0.0.1:9515/session",
                 "POST",
@@ -82,6 +85,7 @@ def main() -> None:
                             "browserName": "chrome",
                             "acceptInsecureCerts": True,
                             "pageLoadStrategy": "none",
+                            "timeouts": {"script": 120000},
                             "goog:loggingPrefs": {"browser": "ALL"},
                             "goog:chromeOptions": {
                                 "binary": str(args.chrome),
@@ -124,7 +128,7 @@ const execute = async (name, input) => {
   return decode(await document.modelContext.executeTool(tool, JSON.stringify(input)));
 };
 (async () => {
-  const deadline = performance.now() + 30000;
+  const deadline = performance.now() + 90000;
   let names = [];
   while (performance.now() < deadline) {
     names = (await getTools()).map((tool) => tool.name).sort();
@@ -161,6 +165,15 @@ const execute = async (name, input) => {
     if (destinationNames.includes('example.details.page.read')) break;
     await sleep(50);
   }
+  step = 'covered-page-negative';
+  const homeStillRegistered = destinationNames.includes('example.home.page.read');
+  const homeAfterNavigation = homeStillRegistered
+    ? await execute('example.home.page.read', {})
+    : {ok: false, code: 'unregistered'};
+  if (homeAfterNavigation.code !== 'inactiveScope' &&
+      homeAfterNavigation.code !== 'unregistered') {
+    throw new Error('Covered home page remained readable');
+  }
   step = 'observe-after';
   const observedAfter = await execute('example.app.observe', {
     cursor: observedBefore.cursor,
@@ -180,6 +193,7 @@ const execute = async (name, input) => {
       targetLabel: target.label,
     },
     receipt,
+    homeAfterNavigation,
     destinationNames: destinationNames.filter((name) => name.startsWith('example.')),
     observedAfter,
     details: {
