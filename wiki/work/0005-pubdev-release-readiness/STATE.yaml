@@ -7,11 +7,18 @@ verdict: PASS
 owner_agent: codex
 created: "2026-09-10"
 updated: "2026-09-10"
-blockers:
-  - "Official dart pub login is waiting for user authentication and selection of the authorized publishing account."
-  - "Exact candidate/account and redistribution authority launch confirmation remains pending; no upload has occurred."
+blockers: []
 followups: []
 decisions:
+  - round: 3
+    verdict: PASS
+    action: accept-corrected-upload-plan
+    reason: "Fresh plan-review-03 passes corrected guidance34 with no findings. F-001 from impl-review-02 is resolved at plan level; ordinary interactive publish preserves validation. No included bytes or criteria changed; final CLI selection independently matches22 approved paths."
+  - round: 2
+    verdict: FAIL
+    finding: F-001
+    action: return-command-guidance-to-plan
+    reason: "impl-review-02 verifies all22 final payload entries but identifies unsupported interactive --ignore-warnings at21:49. Corrected plan guidance34 supersedes that command with ordinary interactive publish; criteria and included bytes are unchanged. Obtain fresh independent plan validation before upload confirmation."
   - round: 1
     verdict: PASS
     action: accept-prepublication-review
@@ -43,7 +50,7 @@ name_gate: "Proposed alternative has no public registry record (HTTP 404); reche
 
 planning_status: complete
 implementation_status: prepublication_review_passed
-publication_status: awaiting_account_and_exact_candidate_confirmation
+publication_status: authenticated_ready_for_interactive_upload
 active_research: "08-capability-comparison.md"
 active_plan: "17-plan-consolidated.md"
 active_criteria: "19-criteria-consolidated.md"
