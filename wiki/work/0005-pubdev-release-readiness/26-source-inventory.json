@@ -1,0 +1,952 @@
+[
+  {
+    "path": ".DS_Store",
+    "size": 6148,
+    "sha256": "63b0f16b5d27af33a3e75b37cd0004f958e6c5d0cdb92e534bc1f92cabf5805c"
+  },
+  {
+    "path": ".claude/agents/doc-keeper.md",
+    "size": 2638,
+    "sha256": "b7b530f2f20503ebd0aa60b48c88a763be069c116d42433f57ce55d96df9b08b"
+  },
+  {
+    "path": ".claude/agents/impl-validator.md",
+    "size": 3209,
+    "sha256": "58ad427ce27c8a8d6eeffce14f185c05a74c205eb15b02b3becbc641ceb1378d"
+  },
+  {
+    "path": ".claude/agents/implementer.md",
+    "size": 2304,
+    "sha256": "6700371e0a7d5007fa92193be5341f14e0257415569d8554d973729160b171b9"
+  },
+  {
+    "path": ".claude/agents/plan-validator.md",
+    "size": 3423,
+    "sha256": "89a376c472770056d26bc31b0a5d3b9067796a2f14692561f06214dc10f2b349"
+  },
+  {
+    "path": ".claude/agents/planner.md",
+    "size": 2928,
+    "sha256": "f4bc2b3a2560aa284c2fd25045b4801f9d754d914813b842e6b9fb78897728a7"
+  },
+  {
+    "path": ".claude/agents/research-validator.md",
+    "size": 2864,
+    "sha256": "b39f47833786b8674b992c7ef1b43cd234181fcb12293dbfb4b1c74554456e73"
+  },
+  {
+    "path": ".claude/agents/researcher.md",
+    "size": 1878,
+    "sha256": "0ee4a8a63acba2b64e70a53014c2de3d8a3026065fb9ae6286def2c7458b6e51"
+  },
+  {
+    "path": ".claude/agents/synthesizer.md",
+    "size": 1844,
+    "sha256": "c5de97a3c6c0a53e6e7601a219690f638c400efe0e36ab3ce1b2536591a82374"
+  },
+  {
+    "path": ".claude/hooks/lint_on_stop.py",
+    "size": 2355,
+    "sha256": "a30bfe92c0f50fb2e1a8ac04ffcb664a0158dac3a68184d276d818006847395b"
+  },
+  {
+    "path": ".claude/hooks/lint_on_write.py",
+    "size": 2465,
+    "sha256": "80c7df5f30d9ccf1a1deb363deb243441a1005f55b30188cbd4ac5e7c5b7dad6"
+  },
+  {
+    "path": ".claude/rules/agent-config.md",
+    "size": 1839,
+    "sha256": "c655ae2d0b827e7f3f47d1f3167c820c05ebe35c5a64dfbc3e1e25a6d358b9d2"
+  },
+  {
+    "path": ".claude/rules/wiki-artifacts.md",
+    "size": 1361,
+    "sha256": "4cfc0e5554c5aab5daee4f62aafca6870b598aa3280a760b28779a51dc48afe7"
+  },
+  {
+    "path": ".claude/settings.json",
+    "size": 1153,
+    "sha256": "3c388c6c55a90b468b207db80bbbc0a7b7930094d88c6e5852dcc8152bb2aff3"
+  },
+  {
+    "path": ".claude/skills/bootstrap-product/SKILL.md",
+    "size": 3738,
+    "sha256": "ee0e403549a81377be5a28cf35b82f9a6367d07dcaf723e57f9d2b50b26c9957"
+  },
+  {
+    "path": ".claude/skills/document/SKILL.md",
+    "size": 3146,
+    "sha256": "5749e24166c313a55894190e48ec9879cd425b649f78dcb42af0310b9cff2c14"
+  },
+  {
+    "path": ".claude/skills/feature/SKILL.md",
+    "size": 6371,
+    "sha256": "e28e47c01ce87391a36389424fff82c17d71e7f2d54f2cf9736d3eca35a6001c"
+  },
+  {
+    "path": ".claude/skills/implement/SKILL.md",
+    "size": 2887,
+    "sha256": "8d1ec7a72908a3e741d5e33bc14c020d0d4e7b09b5610dabcf8b7ad8daa92f22"
+  },
+  {
+    "path": ".claude/skills/plan/SKILL.md",
+    "size": 2156,
+    "sha256": "b32228db3f2456ac58da51fa5ae824cab1634701db977c1fdf17c140d59892c3"
+  },
+  {
+    "path": ".claude/skills/quick-change/SKILL.md",
+    "size": 2447,
+    "sha256": "e15dc5c4409d908a0ab39b44a6ec66bd576c5e75ea10bee91071f7d32b6553c3"
+  },
+  {
+    "path": ".claude/skills/research/SKILL.md",
+    "size": 2745,
+    "sha256": "ebd769093554d06983bb8b249fea6d8e59c24cbfe8445cc3043387a451604630"
+  },
+  {
+    "path": ".claude/skills/validate/SKILL.md",
+    "size": 2892,
+    "sha256": "253f934689976026d340622daac45c55cb552c7818c0851ba12f2cebbbc12dc6"
+  },
+  {
+    "path": ".claude/skills/verify/SKILL.md",
+    "size": 2673,
+    "sha256": "642158b5aeb4438cd7c94a56ac431ea148f2a37cbddd24e4c8f420b7cbc08a3e"
+  },
+  {
+    "path": ".cursor/hooks/lint_on_write.sh",
+    "size": 712,
+    "sha256": "5853b38a5f1b9ba86e6ac38a576f4fd3c73475f466b371778f1bc2c4a8787cd0"
+  },
+  {
+    "path": ".cursor/hooks.json",
+    "size": 157,
+    "sha256": "41c68d24d58775a0cbcde8911b50b5a8180f15682b2918f1dc16db199e0cc6f5"
+  },
+  {
+    "path": ".cursor/rules/agent-config.mdc",
+    "size": 2056,
+    "sha256": "bb3df801e13bb89a0e381ba65d9a3682c8d8782ec626c645b2bdb24d411bfca8"
+  },
+  {
+    "path": ".cursor/rules/wiki-artifacts.mdc",
+    "size": 1649,
+    "sha256": "c820a969ada639afbeb5a8eea5dc26e06edf56ad362a88bfaa094746c7e6204b"
+  },
+  {
+    "path": ".github/workflows/checks.yml",
+    "size": 1252,
+    "sha256": "c60de4613a523a315066f811b9f460794d93fd3212cb9f944fdea2ac8799147f"
+  },
+  {
+    "path": ".gitignore",
+    "size": 523,
+    "sha256": "d1e245bd08df9176f935caec7a4c42e8fefd56595481897a279f7735568e76b8"
+  },
+  {
+    "path": ".idea/.gitignore",
+    "size": 47,
+    "sha256": "a9e54fc4f08bc97d82c04bd86ff37d3af84ba9ef4ad87fcfcb438dab622e8aaa"
+  },
+  {
+    "path": ".idea/caches/deviceStreaming.xml",
+    "size": 113126,
+    "sha256": "6bc448a0c859e381046358edaa57c08448dc91e65f43d658d3492d17f20d4f7f"
+  },
+  {
+    "path": ".idea/flutter_webmcp.iml",
+    "size": 854,
+    "sha256": "f45115387240a193fd54eea0d090f1ad977bae1ec81b2eccdcccf36fe932b677"
+  },
+  {
+    "path": ".idea/gpt-helper.xml",
+    "size": 170,
+    "sha256": "9bd93f918de69b7ab470544a994d380ea49035304054140dfe3907c097657b45"
+  },
+  {
+    "path": ".idea/libraries/Dart_Packages.xml",
+    "size": 18740,
+    "sha256": "6330fff2b243c6d723b5a300873c9917a06bc03e7926a129385dfb7016c3548b"
+  },
+  {
+    "path": ".idea/libraries/Dart_SDK.xml",
+    "size": 2236,
+    "sha256": "606d150967e50e17717753577688aeb98bb7381f69ca593579ee7050efda8bb9"
+  },
+  {
+    "path": ".idea/libraries/Flutter_Plugins.xml",
+    "size": 173,
+    "sha256": "1f2d24163e194f2b588fc64eb3a5b2e581ef50f271c25ec9dc94c3c0a57d634c"
+  },
+  {
+    "path": ".idea/markdown.xml",
+    "size": 307,
+    "sha256": "3879e9f85b478aef75485f6b3a3946cda34626eb69a45ecbbf9a2112bdb125a9"
+  },
+  {
+    "path": ".idea/misc.xml",
+    "size": 275,
+    "sha256": "67eedb9728528dc8b25aafd6536924081941c60b7a5b6fad2426020413a53f34"
+  },
+  {
+    "path": ".idea/modules.xml",
+    "size": 280,
+    "sha256": "5cad24ef14880be2323cb756e7adc6a0e67d3d382692f18c8f2b4dd7c7aa79fc"
+  },
+  {
+    "path": ".idea/vcs.xml",
+    "size": 167,
+    "sha256": "6323e12648862a0a96fc0d7877672817d6cd91e2c2a3c3d78f1090db23c6e88e"
+  },
+  {
+    "path": ".idea/workspace.xml",
+    "size": 6052,
+    "sha256": "84d5ba838f76754c7c7dc4e8bedd3ee0158b3137903035e9a43a5c99f677a548"
+  },
+  {
+    "path": ".pubignore",
+    "size": 582,
+    "sha256": "441429ac422354d4ecfa28c25027c735f2d09aa3cbf35ecb322427e1432a33c3"
+  },
+  {
+    "path": "AGENTS.md",
+    "size": 4249,
+    "sha256": "0b85fb670ed3a07f03711ed363f32a6c0a9b9a37a0ee2641cbd7597be4ae72cd"
+  },
+  {
+    "path": "CHANGELOG.md",
+    "size": 298,
+    "sha256": "2684920c1198836a2d9c29840d2fd6f6323ca519450f566addb87ffee9ad4832"
+  },
+  {
+    "path": "CLAUDE.md",
+    "size": 486,
+    "sha256": "0e29c05f69370eb4a90c125d7dd9106341731e38c87584e60bb6f18b30691d45"
+  },
+  {
+    "path": "LICENSE",
+    "size": 1071,
+    "sha256": "03da847fe3b1c3de80123eecdd6e591661982ead07c5ecf7671d4f3a79b9875e"
+  },
+  {
+    "path": "README.md",
+    "size": 3991,
+    "sha256": "2065e0ce4de29e236d72dd249044425dd9196d0647b9d36ac1c9e9f9760d7c4f"
+  },
+  {
+    "path": "analysis_options.yaml",
+    "size": 265,
+    "sha256": "82a7e1ba26651381e2b269e6e9c3899e3b6eb30a655b15546ac3911982d63554"
+  },
+  {
+    "path": "example/analysis_options.yaml",
+    "size": 191,
+    "sha256": "057d9e7ac76d22002c3d152858da3f450165588ace6e55ccdf90662b70ff1432"
+  },
+  {
+    "path": "example/lib/example_screen.dart",
+    "size": 2156,
+    "sha256": "fd186adcbfa5bc01e44ebf51f9a31b039984dbc339115cff53502b6991217bbc"
+  },
+  {
+    "path": "example/lib/example_tools.dart",
+    "size": 858,
+    "sha256": "cf8c1328a6bc3d6d5fb06b99ad70585dda7b9765fc3c56e972653aed0bddfc9a"
+  },
+  {
+    "path": "example/lib/main.dart",
+    "size": 404,
+    "sha256": "8e4207ad7b48b9ec7070c83e5f06cb1a522a1ea78986d65a572e51d6d03be383"
+  },
+  {
+    "path": "example/pubspec.lock",
+    "size": 6188,
+    "sha256": "64b4d484d41b807b4fcc80667c221a577bc2c7d7ea42fdb54140bface90260c0"
+  },
+  {
+    "path": "example/pubspec.yaml",
+    "size": 345,
+    "sha256": "56543caef9acb59bb1dd3322e4a3789488063d3c8ddffa89e339b52360d2cf36"
+  },
+  {
+    "path": "example/test/example_tools_test.dart",
+    "size": 712,
+    "sha256": "2396f135922a68c8b570979c0474bd369414776959e33142962f96b327c40241"
+  },
+  {
+    "path": "example/web/index.html",
+    "size": 397,
+    "sha256": "6a64ebf75be267a6e3f6571a5ace88569eecff6ede26ed9ef93b5514fe17c166"
+  },
+  {
+    "path": "lib/src/transport/transport_noop.dart",
+    "size": 500,
+    "sha256": "a186e586040aac849cc64c5c7287802c2a6e1cab39fe11994701bed423a880aa"
+  },
+  {
+    "path": "lib/src/transport/transport_selector.dart",
+    "size": 80,
+    "sha256": "e7227a06a84a45fc0f34b55fb847873cc2e84bec043a7736cb94a97161846d26"
+  },
+  {
+    "path": "lib/src/transport/transport_web.dart",
+    "size": 1407,
+    "sha256": "4d32536fa44f83c933359e9ed0ad664398b75622e501ce7130f6efdbc0abeac1"
+  },
+  {
+    "path": "lib/src/transport/webmcp_transport.dart",
+    "size": 413,
+    "sha256": "95ff6e6dd4b757332fb6c2b77f56a6540bdb765e56e2ced7e588c3fb782d95ff"
+  },
+  {
+    "path": "lib/src/webmcp.dart",
+    "size": 2425,
+    "sha256": "faf662d7eba4ee706f693de8c42a6dbc8695995e1619ad7a1cb7c3639b33b1e5"
+  },
+  {
+    "path": "lib/src/webmcp_exceptions.dart",
+    "size": 1700,
+    "sha256": "bfc4bbb445aa2e025919f992f563d17432546ce6c3fb494290e91283db7350ec"
+  },
+  {
+    "path": "lib/src/webmcp_scope.dart",
+    "size": 2413,
+    "sha256": "65e332711bc560446ad7997395be88eb4d5fe427bbe0ba270333f80e42e73bd8"
+  },
+  {
+    "path": "lib/src/webmcp_tool.dart",
+    "size": 931,
+    "sha256": "6d331d724adee4dfd50296a1d6a9cc4ec3e2f1922b76776bdd5a7538718dad12"
+  },
+  {
+    "path": "lib/src/webmcp_tool_source.dart",
+    "size": 219,
+    "sha256": "b989272951455c982f69f56f4dfb18e1ec4c21ca4e4b7721d714f144175dfc81"
+  },
+  {
+    "path": "lib/src/widgets/webmcp_action.dart",
+    "size": 2175,
+    "sha256": "888f113ce9b2db489c202efb81e8b631afd7261f09075a4b6f0994b4502e0146"
+  },
+  {
+    "path": "lib/src/widgets/webmcp_screen.dart",
+    "size": 1100,
+    "sha256": "ceb46b9a2de0f0fc5cebb1224be737457acbb7bcab625cbfacd0c36221d3e37d"
+  },
+  {
+    "path": "lib/webmcp_flutter.dart",
+    "size": 292,
+    "sha256": "7c9c9aed4e054679c4e47267ae9d8a8fe2eaf7e232ebbafb773f66ba10e20fd3"
+  },
+  {
+    "path": "pubspec.lock",
+    "size": 13689,
+    "sha256": "4b2be6e10d2eea2bc567225ff8cc85f9d85c77e4a5050c2ba5180f458a983aa4"
+  },
+  {
+    "path": "pubspec.yaml",
+    "size": 384,
+    "sha256": "c4d014318d00568e229bbc0c8d85ab62c44c8d411919da70705f86ea9345dd1a"
+  },
+  {
+    "path": "test/registry_test.dart",
+    "size": 5536,
+    "sha256": "00ed29f149fef4e35e57b04e72d1d14b1b47fd7415db843f2e4eee8019897690"
+  },
+  {
+    "path": "test/repo_hygiene_test.dart",
+    "size": 9347,
+    "sha256": "629578b8751cc28bc97b169e3fbd798b2fb65c16ae79c24a730d79d494b71aba"
+  },
+  {
+    "path": "test/transport_selection_test.dart",
+    "size": 3400,
+    "sha256": "bd02d6fb800d62a2f3b97333c533b1d5141bbf8f119fd673175d0e6b67b6cbf7"
+  },
+  {
+    "path": "test/transport_web_browser_test.dart",
+    "size": 2962,
+    "sha256": "cc57c853d1f36863d801c1d6a4c65054644788c490fedf4f9a3904dcaabb20b8"
+  },
+  {
+    "path": "test/transport_web_source_test.dart",
+    "size": 350,
+    "sha256": "213834f3a44fc6c48694f4b1d4021a4a219ffb63796382b06a5044e457dcc81c"
+  },
+  {
+    "path": "test/webmcp_public_surface_test.dart",
+    "size": 1635,
+    "sha256": "b9e555378462bbf52ecc35b3da24d35c956ef1c4ad7394c4a207250c738c0602"
+  },
+  {
+    "path": "test/webmcp_scope_test.dart",
+    "size": 2815,
+    "sha256": "178da046cf0dd47289554ffdd48c5c7b2737006a57df4a27f05eb916bdf7cdf9"
+  },
+  {
+    "path": "test/widget_layer_test.dart",
+    "size": 7597,
+    "sha256": "726866ceaaddbc9f31cf1faadcc5d40bca086c1826c0566010762da14fdffdbc"
+  },
+  {
+    "path": "tools/check.sh",
+    "size": 1146,
+    "sha256": "f4a3b8b1e687ef28936b37f208d251c1484fc971897216a3d5a96d557341d40d"
+  },
+  {
+    "path": "tools/lint_wiki.py",
+    "size": 15639,
+    "sha256": "d7b3ce1dc7e1e64dca5ed6eb2f80613f1614f99891d6ddf55ac7f482bd099659"
+  },
+  {
+    "path": "wiki/INDEX.md",
+    "size": 3269,
+    "sha256": "fd3e1781bd8baa8014aca50b740e40987159a071f16bd9eacd189b2742c19446"
+  },
+  {
+    "path": "wiki/adr/0001-use-a-phased-agent-pipeline.md",
+    "size": 5055,
+    "sha256": "0e9a2addbca67f0c85add04fd92748188546da1d92e3bd142bf5052cae670306"
+  },
+  {
+    "path": "wiki/adr/0002-share-agent-config-between-claude-code-and-cursor.md",
+    "size": 5461,
+    "sha256": "b2b6c61b2733b0e7578df6d70d72fad0513a73b71f108d172d34092fce7c55f9"
+  },
+  {
+    "path": "wiki/adr/0003-webmcp-detection-first-registry.md",
+    "size": 3062,
+    "sha256": "9a2f688dc1758c10eb87dfc6b918d983c220d5bdeb99fa4b9c26419359fd78d8"
+  },
+  {
+    "path": "wiki/adr/README.md",
+    "size": 2070,
+    "sha256": "88e26bb62b15982d1d1e51a83c86adc3b0dd86486c279ce230ff91e353613483"
+  },
+  {
+    "path": "wiki/conventions/definition-of-done.md",
+    "size": 2108,
+    "sha256": "4081e82263710d610f06d643d0743365c030dee786599597719d2f0f2041799f"
+  },
+  {
+    "path": "wiki/conventions/model-routing.md",
+    "size": 2466,
+    "sha256": "440c11a0941681f6cbc002600851ca494d6346a8f8d3275a57f89ab4bec60101"
+  },
+  {
+    "path": "wiki/conventions/naming.md",
+    "size": 3031,
+    "sha256": "5f589aed4210d3c3226a34e1abe12c13ddf59441a52398f4463b3c5e8b5e23fd"
+  },
+  {
+    "path": "wiki/conventions/parallelism.md",
+    "size": 3856,
+    "sha256": "d46978c4550ebcb1b1f55ca8700ef195fccd61e70e13fbbbd92d990476cc0809"
+  },
+  {
+    "path": "wiki/conventions/validation-rubrics.md",
+    "size": 4024,
+    "sha256": "6a7bd3e681ba17fda2aaa727b2accaa9f18c37680916dce9f837a3b113daf7b1"
+  },
+  {
+    "path": "wiki/conventions/workflow.md",
+    "size": 6234,
+    "sha256": "d5269d2a4c3769dbf1b6328602d6bf02790cc40dba20647011a3d87addb383d1"
+  },
+  {
+    "path": "wiki/product/README.md",
+    "size": 2435,
+    "sha256": "32be91af8d96e7b8a3dabbdde8234327d7be8f3caf7654f50f8e9fa2976fa2f6"
+  },
+  {
+    "path": "wiki/product/webmcp-contract.md",
+    "size": 5713,
+    "sha256": "3d1225f030fea0ba731105c2d8c2d81ef364a25dc64a96d6112f2fb391249cbe"
+  },
+  {
+    "path": "wiki/templates/00-research.md",
+    "size": 1349,
+    "sha256": "3c9feeb4ba4dfaf1fafd49c71b8417c977b182152efff7b34668fb41a7c9ea88"
+  },
+  {
+    "path": "wiki/templates/01-plan.md",
+    "size": 2098,
+    "sha256": "ffb4c2b4e5e3a213bc5606466c403fe0f4e7be2d779e39141425f9a0b48d7f58"
+  },
+  {
+    "path": "wiki/templates/02-criteria.md",
+    "size": 1556,
+    "sha256": "9f4d1009a044ac19671e08a88c5821ca4540dc1b9bd5033cc1c8e7bbe4dc3345"
+  },
+  {
+    "path": "wiki/templates/03-tasks.md",
+    "size": 1531,
+    "sha256": "58c4c3d71bce1c1164d1d388c28cdd94be6e50b362219ca489b52e87e01af202"
+  },
+  {
+    "path": "wiki/templates/STATE.yaml",
+    "size": 1380,
+    "sha256": "be01caaadb665925e05908a309bf7898d83a25ecb297e250742858b3cb76f74d"
+  },
+  {
+    "path": "wiki/templates/adr.md",
+    "size": 1678,
+    "sha256": "6953031e9b1ae443649a625d0ead9013cdc64eae3b314c34748eff390f1a5ead"
+  },
+  {
+    "path": "wiki/templates/validation-report.md",
+    "size": 2380,
+    "sha256": "db5fd5f8c8495fadfe03d7256f7e89a2df963a289e13abee5da89d5480dbd290"
+  },
+  {
+    "path": "wiki/work/0001-add-build-dispatcher-skill/RECORD.md",
+    "size": 2086,
+    "sha256": "ee4454c93ce2d8ff8ca2be1e001eaadb2eec6726958fdd2dc3a7b6788f04f224"
+  },
+  {
+    "path": "wiki/work/0001-add-build-dispatcher-skill/STATE.yaml",
+    "size": 1390,
+    "sha256": "ad2d6571b1a635b96e028b54938c0d57db73014ed9792d43bbca2b5ee8c92101"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/00-research.md",
+    "size": 30377,
+    "sha256": "6710c831eb4991420f40f8ed98572a40323274a3f06a9dff42f28359a55688f0"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/01-plan.md",
+    "size": 28906,
+    "sha256": "beacb1b783e1777351e58c0a5eb385496bc0d1744397c1af9d0e5c4f15b17061"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/02-criteria.md",
+    "size": 19852,
+    "sha256": "1d0a1bc091e0b59a4b943ba5281cd0a521f969d59da8a3553f60730cab9b8cb0"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/STATE.yaml",
+    "size": 10751,
+    "sha256": "5e7de06c1b4c977ca7e46e4a5307d3128947597ded1097fcdb254494e9a8cfe1"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/research/dart-js-interop-bridge.md",
+    "size": 21759,
+    "sha256": "7e3a9b174b9b96b577cb4f78522a09616d9e4d194a7a0c0a25fc7e29974ea32e"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/research/prior-art-and-pubdev-conventions.md",
+    "size": 16714,
+    "sha256": "c7a8acded1c2887c4177241c413d327739415280d8359e1853519d7e42817e7d"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/research/tool-registry-architecture.md",
+    "size": 18594,
+    "sha256": "849dcc1937acfe1e845d4c4fc9de891d57b601e95d88b0cb5b1136488e5a9095"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/research/webmcp-api-shape.md",
+    "size": 23576,
+    "sha256": "317889292b09221ca4ea67a9e7808c8a1eefc785eff23a84132ab3cff503cff6"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/validation/plan-review-01.md",
+    "size": 16700,
+    "sha256": "05f599c0b71f60a535ea7c6e9474d1755acb8b237c20ca30c6721e3bc44bba94"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/validation/plan-review-02.md",
+    "size": 24407,
+    "sha256": "0542e6a0bd30875a5889dc587e1e67e72853956d3614d7f89cfbe4857e7b41c6"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/validation/plan-review-03.md",
+    "size": 31329,
+    "sha256": "1d71a9572472bc253032e2b28e461bf3179bd0a25a00dd262ae703b75b51040e"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/validation/research-review-01.md",
+    "size": 18555,
+    "sha256": "9e4b9c015dda0b8bd11d8961fb820204a0aa3b7af3a9f757f629482c62beae82"
+  },
+  {
+    "path": "wiki/work/0002-flutter-webmcp-stack/validation/research-review-02.md",
+    "size": 22448,
+    "sha256": "68e31ed0b64fb8441bcdf3b6a2fe8228c63b313f1b5db61c70fca53fe5669f72"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/00-research.md",
+    "size": 30377,
+    "sha256": "6710c831eb4991420f40f8ed98572a40323274a3f06a9dff42f28359a55688f0"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/01-plan.md",
+    "size": 34727,
+    "sha256": "c14aa84519898b7a52886696762ed405d2268fcac9aa5434bcc160c52132fd81"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/02-criteria.md",
+    "size": 23285,
+    "sha256": "5758179f13862812dcbd4d66b84fb62e98dbb5ccc9a1b98cf47d44e668dcaf5e"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/STATE.yaml",
+    "size": 8899,
+    "sha256": "4741bd5bb2801aa8f00f01d0997f7c26b11da556ee225661cc49629c8f4b4993"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/research/dart-js-interop-bridge.md",
+    "size": 21759,
+    "sha256": "7e3a9b174b9b96b577cb4f78522a09616d9e4d194a7a0c0a25fc7e29974ea32e"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/research/prior-art-and-pubdev-conventions.md",
+    "size": 16714,
+    "sha256": "c7a8acded1c2887c4177241c413d327739415280d8359e1853519d7e42817e7d"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/research/tool-registry-architecture.md",
+    "size": 18594,
+    "sha256": "849dcc1937acfe1e845d4c4fc9de891d57b601e95d88b0cb5b1136488e5a9095"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/research/webmcp-api-shape.md",
+    "size": 23576,
+    "sha256": "317889292b09221ca4ea67a9e7808c8a1eefc785eff23a84132ab3cff503cff6"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/validation/plan-review-01.md",
+    "size": 25019,
+    "sha256": "7764ff511fc936ebd1aa408b8146436ec6edcda9661fbc29dc748bfe9c1cf25a"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/validation/plan-review-02.md",
+    "size": 27459,
+    "sha256": "8d6e99168b5b37aa312f92cd427ecb7f905bbae2129a010ccf20f2f1ab23b6bd"
+  },
+  {
+    "path": "wiki/work/0003-flutter-webmcp-skeleton/validation/plan-review-03.md",
+    "size": 23348,
+    "sha256": "615c1abe31d54ca6e63fb46b710fd5f5c47630737fb49e201b9b8988d1856631"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/00-research.md",
+    "size": 30377,
+    "sha256": "6710c831eb4991420f40f8ed98572a40323274a3f06a9dff42f28359a55688f0"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/01-plan.md",
+    "size": 64215,
+    "sha256": "887e93d235e92817ecc4f63b23e53fa3545b2ee2d82fbb956385466ae6f0f5f6"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/02-criteria.md",
+    "size": 35619,
+    "sha256": "93143e5c80bf765d4c7fc3f89ddfa6050153efa735d32a1845f4959855be6b3f"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/03-tasks.md",
+    "size": 9512,
+    "sha256": "5e4fd90d11e5bf32b0a09ffa31fe6a4cbff714a55d0e48644c92cf0344157d74"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/04-notes.md",
+    "size": 7483,
+    "sha256": "5f37de8c21e93995b642a9fc8360cc21e5f46c4b9af15fe30414816caa3ef49c"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/05-negative-checks.md",
+    "size": 87669,
+    "sha256": "bb1ce535295249352eece0db5000ae33e07893580a7a2a19cc7a76740edae6d5"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/06-plan-amendment.md",
+    "size": 6249,
+    "sha256": "2ee0983ba6f63189401701ef91a0b8c944b51016e1dc6a66f1ff5a21753c0f27"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/07-repair-evidence.md",
+    "size": 6265,
+    "sha256": "9519d8c1e4736ea71c4f28343597cbfadd0ed965dc5cf3b059becb77ed2debc2"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/08-escape-repair.md",
+    "size": 5187,
+    "sha256": "72dd0482b71cc207153c5ff92237b5e3912466c4fdf5ffc043c5a6bb777ef226"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/09-parser-plan-amendment.md",
+    "size": 8903,
+    "sha256": "c95c18229e1770431d1f344fbf400d172fbac3d2d7aa6bcad21198a61b92e1c0"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/10-parser-repair-evidence.md",
+    "size": 7850,
+    "sha256": "3f4c8528ef77bcd4080d85d56fc2338621ab5234ff4ca29a6bcb8c5e3a86869f"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/11-completion.md",
+    "size": 4434,
+    "sha256": "b65ca4203ad5ddc145ddc34b23d707a8cf85c84e9f3d3921ef44f8a94205a2e1"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/STATE.yaml",
+    "size": 13645,
+    "sha256": "83fdb9911f7e3e620a198c208d0a41ffe899943f68d4f0ad4d26be892a7677c1"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/research/dart-js-interop-bridge.md",
+    "size": 21759,
+    "sha256": "7e3a9b174b9b96b577cb4f78522a09616d9e4d194a7a0c0a25fc7e29974ea32e"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/research/prior-art-and-pubdev-conventions.md",
+    "size": 16714,
+    "sha256": "c7a8acded1c2887c4177241c413d327739415280d8359e1853519d7e42817e7d"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/research/tool-registry-architecture.md",
+    "size": 18594,
+    "sha256": "849dcc1937acfe1e845d4c4fc9de891d57b601e95d88b0cb5b1136488e5a9095"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/research/webmcp-api-shape.md",
+    "size": 23576,
+    "sha256": "317889292b09221ca4ea67a9e7808c8a1eefc785eff23a84132ab3cff503cff6"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/impl-review-01.md",
+    "size": 114703,
+    "sha256": "24ec23a20f7bfead681884c703987333d69794abeef0db2b6e2750b1f4f7ccaa"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/impl-review-02.md",
+    "size": 60071,
+    "sha256": "13fc4276e6afed2d46816698b56366aeeecb711a211ab095fe1f524012d5a162"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/impl-review-03.md",
+    "size": 48572,
+    "sha256": "ee0e0f606738ca4d69a452f7505a7b51faca15a254198936adcd6c8b2575fe04"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/impl-review-04.md",
+    "size": 47050,
+    "sha256": "94a6d621801450f1fe50c0a0d0d72a80d407f47f9e0086c791ae9ab406d57a28"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/plan-review-01.md",
+    "size": 25510,
+    "sha256": "739dac0094cef2abe876eb93c3c815755325c60ad06d2207dd4cea7977753ac8"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/plan-review-02.md",
+    "size": 24273,
+    "sha256": "0921431fb5aeb0919027d4c66fd361ecc4e30b1f48adba391adb5c14137ffcf6"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/plan-review-03.md",
+    "size": 4161,
+    "sha256": "563461e17376f9c9c83bb0ec67bea1a190cfccc90686f4034b494f6f64b30d1f"
+  },
+  {
+    "path": "wiki/work/0004-flutter-webmcp-skeleton/validation/plan-review-04.md",
+    "size": 6629,
+    "sha256": "def3b896dbec64b501124eb7db1a2ca0b7859fd944d3df5761e77fee794c8397"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/00-research.md",
+    "size": 4061,
+    "sha256": "b48c702bf23241dc4d69b9acf70e275d968ada620773ffaf02d82185a3411e1c"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/01-plan.md",
+    "size": 9009,
+    "sha256": "5fccce2dedd3616cc355d8a35b103e8c5b35eaa0324a2a7b5cb7b4e362f7eb58"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/02-criteria.md",
+    "size": 6048,
+    "sha256": "d0a714fd0c5e210313395360222259da13d361e781fc0026c5b291af9e8b6098"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/03-tasks.md",
+    "size": 5745,
+    "sha256": "5991bc4769e8920bf8399ca8c6e427d2d77a0e8b92f06616a7e396e3989f287a"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/04-package-audit.md",
+    "size": 5754,
+    "sha256": "a8763b8e67cdfeb1c368023dc0e615d946a4a70dd84c2f4e0a1eb4f8aea33eba"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/05-quality-audit.md",
+    "size": 12200,
+    "sha256": "1b34ee990c1583dd7f1a8b22d7c405943b9c3763ce613b62b67134dd27808b3d"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/06-publishing-rules.md",
+    "size": 1501,
+    "sha256": "68c9550ca136c541cb21ee7bd4e547e9f80aceec1a4f853dbeef478281fcc172"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/07-name-check.md",
+    "size": 1916,
+    "sha256": "a36dc6e1eaae35e92e97339e7737097f6ca8db950e2d07a1c8a98346f19e163a"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/08-capability-comparison.md",
+    "size": 4354,
+    "sha256": "1818ff53ab3a98a82333538cedffe32becd6a2a1ed6f2e62a4d8df34810eafcf"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/13-name-selection.md",
+    "size": 3291,
+    "sha256": "2110dca9d2677d550ee657639e40a54b1be131378ef7b681fa7104ef143a4e0f"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/14-kicknext-comparison.md",
+    "size": 9761,
+    "sha256": "1c15886905dd895a376239cbf39ff905e2b6799f3dc0b68c6846b68fcd3e6eb3"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/15-intentcall-comparison.md",
+    "size": 10750,
+    "sha256": "b1b3c36d5213bb60587a5677f50f9b9201cc5b6447e294cee84ba0da5b79ed22"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/16-release-preflight.md",
+    "size": 15952,
+    "sha256": "acc500cb6d53945c6fde750bac4d8088d3dde4e7ff9c8215df3dd9264db6acca"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/17-plan-consolidated.md",
+    "size": 10020,
+    "sha256": "09056551df587f297f782979ab8ea0ac6d101d9f155f47d642c8e496d021ccb4"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/18-preflight-output.md",
+    "size": 10978,
+    "sha256": "b9f349c82eb88207b1db75ad8e56555693dd9c7ba245c4e7ae4f1cf4cbd9ad01"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/19-criteria-consolidated.md",
+    "size": 5306,
+    "sha256": "6784721ee0ac79f97a1b1ecb5ee03774fd243f2ea83bbff7fc7df3cdc93f5575"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/20-tasks-consolidated.md",
+    "size": 4321,
+    "sha256": "32891e4384b3ba35d75c8dba4845ff99c5184d97dd15509652ea0b6dd3045c2a"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/21-release-decisions.md",
+    "size": 7465,
+    "sha256": "bdf3c1208557cc301776d92268469fe443251b1d4f434483600d001ff73c0ef5"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/22-planning-completion.md",
+    "size": 3034,
+    "sha256": "b520494496e785800aa1f548271d79a19fda7a13d7a72f8b6c6e6b79a08041af"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/23-warning-policy-evidence.md",
+    "size": 5262,
+    "sha256": "f50738391672a6bb27909f1e75bd6b9eb65d52a0886b2379c25316027c592eff"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/24-docs-implementation.md",
+    "size": 3494,
+    "sha256": "03ec8b064ac5d578c19ee5468d92c0129602d9a75c408cb600aa9ef8130f43b0"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/25-package-implementation.md",
+    "size": 4794,
+    "sha256": "2e29969191fd771ab7ca5d6ec3207adb68d52399dd32ff43bc9e7a435eb557d2"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/30-release-execution.md",
+    "size": 2261,
+    "sha256": "3b378dcb04ee62e40c2020db88e5433a30c85616ca9b717bfe33a01b9b5feb39"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/STATE.yaml",
+    "size": 3381,
+    "sha256": "bb3f10a91ade880ed1901c2b7b72498a9097c5138214073e57cfa2ea9dd78deb"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/validation/plan-review-01.md",
+    "size": 1737,
+    "sha256": "d2e4eef71dc50bbdcb4e6cd0c657272a51fa7fdb1d05986601a5f011322c67cb"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/validation/plan-review-02.md",
+    "size": 2609,
+    "sha256": "44f06d49a1084673f911dd0bb757c1b9ecb262f6ccede96c59b61473cd6a1821"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/validation/research-review-01.md",
+    "size": 2643,
+    "sha256": "21666b95d607ad5423bd05e2ecd343b6e15abd9a6a07e7ab5f5382e5bcd73ac6"
+  },
+  {
+    "path": "wiki/work/0005-pubdev-release-readiness/validation/research-review-02.md",
+    "size": 4824,
+    "sha256": "116287192c289f125f7494cff60f3fca1167948f9d3cccc92220be221dcb48be"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/00-research.md",
+    "size": 4924,
+    "sha256": "f6a5f2f3c9ce7109ba762b3e0d8b2f99ed453bb7e5d9e6437d5f5d6c6e4cdbac"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/01-plan.md",
+    "size": 3288,
+    "sha256": "e3fa56d940a96721ecb59ab80221a36a34cddae11b34ed79bcb6a8423e485b75"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/02-criteria.md",
+    "size": 2359,
+    "sha256": "635e90a7fb215b637827ad22b063297811a72acb2fc0100686b67caf3c86aac5"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/03-tasks.md",
+    "size": 1656,
+    "sha256": "10c33a9594618f68b456500998df09ac50af729bc4f0427d17593d8d6385e564"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/04-implementation-evidence.md",
+    "size": 14907,
+    "sha256": "090ad3866e72996a34a235a24d311f3d79500824d78780627542800ffb30befb"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/05-documentation.md",
+    "size": 2704,
+    "sha256": "12189c5228177360494ede23b8376fb1802ca6bc9055d87b71743a6771c1ab66"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/06-completion.md",
+    "size": 1899,
+    "sha256": "9fbacd28f2e486098b2ae81d90e801b1f69cac9d6f87708d541a59c67fd01b1f"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/STATE.yaml",
+    "size": 1138,
+    "sha256": "2afe6630149c518843c8d8fdc92f820fc98000ed08cab85207fee0c909b25e33"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/validation/impl-review-01.md",
+    "size": 19375,
+    "sha256": "113dcbb38054dbbab6fceb5267fa5068b6bd5e5b736fabfb86dba1fe1468c4c9"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/validation/plan-review-01.md",
+    "size": 1843,
+    "sha256": "69d783e2c9590ee6a071e761fe285eb63338e6d447e885828c54f80080f84710"
+  },
+  {
+    "path": "wiki/work/0006-rename-webmcp-flutter/validation/research-review-01.md",
+    "size": 1794,
+    "sha256": "0e9ae85dd015a612812745066b65592a5659348e33dadb0effa488339c2b079e"
+  }
+]
