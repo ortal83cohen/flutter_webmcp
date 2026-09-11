@@ -1,5 +1,12 @@
 # webmcp_flutter
 
+[![Pub Version](https://img.shields.io/pub/v/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter)
+[![Pub Points](https://img.shields.io/pub/points/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter/score)
+[![Pub Popularity](https://img.shields.io/pub/popularity/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter/score)
+[![Pub Likes](https://img.shields.io/pub/likes/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter)
+[![CI](https://github.com/ortal83cohen/flutter_webmcp/actions/workflows/checks.yml/badge.svg)](https://github.com/ortal83cohen/flutter_webmcp/actions/workflows/checks.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 `webmcp_flutter` provides an application-owned tool registry, automatic
 opt-in Flutter page semantics, and an experimental native Chrome WebMCP
 publisher. A wrapped page can expose permitted visible content and supported

@@ -1,0 +1,13 @@
+id: "0010-readme-pubdev-badges"
+title: "Add pub.dev and project badges to the README"
+route: quick
+phase: verify
+round: 0
+verdict: null
+owner_agent: codex
+created: "2026-09-11"
+updated: "2026-09-11"
+blockers: []
+followups: []
+decisions: []
+escalations: []
