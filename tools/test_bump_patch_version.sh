@@ -280,12 +280,16 @@ test_real_repo() {
     cp "$REPOSITORY_ROOT/pubspec.yaml" "$temp_dir/"
     cp "$REPOSITORY_ROOT/CHANGELOG.md" "$temp_dir/"
     
-    local output
-    if output=$(sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) && [ "$output" = "0.1.2" ]; then
+    local current_version expected_version output
+    current_version=$(sed -n 's/^version:[[:space:]]*//p' "$REPOSITORY_ROOT/pubspec.yaml" | head -n 1)
+    expected_version=$(printf '%s\n' "$current_version" | awk -F. \
+        'NF == 3 { printf "%s.%s.%d\n", $1, $2, $3 + 1 }')
+
+    if output=$(sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) && [ "$output" = "$expected_version" ]; then
         echo "PASS: real-repo-test"
         return 0
     else
-        echo "FAIL: real-repo-test - output was '$output'"
+        echo "FAIL: real-repo-test - expected '$expected_version', output was '$output'"
         return 1
     fi
 }
