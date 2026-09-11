@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2026-09-11
+
+- Automated patch release from main.
+
 ## Unreleased
 
 - Add automatic single-view page semantics, guarded actions, navigation
