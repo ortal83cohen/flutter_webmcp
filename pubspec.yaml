@@ -1,6 +1,6 @@
 name: webmcp_flutter
 description: A detection-first WebMCP tool registry and widget lifecycle layer for Flutter web applications.
-version: 0.1.3
+version: 0.1.4
 repository: https://github.com/ortal83cohen/flutter_webmcp
 homepage: https://github.com/ortal83cohen/flutter_webmcp
 topics:
