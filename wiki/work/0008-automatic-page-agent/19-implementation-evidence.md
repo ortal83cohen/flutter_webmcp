@@ -136,3 +136,51 @@ authorization denial, and live-instance replacement.
 Optional follow-ups remain multiple Flutter views, positive observation waits,
 Chrome platform-back gestures, generated route wrapping, framework state
 adapters, generalized service proxies, and custom data providers.
+
+## Post-fix verification update — 2026-09-11
+
+The Wasm blocker described above is superseded by the implementation change in
+the working tree. Navigator eligibility now uses the adapter's settled top
+route for the single-owner case. The page action boundary also normalizes
+generic JSON maps and integer-valued `double` values, which is required by the
+Wasm browser bridge before revision and request-id validation can run.
+
+The focused regression suite passed with 40 tests, including the replacement
+navigation case and the integer-valued JSON-double action case:
+
+```text
+$ /Users/ortalcohen/fvm/versions/3.47.0/bin/flutter test test/page
+00:00 +22: ... accepts integer-valued JSON doubles at the action boundary
+00:00 +37: ... settled Navigator top route controls eligibility during replacement
+00:00 +40: All tests passed!
+```
+
+The pinned full check reached the dependency, format, analysis and test gates;
+its output began the web build after `Stage 5 passed: tests`. The standalone
+web build, generator fixture build, and version-bump safety test also passed:
+
+```text
+$ PATH=/Users/ortalcohen/fvm/versions/3.47.0/bin:$PATH flutter build web
+✓ Built build/web
+
+$ PATH=/Users/ortalcohen/fvm/versions/3.47.0/bin:$PATH dart run build_runner build
+Built with build_runner/aot in 1s; wrote 0 outputs.
+
+$ PATH=/Users/ortalcohen/fvm/versions/3.47.0/bin:$PATH sh tools/test_bump_patch_version.sh
+PASS: real-repo-test
+All tests passed
+```
+
+The final JavaScript and Wasm packages both passed the unchanged Chrome 152
+conformance runner. The Wasm result is the evidence that closes V-001:
+
+```text
+$ python3 spikes/native-publisher/tool/run_final_package_conformance.py ... --build-dir example/build/web-final-wasm
+FINAL_PACKAGE_EVIDENCE={"details":{"pageId":"example.details","mountToken":"s2","revision":1},"homeAfterNavigation":{"code":"inactiveScope","ok":false,"refreshRequired":true,"retryable":true},"observedAfter":{"eligibleScopes":["s2"],"gap":false,"ok":true,"refreshRequired":false},"ok":true,"receipt":{"dispatched":true,"evidence":"commandDispatched","mountToken":"s1","observedRevision":2,"operationId":"o1","pageId":"example.home","requestId":1,"protocolVersion":1},"secure":true}
+[exit 0]
+```
+
+The authenticated Inspector/Gemini trace and blind implementation review are
+still open. The repository full-check completion line was not captured as one
+complete run, so the full-check gate and work-item completion remain
+unclaimed.
