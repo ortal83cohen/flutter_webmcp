@@ -1,10 +1,10 @@
 # webmcp_flutter
 
-`webmcp_flutter` is a local WebMCP-style tool registry and optional Flutter
-widget lifecycle layer for web applications. It lets an application declare,
-invoke, and remove named asynchronous tools in Dart. The current release only
-detects the browser's experimental WebMCP entry point; it does not publish
-tools to the browser or accept browser-originated invocations.
+`webmcp_flutter` provides an application-owned tool registry, automatic
+opt-in Flutter page semantics, and an experimental native Chrome WebMCP
+publisher. A wrapped page can expose permitted visible content and supported
+semantic actions without one descriptor per widget. Existing manual tools and
+custom transports remain supported.
 
 ## Installation
 
@@ -70,6 +70,72 @@ Imperative tools can instead be registered through
 `WebMcp.instance.registerTool`. Local callers invoke either kind with
 `await WebMcp.instance.invokeTool(name, arguments)`.
 
+## Automatic page setup
+
+Create one session for the application, attach the native publisher, install a
+separate forwarding observer on every participating Navigator, and wrap only
+pages that may be exposed:
+
+```dart
+final session = WebMcpAppSession();
+session.attach(appId: 'shop');
+
+final publisher = WebMcpNativePublisher();
+await publisher.attach();
+
+final rootObserver = WebMcpNavigatorAdapter(
+  session: session,
+  navigatorId: 'root',
+  rootModalRelationship: true,
+);
+
+MaterialApp(
+  navigatorObservers: <NavigatorObserver>[rootObserver],
+  home: WebMcpPage(
+    pageId: 'catalog',
+    child: const CatalogPage(),
+  ),
+);
+```
+
+The application owns and disposes the observer, session, and publisher. A
+wrapped page registers `<pageId>.page.read` and `<pageId>.page.act`; the
+session registers `<appId>.app.observe`. Observation is immediate polling:
+pass the returned application cursor to receive later bounded metadata.
+Navigation receipts are retained by the application session even if the
+originating page is disposed.
+
+Automatic exposure requires exactly one Flutter view and complete settled
+Navigator evidence. Covered, background, ambiguous, disposed, unknown-
+transition, and unwrapped modal scopes fail closed. Nested Navigators require
+their own adapter. Persistent branches require an explicit `selectedBranch`;
+unsupported arrangements may additionally provide page `activity` evidence.
+Navigation evidence never replaces the `WebMcpPage` semantic boundary.
+
+By default obscured editable values are omitted, `setText` and long press are
+disabled, and bounds are hidden. Use `WebMcpPagePolicy` to opt into the minimum
+additional fields or actions required. Excluded and sensitive semantic
+identifiers remove complete subtrees.
+
+## Generated domain actions
+
+The optional packages under `packages/` generate a `WebMcpToolSource` only for
+methods annotated with `@WebMcpDomainAction`. The generated source accepts the
+consumer's existing live service instance; it never constructs the service or
+replaces application authorization.
+
+Supported inputs and outputs are `String`, `bool`, JSON-safe `int`, finite
+`double`, enums, nullable forms, and recursively bounded `List` or
+`Map<String, T>` values. Unsupported signatures and duplicate names fail the
+build. See
+`packages/webmcp_flutter_generator/example/lib/inventory_service.dart`.
+
+Run generation in the consumer package with:
+
+```sh
+dart run build_runner build
+```
+
 ## Current contract
 
 Tool names must contain 1 to 128 ASCII letters, digits, underscores, hyphens,
@@ -85,13 +151,14 @@ the action is unmounted and mounted again. Its handler calls the latest
 grant invocation authority; omit or unmount the wrapper when invocation should
 be unavailable.
 
-Input schemas are descriptive only. The outer map is copied and exposed as
+Manual input schemas are descriptive only. The outer map is copied and exposed as
 unmodifiable, while nested values remain shared. The package does not validate
 arguments against the schema at runtime. Registering a source is sequential,
 so tools registered before a later failure remain registered.
 
-Local handler results and exceptions pass through unchanged. They are not
-normalized into a browser-safe result or error envelope. With a custom
+Local handler results and exceptions pass through unchanged. The native
+publisher separately validates bounded JSON input/output and sanitizes browser
+errors. With a custom
 transport, registry mutations happen before registration and unregistration
 notifications; a notification exception propagates without rolling the
 mutation back. `reset` clears local tools and replaces the transport without
@@ -100,10 +167,24 @@ that provide stateful transports must clean up their external state.
 
 ## Browser and platform support
 
-Version 0.1.0 supports Flutter web with a minimum of Flutter 3.47.0 and Dart
+The implementation targets Flutter web with a minimum of Flutter 3.47.0 and Dart
 3.13.0. Other Flutter platforms are not supported by this release.
 
-The built-in web transport checks whether `document.modelContext` is present
-and logs registry changes. Detection and logs do not publish, invoke, discover,
-or unregister browser tools. Browser interoperability and the experimental
-WebMCP API remain outside the current package contract.
+`WebMcpNativePublisher` additively mirrors local tools to same-origin
+`document.modelContext` without replacing the current transport. Chrome 152
+JavaScript and Wasm page conformance proves registration, discovery, direct
+native invocation, registration-signal cleanup, cancel-before-dispatch, safe
+errors, immediate observation, cursor recovery, and navigation receipts.
+The integrated JavaScript automatic-page flow passes its covered-page and
+destination-observation checks. The equivalent Wasm flow currently retains the
+covered source scope after navigation, so automatic-page support on Wasm is not
+delivered.
+
+This is still experimental and is not a native-agent support claim. The
+required isolated official Chrome Inspector profile currently lacks Gemini
+authentication, so no authenticated natural-language model-selected
+discover → observe → read → act → navigate → receipt → observe → read trace
+has passed. Chrome 152 also supplies no invocation `AbortSignal` after a
+callback starts; admitted work may continue and is never automatically
+replayed. Positive observation waits, multiple Flutter views, and Chrome web
+platform-back gestures are not supported.

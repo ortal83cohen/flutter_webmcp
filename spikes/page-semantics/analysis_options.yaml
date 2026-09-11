@@ -1,0 +1,17 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Spike-specific: disable docs requirement since this is an internal research fixture.
+    public_member_api_docs: false
+    # Allow relative imports from test/ to lib/ within this spike project.
+    avoid_relative_lib_imports: false

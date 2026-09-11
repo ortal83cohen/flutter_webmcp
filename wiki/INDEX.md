@@ -43,13 +43,15 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 | [adr/0001-use-a-phased-agent-pipeline.md](adr/0001-use-a-phased-agent-pipeline.md) | Questioning why the pipeline has six phases and blind validation. |
 | [adr/0002-share-agent-config-between-claude-code-and-cursor.md](adr/0002-share-agent-config-between-claude-code-and-cursor.md) | Questioning where instructions, skills and agents live. |
 | [adr/0003-webmcp-detection-first-registry.md](adr/0003-webmcp-detection-first-registry.md) | Questioning the singleton registry, ownership rules, or detection-only browser boundary. |
+| [adr/0004-use-semantic-page-boundaries-and-app-observation.md](adr/0004-use-semantic-page-boundaries-and-app-observation.md) | Working on automatic page semantics, navigation evidence, app observation, native publication, or generated domain actions. |
 
 ## Product knowledge
 
 | Document | Read it when |
 |---|---|
 | [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. |
-| [product/webmcp-contract.md](product/webmcp-contract.md) | Working on explicit action declarations, scope ownership, name collisions, browser capability detection, or deferred WebMCP integrations. |
+| [product/webmcp-contract.md](product/webmcp-contract.md) | Working on manual tools, automatic page semantics, generated domain actions, scope ownership, or native browser publication. |
+| [product/release-pipeline.md](product/release-pipeline.md) | Touching the release or publish workflow, the version bump helper, or setting up the pub.dev and GitHub prerequisites a release needs. |
 
 ## Work items
 

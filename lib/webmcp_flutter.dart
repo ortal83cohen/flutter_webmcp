@@ -1,3 +1,6 @@
+export 'src/page/page.dart';
+export 'src/transport/webmcp_native_capabilities.dart';
+export 'src/transport/webmcp_native_publisher.dart';
 export 'src/transport/webmcp_transport.dart';
 export 'src/webmcp.dart';
 export 'src/webmcp_exceptions.dart';

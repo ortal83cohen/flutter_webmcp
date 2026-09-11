@@ -1,0 +1,160 @@
+# Work item state. The only mutable file in a work item folder.
+# Copy this into wiki/work/NNNN-slug/STATE.yaml and keep it current.
+
+id: "0008-automatic-page-agent"
+title: "Automatic page content and actions"
+route: full            # full | quick
+phase: verify          # research | plan | validate | implement | verify | document | done
+round: 0               # validation rounds completed in the current phase (one per phase, unless the phase is revisited)
+verdict: null          # null | PASS | CONDITIONAL | FAIL
+owner_agent: root      # name of the agent currently holding the work item
+created: "2026-09-10"
+updated: "2026-09-10"
+
+blockers:
+  - id: V-001
+    from: 19-implementation-evidence.md
+    severity: BLOCKER
+    status: open
+    summary: "The final Chrome 152 Wasm package retains the covered home scope in app observation after navigation."
+  - id: V-002
+    from: 05-transport-spike.md
+    severity: BLOCKER
+    status: open
+    summary: "The required authenticated Inspector/Gemini model-selected AC-035 trace has not run."
+  - id: V-003
+    from: 18-gate-revision-tasks.md
+    severity: BLOCKER
+    status: open
+    summary: "The one required blind implementation review against AC-001 through AC-035 remains pending."
+# - id: F-001
+#   from: validation/plan-review-01.md
+#   severity: BLOCKER
+#   status: open        # open | closed
+#   summary: "One line"
+
+followups:
+  - summary: "Add functional multiple-Flutter-view support."
+    severity: OPTIONAL
+    owner: "unassigned"
+  - summary: "Prove positive observation waits and Chrome platform-back gestures."
+    severity: OPTIONAL
+    owner: "unassigned"
+  - summary: "Evaluate generated route wrapping, framework state adapters, service proxies, and custom data providers."
+    severity: OPTIONAL
+    owner: "unassigned"
+# - summary: "One line"
+#   severity: IMPORTANT
+#   owner: "unassigned"
+
+decisions:
+  - round: 3
+    verdict: CONDITIONAL
+    action: revise-plan
+    reason: "User capped validation overhead on 2026-09-10: one validation round per phase, main agent fixes findings directly, and a further round only for a materially large change. Plan review round 03 blocker F-001 was closed in the plan phase by splitting example integration from the example support claim in 16-gate-revision-plan.md clause 4 and by superseding the done-when of 03-tasks.md task 2.3 and 15-observation-tasks.md task O2.3 in 18-gate-revision-tasks.md. No further plan validation round is commissioned for this clarification."
+  - round: 3
+    verdict: CONDITIONAL
+    action: annotate-only
+    reason: "Gate evidence validation research-review-03.md reviews 04/05/06 in one round. Its findings are dispositioned directly by the main agent; the empirical gate outcomes recorded in 06-gate-decision.md are not re-litigated by an additional round."
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "User requested planning only. Execute research, plan and blind validation; retain validate phase after delivery. Implementation, verification of runtime behavior, publication and product-contract changes are not authorized by this request."
+# Record here every time a validation verdict changed the plan, and every time
+# it was decided that a finding did not change the plan. Both are decisions.
+# - round: 1
+#   verdict: FAIL
+#   action: revise-plan   # revise-plan | revise-research | revise-implementation | annotate-only | escalate
+#   reason: "One line"
+
+research_review:
+  report: validation/research-review-01.md
+  verdict: PASS
+  findings:
+    - id: F-001
+      disposition: closed
+      reason: "Appended a superseding clarification distinguishing optional browser fields from proposed bridge policy; original artifact retained."
+    - id: F-002
+      disposition: not-applicable
+      reason: "wiki/conventions/naming.md explicitly states work-item artifacts carry no frontmatter. Their folder, filename and STATE provide metadata. No content change required."
+escalations: []
+# - date: "2026-09-10"
+#   reason: oscillating-loop   # oscillating-loop | high-impact-decision | scope-change
+#   question: "The specific question put to the human"
+
+plan_review:
+  report: validation/plan-review-01.md
+  verdict: PASS
+  findings: []
+delivery:
+  status: implementation-complete-verification-blocked
+  criteria_count: 35
+  implementation_started: true
+  criteria_frozen: true
+  criteria_frozen_at: "2026-09-10"
+  criteria_artifacts: [02-criteria.md, 14-observation-criteria.md, 17-gate-revision-criteria.md]
+  implementation_evidence: 19-implementation-evidence.md
+  reason: "Runtime, generator, example and documentation implementation are present. The full repository check, Flutter 3.47.3 page suite and final JavaScript direct native API sequence pass. Verification remains blocked by the Wasm stale eligible scope, the unavailable authenticated Chrome-only model-selected trace, and the pending blind implementation review. Native support, release and work-item completion are not claimed."
+
+revision_2:
+  request: "Investigate navigation, action and state listeners as the best low-boilerplate integration approach."
+  implementation_authorized: false
+  artifacts:
+    research: 12-observation-research.md
+    plan: 13-observation-plan.md
+    criteria: 14-observation-criteria.md
+    tasks: 15-observation-tasks.md
+  supersession: "Append-only revision of original planning artifacts; originals remain available."
+  scope_note: "Research and plan revision only. Original unfrozen criteria and artifacts preserved; new criteria will append IDs rather than renumber AC-001 through AC-018."
+  observations:
+    - "Navigation identifies route lifecycle; semantic projection identifies page content; command completion needs distinct evidence."
+    - "Observer registration must compose with the consumer app and cannot infer every hidden navigator or arbitrary callback."
+  research_review:
+    report: validation/research-review-02.md
+    verdict: PASS
+    findings: []
+  plan_review:
+    report: validation/plan-review-02.md
+    verdict: PASS
+    findings: []
+  status: superseded-by-gate-revision
+  additional_criteria_count: 10
+  current_artifacts:
+    research: [00-research.md, 12-observation-research.md]
+    plan: [01-plan.md, 13-observation-plan.md]
+    criteria: [02-criteria.md, 14-observation-criteria.md]
+    tasks: [03-tasks.md, 15-observation-tasks.md]
+  precedence: "Observation artifacts explicitly refine/supersede corresponding baseline sections per 14-observation-criteria.md; all other baseline obligations remain."
+  limitations: "No runtime, browser, release, generator or full-suite tests executed for this planning revision. Native waiting and supported-SDK behavior remain empirical gates."
+
+revision_3:
+  request: "Run the empirical gates, then implement the runtime MVP and the annotation-based domain-action generator."
+  implementation_authorized: true
+  environment_correction: "The installed SDK is Flutter 3.47.0 with Dart 3.13.0, matching the declared package minimum. The earlier 3.38.4 observation no longer applies to this machine. No package constraint was lowered. Upper stable test version is 3.47.3. Browser is Google Chrome 152.0.7977.83, chosen by the user as the only accepted native target."
+  artifacts:
+    gate_evidence: [04-semantics-spike.md, 05-transport-spike.md]
+    gate_decision: 06-gate-decision.md
+    plan: 16-gate-revision-plan.md
+    criteria: 17-gate-revision-criteria.md
+    tasks: 18-gate-revision-tasks.md
+  gate_results:
+    semantics: "FAIL as an all-or-nothing gate. The marker-based single-view core passed six compiled-mode runs across Flutter 3.47.0 and 3.47.3. Multiple views, owner replacement, platform back gesture and component-level AC-027 caps were unavailable."
+    transport: "FAIL. Chrome 152 JavaScript and Wasm passed registration, discovery, invocation, safe wire handling, registration-signal cleanup, cancel-before-dispatch, immediate observation, cursor gap recovery and navigation receipts. Post-start invocation cancellation supplies no AbortSignal and the callback continues. The authenticated natural-language agent trace was blocked by a missing Gemini credential in the isolated official inspector profile."
+  plan_review:
+    report: validation/plan-review-03.md
+    verdict: CONDITIONAL
+    findings:
+      - id: F-001
+        disposition: closed
+        reason: "Plan-phase fix. 16-gate-revision-plan.md clause 4 now separates landing the unsupported example from claiming example support, and 18-gate-revision-tasks.md records the superseded done-when of 03-tasks.md task 2.3 and 15-observation-tasks.md task O2.3."
+  research_review:
+    report: validation/research-review-03.md
+    verdict: not-commissioned
+    findings: []
+    reason: "The user capped validation overhead at one review per phase. The combined empirical gate evidence received one recorded main-agent disposition and no additional research review was commissioned."
+  validation_policy: "One round per phase from 2026-09-10 by user instruction. Findings are fixed directly and recorded; a new round is commissioned only for a materially large change."
+  blocked_claims:
+    - "Native WebMCP support, delivery, release and work-item completion, until an authenticated Chrome-only discover-observe-read-act-navigate-receipt-observe-read trace with model-selected calls passes."
+    - "Multiple-Flutter-view support."
+    - "Chrome web platform-back-gesture support."
+    - "In-flight cancellation or termination of an already started browser callback."

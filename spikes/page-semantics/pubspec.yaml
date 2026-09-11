@@ -1,0 +1,27 @@
+name: page_semantics_spike
+description: >
+  Semantics boundary feasibility spike for flutter_webmcp task 1.1.
+  Tests runtime semantics isolation, scope ownership, siblings, nesting,
+  merge/exclude/block, route transitions, modals, disposal, enable/disable,
+  activity invalidation, traversal budgets, and multiple views.
+  Self-contained; do not depend on lib/ or test/ from the parent package.
+version: 0.1.0
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# Web only – semantics isolation is a Flutter-web concern.
+platforms:
+  web:
