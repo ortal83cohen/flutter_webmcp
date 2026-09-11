@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5 - 2026-09-11
+
+- Automated patch release from main.
+
 ## 0.1.4 - 2026-09-11
 
 - Automated patch release from main.
