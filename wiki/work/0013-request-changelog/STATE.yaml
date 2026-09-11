@@ -1,0 +1,34 @@
+id: "0013-request-changelog"
+title: "Request-based release changelog"
+route: full
+phase: validate
+round: 2
+verdict: PASS
+owner_agent: codex
+created: "2026-09-11"
+updated: "2026-09-11"
+planning_status: complete
+implementation_status: not-started
+criteria_frozen: false
+blockers: []
+followups:
+  - summary: "Implementation tasks remain unstarted because the user requested planning only."
+    severity: IMPORTANT
+    owner: unassigned
+  - summary: "Before activation, prove legacy dispositions, registry payload identity, same-tag retry, confirmation permission and metadata exclusion."
+    severity: IMPORTANT
+    owner: unassigned
+decisions:
+  - round: 1
+    verdict: PASS
+    action: annotate-only
+    reason: "Independent research review supports current local facts; external activation facts remain explicitly unresolved."
+  - round: 1
+    verdict: PASS
+    action: revise-plan
+    reason: "Initial plan review passed before the scope amendment. Main agent required all ready internal, documentation and maintenance requests to be included, matching the user's all-points request. Original artifacts preserved with explicit append-only supersession."
+  - round: 2
+    verdict: PASS
+    action: annotate-only
+    reason: "Fresh blind plan-review-02 validates the final amended contract against all 20 criteria; no findings. Implementation and live activation are not claimed."
+escalations: []

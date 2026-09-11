@@ -9,14 +9,14 @@ round: 0               # validation rounds completed in the current phase (one p
 verdict: null          # null | PASS | CONDITIONAL | FAIL
 owner_agent: root      # name of the agent currently holding the work item
 created: "2026-09-10"
-updated: "2026-09-10"
+updated: "2026-09-11"
 
 blockers:
   - id: V-001
     from: 19-implementation-evidence.md
     severity: BLOCKER
-    status: open
-    summary: "The final Chrome 152 Wasm package retains the covered home scope in app observation after navigation."
+    status: closed
+    summary: "Closed 2026-09-11: the final Chrome 152 Wasm package observes destination scope s2 exclusively after navigation and rejects the covered home page."
   - id: V-002
     from: 05-transport-spike.md
     severity: BLOCKER
@@ -94,7 +94,7 @@ delivery:
   criteria_frozen_at: "2026-09-10"
   criteria_artifacts: [02-criteria.md, 14-observation-criteria.md, 17-gate-revision-criteria.md]
   implementation_evidence: 19-implementation-evidence.md
-  reason: "Runtime, generator, example and documentation implementation are present. The full repository check, Flutter 3.47.3 page suite and final JavaScript direct native API sequence pass. Verification remains blocked by the Wasm stale eligible scope, the unavailable authenticated Chrome-only model-selected trace, and the pending blind implementation review. Native support, release and work-item completion are not claimed."
+  reason: "Runtime, generator, example and documentation implementation are present. Focused page tests, pinned analysis, standalone web and generator builds, version-bump safety, and final JavaScript and Wasm direct native API sequences pass. Verification remains blocked by the unavailable authenticated Chrome-only model-selected trace, the pending blind implementation review, and the not-fully-captured full-check completion output. Native support, release and work-item completion are not claimed."
 
 revision_2:
   request: "Investigate navigation, action and state listeners as the best low-boilerplate integration approach."

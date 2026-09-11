@@ -133,7 +133,10 @@ final class WebMcpAppSession {
     if (blockingRoots.length == 1) {
       return identical(blockingRoots.single.topRoute, route);
     }
-    return route.isCurrent;
+    // The adapter's top-route observation is the settled Navigator evidence.
+    // Route.isCurrent can lag that observation on Wasm during replacement
+    // transitions, which could otherwise re-expose the covered route.
+    return identical(owners.single.topRoute, route);
   }
 
   /// Number of retained broker events.
