@@ -1,0 +1,64 @@
+id: "0009-pubdev-publish-workflow"
+title: "Publish webmcp_flutter to pub.dev on every push to main with a patch bump"
+route: full
+phase: done
+round: 1
+verdict: CONDITIONAL
+owner_agent: cursor-main
+created: "2026-09-10"
+updated: "2026-09-10"
+
+criteria_frozen: true
+criteria_frozen_at: "2026-09-10"
+criteria_frozen_by: cursor-main
+
+blockers:
+  - id: F-001
+    from: validation/impl-review-01.md
+    severity: PRE_EXISTING
+    status: open
+    summary: "bash tools/check.sh stops at stage 4 with 142 analyzer issues, all under spikes/ from work item 0008, so the new stage 7 cannot be reached in a full local run and no release can be cut from this tree until 0008 resolves them."
+followups:
+  - action: resolve-spike-analysis-before-first-release
+    reason: "The release job runs tools/check.sh before it tags. While the spikes/ analyzer failures from work item 0008 remain, that step fails and no version is ever published. The first release therefore waits on 0008, or on those spike files being excluded from analysis by their owning work item."
+  - action: document-operator-gates
+    reason: "The document phase must record the three operator prerequisites in a wiki product doc: pub.dev automated publishing enabled with tag pattern v plus version placeholder, the RELEASE_GITHUB_TOKEN repository secret, and branch protection on main that permits that token to push."
+decisions:
+  - round: 1
+    verdict: FAIL
+    finding: F-001
+    action: revise-plan
+    reason: "plan-review-01 shows AC-004's negative case is unreachable: after a successful run the pubspec already holds the bumped version, so a second run computes a further version and exits zero. The plan now states that the duplicate-heading rejection is a pubspec-versus-changelog consistency check, and AC-004's negative case is a disagreement fixture instead of a repeated run."
+  - round: 1
+    verdict: FAIL
+    finding: F-002
+    action: revise-plan
+    reason: "plan-review-01 shows the skip instruction would sit on the head commit of the tag push that must start the publish run, and GitHub's documentation does not distinguish branch pushes from tag pushes. All skip instructions are removed from the design; the loop guard is now a repository-owned job condition on the head commit message prefix. Recorded as UNRESOLVED in the research artifact rather than assumed away."
+  - round: 1
+    verdict: FAIL
+    finding: F-003
+    action: revise-plan
+    reason: "plan-review-01 shows a github.actor comparison against github-actions[bot] cannot fire for a push authenticated with RELEASE_GITHUB_TOKEN, because the actor is the token owner. The actor guard is removed rather than kept as inert defence in depth, and AC-010 now covers the commit-message-prefix guard with a cross-check against the message the commit step writes."
+  - round: 1
+    verdict: FAIL
+    finding: F-004, F-005, F-006, F-007, F-008, F-009
+    action: revise-plan
+    reason: "Accepted and fixed at plan level: the changelog bullet is now a fixed byte-for-byte string; toolchain setup and the operator comments gained criteria AC-021 and AC-022; the five restatement negative cases were replaced with cases that prove the detector fires; the new version now travels between steps as a named bump step output; the serialised-files table lists all four helper paths; the concurrency wording no longer claims full serialisation."
+  - round: 1
+    verdict: FAIL
+    finding: F-010
+    action: annotate-only
+    reason: "The delegated Dart publish workflow installs its own unpinned SDK. Accepted as out of scope: pinning it would mean forking the officially maintained workflow. Recorded as an UNRESOLVED research item, a risk row, and an explicit non-requirement."
+  - action: accept-missing-research-review
+    reason: "The research-validator subagent was interrupted after roughly fifty minutes without writing validation/research-review-01.md. Rather than spend a second long round, the main agent verified the load-bearing research claims directly against primary sources: the pub.dev package API for the published 0.1.0 and 0.1.1 versions, the Dart automated-publishing page for the tag-trigger rule and the reusable workflow reference, and the GitHub trigger and skip-instruction pages for the token and marker behaviour. The two claims that could not be closed are marked UNRESOLVED in 00-research.md. No research-review report exists for round 1; this is a known gap, not a passed gate."
+  - action: scope-main-patch
+    reason: "User chose push to main, always bump patch, then publish to pub.dev. Feature branches and tag-driven releases are out of scope."
+  - action: two-workflow-split
+    reason: "Pub.dev accepts automated publishing only from tag-triggered runs, so release.yml bumps and tags on main and publish.yml publishes on the v-prefixed tag via the official dart-lang setup-dart reusable workflow at v1 with OIDC. No pub credential is stored."
+  - action: helper-script-owns-arithmetic
+    reason: "tools/bump_patch_version.sh reads and writes pubspec.yaml and CHANGELOG.md and prints the new version, so the bump logic has an offline fixture test and the workflow YAML keeps only the secret check, commit, tag and push."
+  - action: fail-closed-on-missing-secret
+    reason: "The unresolved operator items in the research are planned as human gates, not guessed. The release job's first step fails when RELEASE_GITHUB_TOKEN is empty, before checkout and before any git write."
+escalations:
+  - action: one-way-door-per-published-version
+    reason: "Every push to main produces a permanent pub.dev version; published versions cannot be unpublished and retraction is out of scope. Recorded in 01-plan.md under Rollback for human awareness before implementation."

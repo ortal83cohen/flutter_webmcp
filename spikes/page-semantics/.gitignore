@@ -1,0 +1,9 @@
+# Generated Flutter/Dart output. Keep source, tests, web host, and lockfile.
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+.idea/
+.DS_Store

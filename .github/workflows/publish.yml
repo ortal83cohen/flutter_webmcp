@@ -1,0 +1,21 @@
+name: publish
+
+# Publishes the package to pub.dev when release.yml pushes a version tag. Authentication is a
+# short-lived OpenID Connect token signed by GitHub and exchanged with pub.dev, so no pub.dev
+# credential is stored in this repository.
+#
+# Operator prerequisite, outside this file: on the pub.dev admin tab for webmcp_flutter,
+# enable publishing from GitHub Actions with repository ortal83cohen/flutter_webmcp and tag
+# pattern v{{version}}. The pattern must match the tag filter below or no run can publish.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  publish:
+    permissions:
+      id-token: write
+      contents: read
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

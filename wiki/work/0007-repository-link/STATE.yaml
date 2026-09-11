@@ -1,0 +1,31 @@
+id: "0007-repository-link"
+title: "Publish repository metadata link"
+route: full
+phase: done
+round: 2
+verdict: PASS
+owner_agent: codex
+created: "2026-09-10"
+updated: "2026-09-10"
+blockers: []
+followups: []
+decisions:
+  - round: 2
+    verdict: PASS
+    action: accept-final-hosted-review
+    reason: "Independent impl-review-02 passes all five criteria with no findings, including both rendered repository anchors, exact hosted archive and hosted consumer. Concurrent0008 missing-plan warning is outside this item; wiki lint exits0. Preserve0005 pending status."
+  - round: 1
+    verdict: PASS
+    action: accept-preupload-review
+    reason: "Independent impl-review-01 passes applicable preupload criteria with zero warnings and22 approved files. User request authorizes metadata-only0.1.1 publication under existing account. Interactive final selection independently matches inventory; proceed to hosted gates."
+  - round: 1
+    verdict: PASS
+    action: accept-research-and-plan
+    reason: "Both independent reviews pass with no findings. Freeze criteria02 unchanged; authorize implementation of the two-file metadata patch under user request."
+  - action: execute-requested-repository-link
+    reason: "User supplied the public GitHub URL and requested adding it to pub.dev. Repository metadata is immutable per published version; prepare and publish0.1.1 with repository metadata and changelog only. Preserve runtime files and unrelated work."
+escalations: []
+criteria_frozen: true
+criteria_frozen_at: "2026-09-10"
+publication_status: "published_and_repository_link_verified"
+completion_artifact: "11-outcome.md"

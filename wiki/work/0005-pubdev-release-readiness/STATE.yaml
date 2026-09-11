@@ -1,15 +1,22 @@
 id: "0005-pubdev-release-readiness"
 title: "Plan pub.dev release readiness"
 route: full
-phase: document
-round: 2
-verdict: PASS
+phase: verify
+round: 3
+verdict: FAIL
 owner_agent: codex
 created: "2026-09-10"
 updated: "2026-09-10"
-blockers: []
-followups: []
+blockers:
+  - "AC-010 external hosted presentation remains incomplete: pub.dev analysis pending, web badge absent, versioned API documentation HTTP404 at2026-09-10T14:06:35Z."
+followups:
+  - "Recheck the published0.1.0 web badge and versioned API docs after pub.dev finishes processing; retain work item open until verified."
 decisions:
+  - round: 3
+    verdict: FAIL
+    finding: F-001
+    action: retain-external-hosted-gate
+    reason: "impl-review-03 independently confirms published archive, all22 files and fresh hosted web builds. Only AC-010 API docs/web badge remain pending after bounded server-processing checks. No source defect demonstrated; retain verify phase and do not mark full plan complete or mutate published0.1.0."
   - round: 3
     verdict: PASS
     action: accept-corrected-upload-plan
@@ -46,11 +53,11 @@ decisions:
 escalations: []
 
 requested_package_name: webmcp_flutter
-name_gate: "Proposed alternative has no public registry record (HTTP 404); recheck before publishing. See 13-name-selection.md."
+name_gate: "Published webmcp_flutter0.1.0; hosted exact-version API and archive verified. Never attempt to reuse this version."
 
 planning_status: complete
 implementation_status: prepublication_review_passed
-publication_status: uploaded_hosted_build_verified_pending_presentation
+publication_status: published_archive_and_hosted_build_verified_presentation_pending
 active_research: "08-capability-comparison.md"
 active_plan: "17-plan-consolidated.md"
 active_criteria: "19-criteria-consolidated.md"
@@ -60,7 +67,7 @@ planning_completion: "22-planning-completion.md"
 criteria_frozen: true
 criteria_frozen_at: "2026-09-10"
 criteria_frozen_by: codex
-next_action: "Finish server-generated API documentation/web badge verification and final hosted review; record completion."
+next_action: "Recheck only pending pub.dev API documentation and web badge, then obtain updated hosted verification and close documentation when AC-010 passes."
 execution_gates:
   - "Prepare documentation, SDK metadata and consumer-only packaging."
   - "Run full-source, browser, payload and clean-consumer verification."

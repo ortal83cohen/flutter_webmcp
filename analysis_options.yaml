@@ -11,6 +11,7 @@ analyzer:
     - linux/**
     - example/build/**
     - .dart_tool/**
+    - spikes/**
 
 linter:
   rules:

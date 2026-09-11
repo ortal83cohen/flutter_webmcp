@@ -232,10 +232,11 @@ import r"package:\x66lutter/widgets.dart";
     expect(violations, isEmpty, reason: violations.join('\n'));
   });
 
-  test('Flutter imports stay inside the widget layer', () {
+  test('Flutter imports stay inside Flutter-facing layers', () {
     final List<String> violations = <String>[];
     for (final File file in _dartFiles('lib')) {
-      if (!file.path.startsWith('lib/src/widgets/')) {
+      if (!file.path.startsWith('lib/src/widgets/') &&
+          !file.path.startsWith('lib/src/page/')) {
         violations.addAll(
           _importViolations(
             file,
@@ -285,6 +286,7 @@ import r"package:\x66lutter/widgets.dart";
       '--',
       'lib',
       'example/lib',
+      'packages',
       'tools',
       '.github',
     ]);
