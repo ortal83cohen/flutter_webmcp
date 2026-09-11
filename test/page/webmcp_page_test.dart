@@ -200,6 +200,42 @@ void main() {
     expect(taps, 0);
   });
 
+  testWidgets('accepts integer-valued JSON doubles at the action boundary', (
+    WidgetTester tester,
+  ) async {
+    final _Harness harness = _Harness();
+    int taps = 0;
+    await harness.pump(
+      tester,
+      WebMcpPage(
+        pageId: 'numeric-action',
+        child: Semantics(
+          label: 'Numeric target',
+          button: true,
+          onTap: () => taps++,
+          child: const SizedBox(width: 20, height: 20),
+        ),
+      ),
+    );
+    final Map<String, Object?> read = await _read('numeric-action');
+    final Map<String, Object?> node = _actionNode(read, 'tap');
+    final Map<String, Object?> receipt = await WebMcp.instance.invokeTool(
+      'numeric-action.page.act',
+      <String, Object?>{
+        'pageId': 'numeric-action',
+        'mountToken': read['mountToken'],
+        'revision': (read['revision']! as int).toDouble(),
+        'handle': node['handle'],
+        'action': 'tap',
+        'requestId': 1.0,
+        'arguments': <String, Object?>{},
+      },
+    ) as Map<String, Object?>;
+
+    expect(receipt['dispatched'], isTrue);
+    expect(taps, 1);
+  });
+
   testWidgets(
     'semantic change records visible effect separately from dispatch',
     (WidgetTester tester) async {
@@ -871,6 +907,53 @@ void main() {
       isNot(contains('home.page.read')),
     );
   });
+
+  testWidgets(
+    'settled Navigator top route controls eligibility during replacement',
+    (WidgetTester tester) async {
+      final _Harness harness = _Harness();
+      await harness.pump(
+        tester,
+        Builder(
+          builder: (BuildContext context) => WebMcpPage(
+            pageId: 'top-route-home',
+            child: Semantics(
+              label: 'Open details',
+              button: true,
+              onTap: () {
+                Navigator.of(context).pushReplacement<void, void>(
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => WebMcpPage(
+                      pageId: 'top-route-details',
+                      child: const Text('top-route-details-content'),
+                    ),
+                  ),
+                );
+              },
+              child: const SizedBox(width: 20, height: 20),
+            ),
+          ),
+        ),
+      );
+      final Map<String, Object?> home = await _read('top-route-home');
+      final Map<String, Object?> receipt = await _act(
+        'top-route-home',
+        home,
+        _actionNode(home, 'tap'),
+        requestId: 1,
+        action: 'tap',
+      );
+
+      expect(receipt['dispatched'], isTrue);
+      await tester.pumpAndSettle();
+
+      expect(
+        WebMcp.instance.tools.map((WebMcpTool tool) => tool.name),
+        isNot(contains('top-route-home.page.read')),
+      );
+      expect((await _read('top-route-details'))['ok'], isTrue);
+    },
+  );
 
   testWidgets(
     'domain execution saturation rejects before handler side effects',

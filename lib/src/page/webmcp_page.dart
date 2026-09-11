@@ -666,6 +666,30 @@ final class _WebMcpPageState extends State<WebMcpPage>
     );
   }
 
+  Map<String, Object?>? _normalizeActionArguments(Map arguments) {
+    final Map<String, Object?> normalized = <String, Object?>{};
+    for (final dynamic entry in arguments.entries) {
+      final Object? key = entry.key;
+      if (key is! String) {
+        return null;
+      }
+      normalized[key] = entry.value;
+    }
+    return normalized;
+  }
+
+  int? _normalizeInteger(Object? value) {
+    if (value is int) {
+      return value;
+    }
+    if (value is double &&
+        value.isFinite &&
+        value == value.truncateToDouble()) {
+      return value.toInt();
+    }
+    return null;
+  }
+
   FutureOr<Object?> _read(Map<String, Object?> arguments) {
     const Set<String> allowed = <String>{
       'query',
@@ -903,24 +927,30 @@ final class _WebMcpPageState extends State<WebMcpPage>
       'requestId',
       'arguments',
     };
+    final int? normalizedRevision = _normalizeInteger(request['revision']);
+    final int? normalizedRequestId = _normalizeInteger(request['requestId']);
     if (request.keys.any((String key) => !allowed.contains(key)) ||
         request['pageId'] is! String ||
         request['mountToken'] is! String ||
-        request['revision'] is! int ||
+        normalizedRevision == null ||
         request['handle'] is! String ||
         request['action'] is! String ||
-        request['requestId'] is! int ||
-        request['arguments'] is! Map<String, Object?>) {
+        normalizedRequestId == null ||
+        request['arguments'] is! Map) {
       return webMcpPageError(WebMcpPageErrorCode.invalidArguments);
     }
     final String pageId = request['pageId']! as String;
     final String mountToken = request['mountToken']! as String;
-    final int revision = request['revision']! as int;
+    final int revision = normalizedRevision;
     final String handle = request['handle']! as String;
     final String action = request['action']! as String;
-    final int requestId = request['requestId']! as int;
-    final Map<String, Object?> actionArguments =
-        request['arguments']! as Map<String, Object?>;
+    final int requestId = normalizedRequestId;
+    final Map<String, Object?>? actionArguments = _normalizeActionArguments(
+      request['arguments']! as Map,
+    );
+    if (actionArguments == null) {
+      return webMcpPageError(WebMcpPageErrorCode.invalidArguments);
+    }
     if (pageId != widget.pageId ||
         mountToken != _mountToken ||
         !_mountedOwner) {
