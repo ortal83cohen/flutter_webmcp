@@ -13,6 +13,59 @@ publisher. A wrapped page can expose permitted visible content and supported
 semantic actions without one descriptor per widget. Existing manual tools and
 custom transports remain supported.
 
+## Why use this library?
+
+Flutter applications contain useful actions and information, but an external
+agent cannot safely use them just because they are visible on screen. A
+production integration needs an explicit contract, lifecycle ownership, input
+validation, navigation awareness, and a way to expose only the content the
+application has approved.
+
+This library provides that boundary. It lets the application declare tools,
+bind them to the lifetime of a screen or widget, expose selected Flutter
+semantics as bounded page tools, and optionally mirror the resulting registry
+to the browser's native WebMCP surface. The application remains in control of
+authorization and business logic; the library does not connect to an AI model
+or grant permissions by itself.
+
+## Integrations at a glance
+
+Choose the integration that matches what you need:
+
+| Need | Use | What it solves |
+| --- | --- | --- |
+| Expose an application or backend operation | `WebMcpTool` and `WebMcp.instance` | Gives an agent-facing name, description, schema, and handler for an explicit operation |
+| Keep tools aligned with a screen or widget | `WebMcpScope`, `WebMcpScreen`, and `WebMcpAction` | Removes tools automatically when their owner is unmounted or disposed |
+| Let an agent inspect and operate an approved Flutter page | `WebMcpPage`, `WebMcpAppSession`, and `WebMcpNavigatorAdapter` | Turns settled, visible semantics into bounded `page.read` and `page.act` operations with stale-snapshot protection |
+| Expose selected domain-service methods | `webmcp_flutter_annotations` and `webmcp_flutter_generator` | Generates schemas and strict argument decoders without constructing or replacing the live service |
+| Publish tools to browser WebMCP | `WebMcpNativePublisher` | Mirrors the local registry to same-origin `document.modelContext` when the experimental browser surface is usable |
+| Connect another host or protocol | `WebMcpTransport` and `WebMcpRegistryObserver` | Receives registry changes through a custom transport or an additive observer |
+
+These integrations are independent. You can use only the local registry, add
+automatic page tools, generate domain tools, or publish any registered tools to
+the browser. Registering a tool locally does not automatically expose it to a
+browser or connect an agent.
+
+## Typical setup
+
+1. Add `webmcp_flutter` and import
+   `package:webmcp_flutter/webmcp_flutter.dart`.
+2. Register explicit tools for operations that should be callable. Validate
+   arguments and enforce authorization in each handler.
+3. If page interaction is needed, create one application session, attach a
+   navigator adapter to every participating Navigator, and wrap only approved
+   pages in `WebMcpPage`.
+4. If browser publication is needed, attach one `WebMcpNativePublisher` after
+   Flutter binding initialization and detach it during application teardown.
+5. Keep scopes, sessions, adapters, publishers, generated sources, and custom
+   transports owned by the application and clean them up with their owners.
+
+The sections below show each integration in detail. For a runnable combination
+of manual tools, automatic page semantics, navigation observation, and browser
+publication, see [example/lib/main.dart](example/lib/main.dart).
+
+
+
 ## What your application gets
 
 | Feature | What you can expose or control | Main API |
