@@ -11,11 +11,20 @@ dependencies:
     sdk: flutter
   webmcp_flutter:
     path: ..
+  webmcp_flutter_annotations:
+    path: ../packages/webmcp_flutter_annotations
 
 dev_dependencies:
+  build_runner: ^2.16.0
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
+  webmcp_flutter_generator:
+    path: ../packages/webmcp_flutter_generator
+
+dependency_overrides:
+  webmcp_flutter_annotations:
+    path: ../packages/webmcp_flutter_annotations
 
 flutter:
   uses-material-design: true

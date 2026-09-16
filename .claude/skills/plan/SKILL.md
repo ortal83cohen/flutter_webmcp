@@ -17,7 +17,7 @@ Read its `STATE.yaml` and `00-research.md`. If research has `[UNRESOLVED]` items
 
 Spawn exactly one `planner` subagent. Never two. The plan is where every shared assumption is decided, and two planners decide them differently.
 
-If this is a rewrite after a validation `FAIL`, pass the validation report's findings alongside the research, and say explicitly whether this is a revision of the existing plan or a rewrite from scratch. On a third-round `FAIL` it is always a rewrite: patching a plan that has failed three reviews produces a fourth failure.
+If this is a first-time plan, that's the whole brief. If you're returning here after a validation round found issues, pass the validation report's findings alongside the research and have the planner patch the existing plan in place — not rewrite it from scratch. A full rewrite only happens if the user explicitly asks for one.
 
 ## Gate
 

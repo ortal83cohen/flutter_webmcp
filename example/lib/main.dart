@@ -3,31 +3,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webmcp_flutter/webmcp_flutter.dart';
 
+import 'example_runtime.dart';
 import 'example_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final WebMcpAppSession session = WebMcpAppSession();
-  session.attach(appId: 'example');
-  final WebMcpNativePublisher publisher = WebMcpNativePublisher();
-  await publisher.attach();
-  runApp(WebMcpPilotExample(session: session, publisher: publisher));
+  final ExampleRuntime runtime = ExampleRuntime();
+  await runtime.install();
+  runApp(WebMcpPilotExample(runtime: runtime));
 }
 
 /// The example application.
 final class WebMcpPilotExample extends StatefulWidget {
-  /// Creates the example application.
-  const WebMcpPilotExample({
-    required this.session,
-    required this.publisher,
-    super.key,
-  });
+  /// Creates the example application over an already-installed [runtime].
+  const WebMcpPilotExample({required this.runtime, super.key});
 
-  /// Application-owned page observation session.
-  final WebMcpAppSession session;
-
-  /// Native browser publisher attached to the manual registry.
-  final WebMcpNativePublisher publisher;
+  /// The runtime this application drives. Constructed and installed once,
+  /// in [main], so the startup order, the session attachment and the
+  /// Navigator adapter parameters have exactly one definition.
+  final ExampleRuntime runtime;
 
   @override
   State<WebMcpPilotExample> createState() => _WebMcpPilotExampleState();
@@ -39,18 +33,16 @@ final class _WebMcpPilotExampleState extends State<WebMcpPilotExample> {
   @override
   void initState() {
     super.initState();
-    _rootNavigator = WebMcpNavigatorAdapter(
-      session: widget.session,
-      navigatorId: 'root',
-      rootModalRelationship: true,
-    );
+    _rootNavigator = widget.runtime.createRootNavigatorAdapter();
   }
 
   @override
   void dispose() {
     _rootNavigator.dispose();
-    widget.session.detach();
-    unawaited(widget.publisher.detach());
+    // There is no natural "app teardown" in a real Flutter app's `main()`;
+    // this call exists for symmetry with the test harness's disposal and
+    // documents the intended lifecycle rather than running in practice.
+    unawaited(widget.runtime.dispose());
     super.dispose();
   }
 
@@ -58,7 +50,7 @@ final class _WebMcpPilotExampleState extends State<WebMcpPilotExample> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorObservers: <NavigatorObserver>[_rootNavigator],
-      home: ExampleScreen(publisher: widget.publisher),
+      home: ExampleScreen(runtime: widget.runtime),
     );
   }
 }

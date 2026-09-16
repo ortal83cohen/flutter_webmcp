@@ -3,7 +3,7 @@ id: webmcp-contract
 title: WebMCP product contract
 status: active
 owner: unassigned
-last_verified: 2026-09-10
+last_verified: 2026-09-15
 applies_to: ["lib/**", "example/**", "README.md"]
 summary: Product constraints for manual tools, automatic single-view pages, generated domain actions, and experimental native Chrome publication.
 ---

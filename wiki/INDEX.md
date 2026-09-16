@@ -3,7 +3,7 @@ id: index
 title: Wiki index
 status: active
 owner: unassigned
-last_verified: 2026-09-10
+last_verified: 2026-09-15
 applies_to: ["**"]
 summary: Router for the whole wiki. One line per document, stating when to read it.
 ---
@@ -44,6 +44,7 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 | [adr/0002-share-agent-config-between-claude-code-and-cursor.md](adr/0002-share-agent-config-between-claude-code-and-cursor.md) | Questioning where instructions, skills and agents live. |
 | [adr/0003-webmcp-detection-first-registry.md](adr/0003-webmcp-detection-first-registry.md) | Questioning the singleton registry, ownership rules, or detection-only browser boundary. |
 | [adr/0004-use-semantic-page-boundaries-and-app-observation.md](adr/0004-use-semantic-page-boundaries-and-app-observation.md) | Working on automatic page semantics, navigation evidence, app observation, native publication, or generated domain actions. |
+| [adr/0005-async-disposal-in-widget-test-bodies.md](adr/0005-async-disposal-in-widget-test-bodies.md) | Writing widget tests that create and dispose resources requiring async cleanup, especially tests involving WebMcpNativePublisher. |
 
 ## Product knowledge
 

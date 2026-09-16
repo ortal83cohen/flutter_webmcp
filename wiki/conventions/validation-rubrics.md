@@ -3,7 +3,7 @@ id: validation-rubrics
 title: Validation rubrics
 status: active
 owner: unassigned
-last_verified: 2026-09-04
+last_verified: 2026-09-15
 applies_to: ["**"]
 summary: Verdicts, severities and evidence requirements that every validator obeys.
 ---
@@ -54,10 +54,10 @@ Flag as `BLOCKER` or `IMPORTANT` only what affects correctness or a stated crite
 
 ## After the round
 
-- One validation round per phase. A validator reports once; it does not loop or re-check its own findings.
-- The validator reports; the main agent decides what happens next — fix a finding directly, accept it as pre-existing or out of scope, or send it back to the phase that owns it. Record the decision and the reason.
-- If a phase is revisited (a rewritten plan, a reworked implementation), a new numbered report is appended; it never replaces the previous one.
-- Route the send-back by defect class. A plan defect goes to the plan phase. An implementation defect goes to the implement phase. Patching code to satisfy a plan-level finding buries the defect instead of fixing it.
+- At most two validation rounds per phase: the first round, then an optional second round to confirm fixes if the findings were significant. Neither round loops or re-checks its own findings, and there is no third round — a repeat `FAIL` on the second round escalates to the user.
+- The validator reports; the main agent decides what happens next — fix a finding directly by patching the artifact in place, or accept it as pre-existing or out of scope. Record the decision and the reason.
+- If a second round runs, it produces a new numbered report over the patched artifact; it never replaces the first one.
+- Route the fix by defect class. A plan defect is patched in the plan. An implementation defect is patched in the code. Patching code to satisfy a plan-level finding buries the defect instead of fixing it. A finding is never an instruction to rewrite the artifact from scratch — that is a decision for the user to make explicitly.
 
 ## Reviewer strength
 

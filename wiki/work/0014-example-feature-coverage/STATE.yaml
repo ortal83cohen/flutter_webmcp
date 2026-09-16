@@ -1,0 +1,76 @@
+id: "0014-example-feature-coverage"
+title: "Example app covers every webmcp_flutter feature and is verified in Chrome"
+route: full
+phase: done
+round: 0
+verdict: null
+owner_agent: null
+created: "2026-09-15"
+updated: "2026-09-15"
+
+blockers: []
+
+followups:
+  - "Add an example-package build_runner stage to tools/check.sh so the checked-in generated adapter cannot drift from the annotated service. Deliberately out of scope for 0014, whose file boundary is example/."
+
+decisions:
+  - id: "D-0014-01"
+    decision: "Extend the single top-level example/ in place rather than pointing readers at packages/webmcp_flutter_generator/example/."
+    reason: "The generator fixture is a test package with no runnable UI, and this work item requires the demonstrated features to be exercised in a browser."
+  - id: "D-0014-02"
+    decision: "Check the generated example adapter (example/lib/example_task_service.webmcp.g.dart) into version control; never hand-edit it."
+    reason: "tools/check.sh formats, analyses, tests and web-builds example/ without running the generator there, so an absent generated file would fail four stages. Resolves an open research question."
+  - id: "D-0014-03"
+    decision: "Browser verification targets the example's own registry, page and diagnostic behaviour and its honest reporting of whichever native support level it detects; no attempt to force document.modelContext to appear."
+    reason: "Positive in-repo evidence exists only behind experimental Chrome flags on a hardened HTTPS origin; the product contract also disclaims direct invocation as agent proof."
+  - id: "D-0014-04"
+    decision: "Custom view provider, downward-only session limit customization, and nested or parallel navigator adapters stay undemonstrated."
+    reason: "Research ranked them lowest priority and the work item does not name them; recorded as out of scope in 01-plan.md."
+  - id: "D-0014-05"
+    round: 1
+    verdict: "research CONDITIONAL (1 blocker, 8 important, 4 nit), plan FAIL (12 blocker, 9 important, 2 nit, 1 pre-existing)"
+    action: "revise-research (fixed directly by main agent using validator-supplied evidence, no re-delegation needed), then revise-plan (full rewrite by a fresh planner)"
+    reason: "Both validator reports pointed at the same two root causes: (1) 00-research.md's runtime tool-name enumeration and Chrome-evidence claims were incomplete/overstated (research F-001,F003,F004,F005,F006,F007,F008,F009,F010,F011,F012,F013 — fixed in place in 00-research.md, since the validators already supplied verified file:line evidence for each), and (2) the plan's page-read wire shape assumption (a semantics-identifier field that does not exist in the response) and unstated page-eligibility harness requirements (plan F-001,F-002,F-003,F-004,F-021) invalidated the probe/form-screen design and several criteria (AC-011,AC-012,AC-014,AC-023,AC-024,AC-025). Sending the plan back for a genuine rewrite against the corrected research rather than patching individual criteria, per the FAIL-routing rule (plan-level defects go to the plan phase, not to more code)."
+  - id: "D-0014-06"
+    round: 1
+    verdict: "plan-review-01 F-009 (research), F-020 (research/api-surface-coverage.md F-009): out-of-scope items mislabeled as contract-forbidden"
+    action: "annotate-only"
+    reason: "AC-021 conflated 'chosen not to demonstrate, lowest priority' (nested/parallel navigator adapters, custom view provider, custom session limits) with wiki/product/webmcp-contract.md's actual Deliberate-omissions list. Corrected in 00-research.md's new corrections section; the round-2 planner must keep these as two distinct criteria buckets."
+
+  - id: "D-0014-07"
+    round: 2
+    decision: "Round-2 plan rewrite fixes six shared design choices that round 1 left open: one ExampleRuntime class owns the fixed startup order, the session and the Navigator adapter factory for both the app and the tests; one example/test/example_test_support.dart owns the page-eligibility harness and the session detach-and-reset tearDown discipline; page nodes are targeted by their fixed semantics label, never by a semantics identifier, because the read response carries no identifier field; the agent probe increments its requestId on every act attempt including retries and exposes a single-shot before-first-act callback as the only stale-snapshot injection seam; the diagnostics screen renders the publisher diagnostic map once with prefixed row labels and shows an empty reasonCodes list as the literal 'none'; the registry-log retention bound is sixty-four lines, sized above the twelve startup registrations."
+    reason: "Every one of these was a round-1 blocker caused by a decision left to fan-out. They are recorded here because 02-criteria.md depends on them and they cannot be renegotiated during implementation without a new validation round."
+  - id: "D-0014-08"
+    round: 2
+    decision: "The generated task source is registered at application level inside ExampleRuntime's install, not inside any screen's scope."
+    reason: "Resolves round-1 F-006: the generated names must be present in the home screen's tool list for the whole session, which a screen-scoped registration cannot provide."
+  - id: "D-0014-09"
+    round: 2
+    decision: "The navigation criterion is built on the pushed route's own page endpoints appearing and disappearing, and explicitly asserts the screen-owned tool names remain registered across a push and a pop."
+    reason: "Resolves round-1 F-007: MaterialPageRoute.maintainState defaults to true, so a push never disposes the home screen state and WebMcpScreen.dispose never closes its scope. The round-1 assumption that screen tools disappear on navigation was false."
+
+  - id: "D-0014-10"
+    round: 2
+    decision: "Skipped the round-2 plan/research validation round on explicit user instruction (stop doing validation rounds, decide and continue). The main agent read 01-plan.md/02-criteria.md/03-tasks.md directly, confirmed the round-1 blockers were addressed (page-eligibility harness, label-based node targeting, requestId/retry rule, diagnostic map dedup, corrected navigation criterion, dependency-override rationale, out-of-scope bucket separation, disjoint file ownership), and froze criteria."
+    reason: "User directive overrides the default one-validation-round-per-phase procedure for this work item; criteria were frozen on the main agent's own review rather than a second validator pass."
+
+  - id: "D-0014-11"
+    round: 2
+    decision: "Every widget test that disposes an ExampleRuntime or ExampleRuntimeHarness must call `await runtime.dispose()` / `await harness.dispose()` inside a try/finally in the test body itself, never via `addTearDown(runtime.dispose)`."
+    reason: "Empirically confirmed during task 4.1's implementation: awaiting WebMcpNativePublisher.detach() (via ExampleRuntime.dispose) inside a bare addTearDown async callback under testWidgets never settles, reproduced identically outside ExampleRuntime with a minimal publisher-only repro, and tester.runAsync() around the same call does not fix it either. The exact same await settles immediately when made directly inside the test body (in a try/finally). Documented in doc comments on ExampleRuntime.dispose and ExampleRuntimeHarness.dispose; example_runtime_test.dart's four tests were rewritten to this pattern and now pass. Every Group 5/6 task must follow the same pattern."
+
+  - id: "D-0014-12"
+    round: 0
+    decision: "Skipped the verify phase's separate impl-validator round on the same explicit user instruction as D-0014-10. The main agent directly ran the full example test suite (54/54 passing), the complete bash tools/check.sh (all 7 stages passing), python3 tools/lint_wiki.py (clean), the root repo_hygiene_test.dart (passing), both AC-040/AC-041 scope greps (no matches), and personally drove the built example in an external Chromium browser through every screen and interactive path, recording observations in verification/chrome-walkthrough.md."
+    reason: "User directive to stop doing validation/plan rounds and decide-and-continue; the main agent substituted direct, first-hand verification (running every command and clicking through every screen itself) for a second blind-validator pass."
+  - id: "D-0014-13"
+    round: 0
+    decision: "The Chrome walkthrough served example/build/web/ via a local static file server rather than following the README's `flutter run -d chrome` recipe literally."
+    reason: "flutter run -d chrome opens a separate, unautomatable Chrome window; the static build is the byte-identical artifact tools/check.sh's stage 6 already builds and validates. Recorded transparently in verification/chrome-walkthrough.md rather than silently substituted; the served content is what a real deployment would ship."
+
+escalations:
+  - id: "E-0014-01"
+    status: "resolved 2026-09-15"
+    question: "Whether the dart and flutter command line tools are installed on this machine. Research left this unresolved and no planner shell access was available; implement step 1 preflights it and escalates to a human if either binary is absent, before any file is edited."
+    resolution: "flutter (aliased to fvm flutter) reports Flutter 3.47.0, Dart 3.13.0, DevTools 2.60.0 — both binaries present. No human escalation needed; implement step 1's preflight can proceed directly."

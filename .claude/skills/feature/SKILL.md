@@ -58,9 +58,9 @@ Give each only the artifact and the criteria. Do not pass the researcher's or pl
 Read `wiki/conventions/validation-rubrics.md` for how to act on the verdicts. A validator reports; it does not decide what happens next — that call is yours. In short:
 
 - Both `PASS`: proceed.
-- `CONDITIONAL` or `FAIL`: for each finding, decide — fix it directly, accept it as pre-existing or out of scope, or send the artifact the finding actually blames back to its phase, using the validator's routing table. Never patch code for a plan-level finding.
+- `CONDITIONAL` or `FAIL`: for each finding, decide — fix it directly by patching the artifact in place, or accept it as pre-existing or out of scope. Never patch code for a plan-level finding; patch the plan.
 
-One round per phase: the validator does not loop. Record every decision and its reason in `STATE.yaml` under `decisions` — both a fix and a deliberate non-fix are decisions, and both get recorded.
+At most two rounds per phase: the first round, and — only if the findings were worth confirming after the fix — one optional second round over the patched artifact. No third round; a repeat `FAIL` on the second round escalates to the user instead of triggering another rewrite. Record every decision and its reason in `STATE.yaml` under `decisions` — both a fix and a deliberate non-fix are decisions, and both get recorded.
 
 Once the gate passes, set `STATE.yaml` phase to `implement`.
 
@@ -82,7 +82,7 @@ Spawn one `impl-validator`. Pass it the frozen criteria and the diff — not the
 
 Gate: verdict is `PASS`, per-criterion table complete with every criterion explicitly resolved, verification output pasted, and each criterion has a negative case that actually fails.
 
-Verdict handling is identical to Step 3: one round, and you decide what happens next. A `FAIL` naming a plan defect returns to Step 2, not to more code.
+Verdict handling is identical to Step 3: at most two rounds, and you decide what happens next. A `FAIL` naming a plan defect gets patched in the plan, not fixed with more code.
 
 Set `STATE.yaml` phase to `document`.
 

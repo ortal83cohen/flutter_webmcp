@@ -15,7 +15,7 @@ Read `wiki/conventions/validation-rubrics.md`. It is the authority on verdicts, 
 
 ## Before spawning
 
-Read `STATE.yaml`. This phase gets one validation round. If a round has already run for `$phase`, do not spawn another validator — read its report and act on it instead of re-validating.
+Read `STATE.yaml`. This phase gets at most two validation rounds: the first round, and — only if the first round's findings were fixed and are worth confirming — one optional second round over the patched artifact. If two rounds have already run for `$phase`, do not spawn a third validator; escalate to the user instead of iterating further.
 
 ## Spawn
 
@@ -30,9 +30,9 @@ It must not pass the author's summary, reasoning, transcript, self-assessment, o
 A validator reports findings; it does not decide what happens next. That call belongs to the main agent, using the report as evidence, not as a verdict to execute mechanically:
 
 - `PASS` — proceed to the next phase.
-- `CONDITIONAL` or `FAIL` — for each finding, decide: fix it directly, accept it as pre-existing or out of scope, or send it back to the phase that owns it (a research defect to the research phase, a plan defect to the plan phase, an implementation defect to the implement phase). Never close a plan-level finding by changing code; that buries the defect rather than fixing it.
+- `CONDITIONAL` or `FAIL` — for each finding, decide: fix it directly by patching the artifact in place, or accept it as pre-existing or out of scope. Never close a plan-level finding by changing code — a finding against the plan gets patched in the plan, an implementation finding gets patched in the code.
 
-Do not accept a claim that a finding was fixed without re-running the check that found it. If several findings together put the whole artifact in doubt, judge whether targeted fixes are enough or the phase needs a genuine rewrite — that is the main agent's call to make, not a rule that fires automatically.
+Do not accept a claim that a finding was fixed without re-running the check that found it. Patch the existing artifact rather than rewriting it from scratch; a rewrite is a decision for the user to make explicitly, not a default response to a `FAIL`. If it's the second round for this phase, do not spawn a third regardless of the verdict — escalate to the user instead.
 
 ## Decide and record
 

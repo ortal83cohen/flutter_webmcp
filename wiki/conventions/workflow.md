@@ -3,7 +3,7 @@ id: workflow
 title: Development workflow
 status: active
 owner: unassigned
-last_verified: 2026-09-04
+last_verified: 2026-09-15
 applies_to: ["**"]
 summary: The six-phase pipeline every change follows, its artifacts, and the gates between phases.
 ---
@@ -73,11 +73,11 @@ A validator receives the artifact and the criteria. It does not receive the auth
 
 A validator returns a verdict — `PASS`, `CONDITIONAL` or `FAIL` — with findings graded `BLOCKER`, `IMPORTANT`, `NIT` or `PRE_EXISTING`. Every finding cites a file and line. A validator never proposes the fix; proposing it turns the validator into a second author with a stake in its own suggestion. It also never decides what happens next — that call belongs to the main agent.
 
-One round per phase. The validator reports once; it does not loop or re-check its own findings.
+The main agent reads the verdict and decides, finding by finding: fix it directly by patching the plan or research in place, or accept it as pre-existing or out of scope. There is no "send back for a rewrite" step — a validator finding is a patch to the existing artifact, not a mandate to redo it from scratch. The agent records every such decision in `STATE.yaml`, with the finding, the verdict and the reason.
 
-The main agent reads the verdict and decides, finding by finding: fix it directly, accept it as pre-existing or out of scope, or send the defect back to the phase that owns it — a research gap to Phase 1, a plan gap to Phase 2, for a genuine rewrite rather than a patch. The agent records every such decision in `STATE.yaml`, with the finding, the verdict and the reason.
+At most two rounds total for this phase: the first round, then, if fixes were made, one optional confirmation round over the patched artifact. The confirmation round is not required — run it only when the findings were significant enough to warrant a second look. A third round never happens; if the confirmation round still fails, escalate to a human instead of iterating further.
 
-Gate: the round has run and every finding it raised has a recorded decision.
+Gate: at least one round has run, every finding it raised has a recorded decision, and if a confirmation round ran, its findings are also recorded.
 
 ## Phase 4 — Implement
 
