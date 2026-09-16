@@ -1,0 +1,29 @@
+id: "0015-skip-occupied-release-versions"
+title: "Skip occupied package versions instead of failing the release bump"
+route: full
+phase: verify
+round: 0
+verdict: null
+owner_agent: orchestrator
+created: "2026-09-16"
+updated: "2026-09-16"
+
+blockers: []
+
+followups: []
+
+decisions:
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "Parent locked skip-set membership before planning: skip published pub.dev versions only; unpublished tags remain a hard fail at the existing tag-collision step (publish-retry, not skip-next). Occupied-set input is OCCUPIED_VERSIONS. Cap is 50 patch steps in the helper. Workflow fetches GET https://pub.dev/api/packages/webmcp_flutter and fails closed if that fetch fails."
+  - round: 1
+    verdict: PASS
+    action: annotate-only
+    reason: "Research F-001 GET failure behaviour is already decided fail-closed in the plan occupancy-fetch section. Research F-002 and F-003 are NITs; not expanded."
+  - round: 1
+    verdict: PASS
+    action: revise-plan
+    reason: "Plan F-001: AC-009 now requires omitting non-three-component hosted versions. F-002: Accept value named application/vnd.pub.v2+json. F-003: AC-020 check excludes fetch --force. F-004: step 1 and task 1.2 now name the versions-is-object fixture. No confirmation round because there were zero blockers."
+
+escalations: []

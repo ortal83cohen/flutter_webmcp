@@ -69,3 +69,6 @@ echo "Stage 6 passed: build"
 
 sh tools/test_bump_patch_version.sh || stage_failed 7 "version bump test"
 echo "Stage 7 passed: version bump test"
+
+sh tools/test_occupied_pubdev_versions.sh || stage_failed 8 "occupied pub.dev versions test"
+echo "Stage 8 passed: occupied pub.dev versions test"

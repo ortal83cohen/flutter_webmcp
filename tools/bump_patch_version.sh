@@ -3,7 +3,9 @@ set -eu
 
 # Helper script to bump patch version in pubspec.yaml and update CHANGELOG.md
 # Usage: ./bump_patch_version.sh [repository_root]
-# Environment: RELEASE_DATE (optional) - date to use for changelog entry
+# Environment:
+#   RELEASE_DATE (optional) - date to use for changelog entry
+#   OCCUPIED_VERSIONS (optional) - whitespace-separated three-component versions to skip
 
 # Determine repository root
 if [ $# -gt 0 ]; then
@@ -54,9 +56,38 @@ MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
 MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
 PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
 
-# Compute new version (increment patch)
+# Compute new version (increment patch), then skip occupied hosted versions.
 NEW_PATCH=$((PATCH + 1))
 NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+OCCUPIED_SKIP_CAP=50
+OCCUPIED_INCREMENTS=0
+
+for OCCUPIED_TOKEN in ${OCCUPIED_VERSIONS-}; do
+    if ! echo "$OCCUPIED_TOKEN" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' >/dev/null; then
+        echo "Error: Malformed occupied version: $OCCUPIED_TOKEN" >&2
+        exit 1
+    fi
+done
+
+while true; do
+    OCCUPIED_MATCH=0
+    for OCCUPIED_TOKEN in ${OCCUPIED_VERSIONS-}; do
+        if [ "$OCCUPIED_TOKEN" = "$NEW_VERSION" ]; then
+            OCCUPIED_MATCH=1
+            break
+        fi
+    done
+    if [ "$OCCUPIED_MATCH" -eq 0 ]; then
+        break
+    fi
+    if [ "$OCCUPIED_INCREMENTS" -ge "$OCCUPIED_SKIP_CAP" ]; then
+        echo "Error: Occupied-version skip cap of 50 exceeded." >&2
+        exit 1
+    fi
+    OCCUPIED_INCREMENTS=$((OCCUPIED_INCREMENTS + 1))
+    NEW_PATCH=$((NEW_PATCH + 1))
+    NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+done
 
 # Validate CHANGELOG.md format. The title may be preceded by blank lines, so its line
 # number is resolved here and reused when the file is rebuilt below.

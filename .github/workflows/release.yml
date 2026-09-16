@@ -66,6 +66,49 @@ jobs:
       - name: Run package check suite
         run: bash tools/check.sh
 
+      # Hosted versions are skip-set input for the bump helper. Git tags stay out of
+      # that set; the tag-collision step after the bump still fails a chosen version
+      # that already has a tag.
+      - name: Load occupied pub.dev versions
+        run: |
+          python3 - <<'PY'
+          import sys
+          import urllib.error
+          import urllib.request
+
+          url = "https://pub.dev/api/packages/webmcp_flutter"
+          request = urllib.request.Request(
+              url,
+              headers={"Accept": "application/vnd.pub.v2+json"},
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  status = response.getcode()
+                  body = response.read()
+          except urllib.error.HTTPError as error:
+              print(
+                  f"Error: occupancy GET of {url} returned HTTP {error.code}.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          except Exception as error:
+              print(f"Error: occupancy GET of {url} failed: {error}", file=sys.stderr)
+              sys.exit(1)
+          if status != 200:
+              print(
+                  f"Error: occupancy GET of {url} returned HTTP {status}.",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          if not body:
+              print("Error: occupancy GET returned an empty body.", file=sys.stderr)
+              sys.exit(1)
+          with open("occupied-pubdev-versions.json", "wb") as handle:
+              handle.write(body)
+          PY
+          occupied=$(python3 tools/occupied_pubdev_versions.py occupied-pubdev-versions.json)
+          echo "OCCUPIED_VERSIONS=${occupied}" >> "$GITHUB_ENV"
+
       - name: Bump patch version
         id: bump
         run: |

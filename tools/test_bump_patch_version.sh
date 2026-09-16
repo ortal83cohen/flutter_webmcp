@@ -13,6 +13,7 @@ FIXTURES_DIR="$SCRIPT_DIR/fixtures/bump-patch-version"
 export RELEASE_DATE="2026-01-02"
 
 test_case() {
+    unset OCCUPIED_VERSIONS || true
     local case_name="$1"
     local fixture_dir="$FIXTURES_DIR/$case_name"
     
@@ -270,8 +271,224 @@ test_case() {
     return 1
 }
 
+copy_fixture() {
+    local fixture_name="$1"
+    local dest="$2"
+    cp -r "$FIXTURES_DIR/$fixture_name"/. "$dest/"
+}
+
+files_unchanged() {
+    local dir="$1"
+    local before_pubspec="$2"
+    local before_changelog="$3"
+    [ "$(cat "$dir/pubspec.yaml" 2>/dev/null || echo "")" = "$before_pubspec" ] &&
+        [ "$(cat "$dir/CHANGELOG.md" 2>/dev/null || echo "")" = "$before_changelog" ]
+}
+
+assert_chosen_version() {
+    local dir="$1"
+    local expected="$2"
+    grep -q "^version: $expected$" "$dir/pubspec.yaml" &&
+        grep -Eq "^## $expected - 2026-01-02$" "$dir/CHANGELOG.md"
+}
+
+run_occupied_success() {
+    local name="$1"
+    local fixture_name="$2"
+    local occupied="$3"
+    local expected="$4"
+    local temp_dir output
+    temp_dir=$(mktemp -d)
+    copy_fixture "$fixture_name" "$temp_dir"
+    if output=$(OCCUPIED_VERSIONS="$occupied" sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) &&
+        [ "$output" = "$expected" ] &&
+        assert_chosen_version "$temp_dir" "$expected"; then
+        echo "PASS: $name"
+        rm -rf "$temp_dir"
+        return 0
+    fi
+    echo "FAIL: $name - expected '$expected', output was '$output'"
+    rm -rf "$temp_dir"
+    return 1
+}
+
+run_occupied_reject() {
+    local name="$1"
+    local fixture_name="$2"
+    local occupied="$3"
+    local temp_dir before_pubspec before_changelog status
+    temp_dir=$(mktemp -d)
+    copy_fixture "$fixture_name" "$temp_dir"
+    before_pubspec=$(cat "$temp_dir/pubspec.yaml")
+    before_changelog=$(cat "$temp_dir/CHANGELOG.md")
+    status=0
+    OCCUPIED_VERSIONS="$occupied" sh "$HELPER_SCRIPT" "$temp_dir" >/dev/null 2>&1 || status=$?
+    if [ "$status" -ne 0 ] && files_unchanged "$temp_dir" "$before_pubspec" "$before_changelog"; then
+        echo "PASS: $name"
+        rm -rf "$temp_dir"
+        return 0
+    fi
+    echo "FAIL: $name - expected reject with untouched files, status=$status"
+    rm -rf "$temp_dir"
+    return 1
+}
+
+test_occupied_cases() {
+    local failures=0
+    local temp_dir output
+    local occupied_fifty occupied_fifty_one i
+    local stderr_file status before_pubspec before_changelog
+
+    if ! run_occupied_success "occupied-empty-plus-one" "valid-patch" "" "0.1.2"; then
+        failures=$((failures + 1))
+    fi
+
+    temp_dir=$(mktemp -d)
+    copy_fixture "valid-patch" "$temp_dir"
+    if output=$(OCCUPIED_VERSIONS="0.1.2" sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) &&
+        [ "$output" = "0.1.3" ] &&
+        assert_chosen_version "$temp_dir" "0.1.3" &&
+        ! grep -Eq "^## 0.1.2 " "$temp_dir/CHANGELOG.md"; then
+        echo "PASS: occupied-skip-next"
+    else
+        echo "FAIL: occupied-skip-next - expected 0.1.3 without a 0.1.2 heading"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir"
+
+    temp_dir=$(mktemp -d)
+    copy_fixture "valid-patch" "$temp_dir"
+    unset OCCUPIED_VERSIONS || true
+    if output=$(sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) && [ "$output" = "0.1.2" ]; then
+        echo "PASS: occupied-skip-next-negative-unset"
+    else
+        echo "FAIL: occupied-skip-next-negative-unset - expected 0.1.2"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir"
+
+    temp_dir=$(mktemp -d)
+    copy_fixture "valid-patch" "$temp_dir"
+    if output=$(OCCUPIED_VERSIONS="0.1.2 0.1.3" sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) &&
+        [ "$output" = "0.1.4" ] &&
+        assert_chosen_version "$temp_dir" "0.1.4" &&
+        ! grep -Eq "^## 0.1.2 " "$temp_dir/CHANGELOG.md" &&
+        ! grep -Eq "^## 0.1.3 " "$temp_dir/CHANGELOG.md"; then
+        echo "PASS: occupied-consecutive"
+    else
+        echo "FAIL: occupied-consecutive - expected only 0.1.4"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir"
+
+    if ! run_occupied_success "occupied-consecutive-negative-only-next" "valid-patch" "0.1.2" "0.1.3"; then
+        failures=$((failures + 1))
+    fi
+
+    if ! run_occupied_success "occupied-later-not-next" "valid-patch" "0.1.3" "0.1.2"; then
+        failures=$((failures + 1))
+    fi
+
+    if ! run_occupied_success "occupied-later-and-next" "valid-patch" "0.1.2 0.1.3" "0.1.4"; then
+        failures=$((failures + 1))
+    fi
+
+    occupied_fifty_one=""
+    i=2
+    while [ "$i" -le 52 ]; do
+        occupied_fifty_one="$occupied_fifty_one 0.1.$i"
+        i=$((i + 1))
+    done
+    temp_dir=$(mktemp -d)
+    copy_fixture "valid-patch" "$temp_dir"
+    before_pubspec=$(cat "$temp_dir/pubspec.yaml")
+    before_changelog=$(cat "$temp_dir/CHANGELOG.md")
+    stderr_file=$(mktemp)
+    status=0
+    OCCUPIED_VERSIONS="$occupied_fifty_one" sh "$HELPER_SCRIPT" "$temp_dir" >/dev/null 2>"$stderr_file" || status=$?
+    if [ "$status" -ne 0 ] &&
+        files_unchanged "$temp_dir" "$before_pubspec" "$before_changelog" &&
+        grep -q "50" "$stderr_file"; then
+        echo "PASS: occupied-cap-exceeded"
+    else
+        echo "FAIL: occupied-cap-exceeded - status=$status stderr=$(cat "$stderr_file")"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir" "$stderr_file"
+
+    occupied_fifty=""
+    i=2
+    while [ "$i" -le 51 ]; do
+        occupied_fifty="$occupied_fifty 0.1.$i"
+        i=$((i + 1))
+    done
+    if ! run_occupied_success "occupied-cap-boundary" "valid-patch" "$occupied_fifty" "0.1.52"; then
+        failures=$((failures + 1))
+    fi
+
+    if ! run_occupied_reject "occupied-malformed-two-component" "valid-patch" "0.1"; then
+        failures=$((failures + 1))
+    fi
+    if ! run_occupied_reject "occupied-malformed-prerelease" "valid-patch" "0.1.2-beta"; then
+        failures=$((failures + 1))
+    fi
+    if ! run_occupied_reject "occupied-malformed-non-numeric" "valid-patch" "abc"; then
+        failures=$((failures + 1))
+    fi
+    if ! run_occupied_success "occupied-malformed-negative-well-formed" "valid-patch" "0.1.9" "0.1.2"; then
+        failures=$((failures + 1))
+    fi
+
+    if ! run_occupied_reject "occupied-chosen-heading" "occupied-chosen-heading" "0.1.2"; then
+        failures=$((failures + 1))
+    fi
+    if ! run_occupied_success "occupied-chosen-heading-negative" "valid-patch" "0.1.2" "0.1.3"; then
+        failures=$((failures + 1))
+    fi
+
+    temp_dir=$(mktemp -d)
+    copy_fixture "occupied-intermediate-heading" "$temp_dir"
+    if output=$(OCCUPIED_VERSIONS="0.1.2" sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) &&
+        [ "$output" = "0.1.3" ] &&
+        assert_chosen_version "$temp_dir" "0.1.3" &&
+        grep -Eq "^## 0.1.2 " "$temp_dir/CHANGELOG.md"; then
+        echo "PASS: occupied-intermediate-heading"
+    else
+        echo "FAIL: occupied-intermediate-heading - expected 0.1.3 while keeping 0.1.2 heading"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir"
+
+    if ! run_occupied_reject "occupied-intermediate-heading-negative" "occupied-intermediate-heading" ""; then
+        failures=$((failures + 1))
+    fi
+
+    OCCUPIED_VERSIONS="0.1.2"
+    export OCCUPIED_VERSIONS
+    temp_dir=$(mktemp -d)
+    copy_fixture "valid-patch" "$temp_dir"
+    unset OCCUPIED_VERSIONS || true
+    if output=$(sh "$HELPER_SCRIPT" "$temp_dir" 2>/dev/null) && [ "$output" = "0.1.2" ]; then
+        echo "PASS: occupied-parent-env-unset"
+    else
+        echo "FAIL: occupied-parent-env-unset - expected plus-one after unset"
+        failures=$((failures + 1))
+    fi
+    rm -rf "$temp_dir"
+
+    if grep -E 'https?://|[[:space:]]git[[:space:]]|^git[[:space:]]' "$HELPER_SCRIPT" >/dev/null; then
+        echo "FAIL: bump helper references a host, URL, or git command"
+        failures=$((failures + 1))
+    else
+        echo "PASS: occupied-no-network-no-git"
+    fi
+
+    return "$failures"
+}
+
 # Test real repository root
 test_real_repo() {
+    unset OCCUPIED_VERSIONS || true
     local temp_dir
     temp_dir=$(mktemp -d)
     trap "rm -rf '$temp_dir'" EXIT
@@ -312,6 +529,10 @@ done
 if ! test_real_repo; then
     failures=$((failures + 1))
 fi
+
+occupied_failures=0
+test_occupied_cases || occupied_failures=$?
+failures=$((failures + occupied_failures))
 
 if [ $failures -eq 0 ]; then
     echo "All tests passed"
