@@ -1,8 +1,6 @@
 # webmcp_flutter
 
 [![Pub Version](https://img.shields.io/pub/v/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter)
-[![Pub Points](https://img.shields.io/pub/points/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter/score)
-[![Pub Popularity](https://img.shields.io/pub/popularity/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter/score)
 [![Pub Likes](https://img.shields.io/pub/likes/webmcp_flutter.svg)](https://pub.dev/packages/webmcp_flutter)
 [![CI](https://github.com/ortal83cohen/flutter_webmcp/actions/workflows/checks.yml/badge.svg)](https://github.com/ortal83cohen/flutter_webmcp/actions/workflows/checks.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -12,6 +10,10 @@ opt-in Flutter page semantics, and an experimental native Chrome WebMCP
 publisher. A wrapped page can expose permitted visible content and supported
 semantic actions without one descriptor per widget. Existing manual tools and
 custom transports remain supported.
+
+Please [let us know about any problems](https://github.com/ortal83cohen/flutter_webmcp/issues/new/choose)
+you encounter; we would be happy to improve the library together with the
+community.
 
 ## Why use this library?
 
