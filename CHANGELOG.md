@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.9 - 2026-09-25
+
+- Add automatic single-view page semantics, guarded actions, navigation
+  observation, bounded application receipts, and native Chrome publication.
+- Add optional annotation and generator packages for consumer-owned live
+  domain service instances.
+- Preserve manual registry, scope, widget, transport, and custom transport
+  behavior.
+- Forward the browser execution signal to an author call handler. The library
+  does not terminate or replay that handler.
+- Send a tool title, debugging hint, and origin list only when the author sets
+  them. An omitted debugging hint is not sent as false.
+- Report browser tool-start and tool-cancel events without invoking or
+  stopping a handler.
+- Add declared-field decoding for manual tools. Free-form input schemas stay
+  descriptive and are not validated at runtime.
+- Map `WebMcpToolException` to an allowlisted agent error on the native
+  publisher. Local invocation still throws that exception.
+- Add a log hook that records the event kind and tool name, without arguments,
+  results, schemas, messages, or stacks.
+- Allow local registration and invocation on non-web Flutter platforms. Native
+  publication there reports the browser unavailable.
+
 ## 0.1.8 - 2026-09-17
 
 - Automated patch release from main.
@@ -30,26 +53,6 @@
 
 ## Unreleased
 
-- Add automatic single-view page semantics, guarded actions, navigation
-  observation, bounded application receipts, and native Chrome publication.
-- Add optional annotation and generator packages for consumer-owned live
-  domain service instances.
-- Preserve manual registry, scope, widget, transport, and custom transport
-  behavior.
-- Forward the browser execution signal to an author call handler. The library
-  does not terminate or replay that handler.
-- Send a tool title, debugging hint, and origin list only when the author sets
-  them. An omitted debugging hint is not sent as false.
-- Report browser tool-start and tool-cancel events without invoking or
-  stopping a handler.
-- Add declared-field decoding for manual tools. Free-form input schemas stay
-  descriptive and are not validated at runtime.
-- Map `WebMcpToolException` to an allowlisted agent error on the native
-  publisher. Local invocation still throws that exception.
-- Add a log hook that records the event kind and tool name, without arguments,
-  results, schemas, messages, or stacks.
-- Allow local registration and invocation on non-web Flutter platforms. Native
-  publication there reports the browser unavailable.
 
 ## 0.1.1 - 2026-09-10
 
