@@ -40,3 +40,4 @@ Every ADR states how compliance is verified and how a violation would be detecte
 | [0001](0001-use-a-phased-agent-pipeline.md) | Every change goes through a six-phase pipeline with blind adversarial validation | accepted |
 | [0002](0002-share-agent-config-between-claude-code-and-cursor.md) | Instructions, skills and subagents live in one shared location read by both tools | accepted |
 | [0003](0003-webmcp-detection-first-registry.md) | The initial WebMCP package uses a singleton registry and detection-only browser boundary | accepted |
+| [0006](0006-empty-unreleased-keeps-automated-sentence.md) | A deploy with no Unreleased bullets still writes the automated patch sentence | accepted |

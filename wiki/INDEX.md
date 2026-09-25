@@ -3,7 +3,7 @@ id: index
 title: Wiki index
 status: active
 owner: unassigned
-last_verified: 2026-09-15
+last_verified: 2026-09-25
 applies_to: ["**"]
 summary: Router for the whole wiki. One line per document, stating when to read it.
 ---
@@ -45,6 +45,7 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 | [adr/0003-webmcp-detection-first-registry.md](adr/0003-webmcp-detection-first-registry.md) | Questioning the singleton registry, ownership rules, or detection-only browser boundary. |
 | [adr/0004-use-semantic-page-boundaries-and-app-observation.md](adr/0004-use-semantic-page-boundaries-and-app-observation.md) | Working on automatic page semantics, navigation evidence, app observation, native publication, or generated domain actions. |
 | [adr/0005-async-disposal-in-widget-test-bodies.md](adr/0005-async-disposal-in-widget-test-bodies.md) | Writing widget tests that create and dispose resources requiring async cleanup, especially tests involving WebMcpNativePublisher. |
+| [adr/0006-empty-unreleased-keeps-automated-sentence.md](adr/0006-empty-unreleased-keeps-automated-sentence.md) | Questioning why a deploy with no Unreleased bullets still writes the automated patch sentence. |
 
 ## Product knowledge
 
@@ -52,7 +53,7 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 |---|---|
 | [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. |
 | [product/webmcp-contract.md](product/webmcp-contract.md) | Working on manual tools, declared-field decoding, execution signals, structured agent errors, automatic page semantics, generated domain actions, scope ownership, or native browser publication. |
-| [product/release-pipeline.md](product/release-pipeline.md) | Touching the release or publish workflow, the version bump helper, or setting up the pub.dev and GitHub prerequisites a release needs. |
+| [product/release-pipeline.md](product/release-pipeline.md) | Touching the release or publish workflow, the version bump helper, asking which notes a deploy publishes, or setting up the pub.dev and GitHub prerequisites a release needs. |
 
 ## Work items
 

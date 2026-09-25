@@ -3,9 +3,9 @@ id: release-pipeline
 title: Release pipeline operator gates
 status: active
 owner: unassigned
-last_verified: 2026-09-10
+last_verified: 2026-09-25
 applies_to: [".github/workflows/release.yml", ".github/workflows/publish.yml", "tools/bump_patch_version.sh"]
-summary: The three human prerequisites that make the automated pub.dev release work, and the facts about pub.dev that constrain it.
+summary: The three human prerequisites that make the automated pub.dev release work, the pub.dev permanence constraint, and which changelog notes a deploy publishes.
 ---
 
 # Release pipeline operator gates
@@ -55,4 +55,20 @@ stops future releases but removes nothing already uploaded, so each release is a
 Retraction exists as a pub.dev feature but this repository builds no path for it.
 
 Because the release job runs the full check suite before it tags, a repository state that fails
-that suite cannot produce a release at all. That is intended: the suite is the release gate.
+that suite cannot produce a release at all.
+
+## Which notes a deploy publishes
+
+On deploy, if `CHANGELOG.md` has exactly one line equal to `## Unreleased` and that span has
+hyphen-space bullets, those bullets and their immediate whitespace wrap lines become the new
+version's notes. The heading stays, without those bullets.
+
+If that heading is missing or the span has no hyphen-space bullet, the new version still gets
+the sentence "Automated patch release from main."
+
+Two exact Unreleased headings fail the bump and write neither file.
+
+Already numbered changelog sections are not rewritten by the helper. The next real deploy is
+what moves the current Unreleased notes.
+
+Work item 0013 is still plan-only and is not the live note source.

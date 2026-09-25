@@ -1,9 +1,9 @@
 id: "0017-promote-unreleased-on-deploy"
 title: "Promote Unreleased changelog notes into the deployed version"
 route: full
-phase: implement
-round: 1
-verdict: PASS
+phase: done
+round: 2
+verdict: FAIL
 owner_agent: null
 created: "2026-09-25"
 updated: "2026-09-25"
@@ -23,4 +23,8 @@ decisions:
     verdict: PASS
     action: revise-plan
     reason: "Plan review F-001 and F-002: step 2 and the verification approach now name three lookalike fixtures and the orphan-only fixture. No second validation round; the criteria already required those cases."
+  - round: 2
+    verdict: FAIL
+    action: annotate-only
+    reason: "Impl review F-001 (AC-016): CHANGELOG Unreleased gained bullets in 61cb94a for the library changes in that same commit. Those notes stay so the next deploy can publish them. Numbered sections and the pubspec version line still match bc1d786. The promotion helper did not rewrite them."
 escalations: []
