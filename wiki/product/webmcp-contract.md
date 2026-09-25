@@ -3,20 +3,12 @@ id: webmcp-contract
 title: WebMCP product contract
 status: active
 owner: unassigned
-last_verified: 2026-09-15
+last_verified: 2026-09-25
 applies_to: ["lib/**", "example/**", "README.md"]
-summary: Product constraints for manual tools, automatic single-view pages, generated domain actions, and experimental native Chrome publication.
+summary: Product constraints for manual tools, declared-field decoding, automatic single-view pages, generated domain actions, and experimental native Chrome publication.
 ---
 
 # WebMCP product contract
-
-`webmcp_flutter` is an application-owned Dart registry for manual tools,
-automatic opt-in Flutter pages, and generated domain actions. The process-wide
-`WebMcp.instance` registry is the source of truth. `WebMcpScope`,
-`WebMcpScreen`, and `WebMcpAction` add ownership and Flutter lifecycle behavior
-over that registry. `WebMcpAppSession`, `WebMcpPage`, and
-`WebMcpNavigatorAdapter` add a bounded semantic page surface without creating a
-second registry.
 
 ## Product boundary
 
@@ -32,13 +24,21 @@ Registration and invocation are local. Sources register their descriptors in
 the order returned. Registration is not transactional: tools successfully
 registered before a later invalid or duplicate descriptor remain registered.
 Local invocation returns or awaits the handler's value and propagates handler
-exceptions unchanged. The optional native publisher adds its own JSON boundary
-and sanitized errors without changing local invocation behavior.
+exceptions unchanged, including `WebMcpToolException`. A tool has exactly one
+of `handler` and `callHandler`. Local invocation and page dispatch pass a null
+execution signal. The optional native publisher adds its own JSON boundary.
+It maps an accepted `WebMcpToolException` to an allowlisted error and omits
+the exception message and stack. A code or details value outside the publisher
+limits becomes the existing handler-failed object. Other handler exceptions
+stay sanitized failures. That mapping does not change local invocation.
 
 Descriptors make an unmodifiable shallow copy of the input schema map. Later
 changes to the caller's outer map do not change the descriptor, but referenced
 nested objects remain shared. The schema is descriptive; the registry performs
-no runtime JSON Schema validation.
+no runtime JSON Schema validation. Declared-field decoding is a separate check.
+It runs only for a tool built from a field list, and it does not read the
+schema map. The log hook records event kind and tool name only. A hook
+exception does not change registration, invocation, or publication.
 
 ## Flutter lifecycle
 
@@ -48,10 +48,12 @@ lifetime. Omitting or unmounting it removes the exposure. The wrapper renders
 the identical child and does not inspect children, discover buttons, or infer
 actions from the widget tree.
 
-The registered descriptor's name, description, and input schema are fixed at
-the initial mount. Rebuilding the same action state with new descriptor values
-does not reconcile the registration; unmount and mount a new action to change
-them. Its handler does call the newest widget `onInvoke` callback.
+The registered descriptor's name, description, input schema, title,
+annotations, and origin list are fixed at the initial mount. Rebuilding the
+same action state with new descriptor values does not reconcile the
+registration; unmount and mount a new action to change them. A
+`WebMcpAction` has exactly one of `onInvoke` and `onCall`. Its handler calls
+the newest callback of the kind chosen at the first mount.
 
 A mounted wrapper remains directly invokable even when its child is visually
 hidden or disabled. Child state neither disables the tool nor grants authority
@@ -127,9 +129,13 @@ become allowlisted safe failures without logging descriptors or payloads.
 
 Chrome 152 page conformance establishes registration, discovery, direct
 invocation, cleanup, cancel-before-dispatch, cursor recovery, and navigation
-receipts for JavaScript and Wasm. It does not supply an invocation signal after
-callback start, so admitted work may continue; the library does not terminate
-or replay it. `toolchange` is not application-state delivery.
+receipts for JavaScript and Wasm. The native publisher forwards the browser
+execution AbortSignal to an author call handler. The library does not
+terminate or replay that handler. A null title, debugging hint, or origin
+list is omitted from the registration object. An omitted debugging hint is
+not sent as false. Tool-start and tool-cancel events notify listeners and do
+not invoke, abort, or replay a handler. `toolchange` is not application-state
+delivery.
 
 The integrated release JavaScript fixture additionally completes
 discover-observe-read-act-navigate-receipt-observe-read and rejects the covered
@@ -149,8 +155,11 @@ Multiple-Flutter-view operation, positive observation waits, generated route
 wrapping, generalized service proxies, framework-specific state adapters,
 custom data providers, Chrome web platform-back-gesture support, in-flight
 callback termination, deep schema immutability, transactional source
-registration, notification rollback, automatic cleanup of custom transports,
-and non-web product support are not delivered.
+registration, notification rollback, and automatic cleanup of custom
+transports are not delivered. Non-web hosts can register and invoke locally.
+Native publication on those hosts reports the browser unavailable, and
+`registerTool` on the non-browser boundary does not throw. That is not
+support for automatic pages, browser agents, or multiple Flutter views.
 
 Consumers must keep names unique across simultaneously mounted scopes, retain
 application authorization, install every required Navigator adapter, and own

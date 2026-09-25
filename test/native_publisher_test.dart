@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:webmcp_flutter/src/transport/native_publisher_boundary.dart';
 import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 WebMcpTool _tool(
@@ -52,6 +51,26 @@ final class _FakeBoundary implements WebMcpNativeBoundary {
   final Map<String, WebMcpNativeReasonCode> failures =
       <String, WebMcpNativeReasonCode>{};
   final List<String> registrationAttempts = <String>[];
+  final List<Map<String, Object?>> registrationObjects =
+      <Map<String, Object?>>[];
+  void Function(WebMcpNativeToolActivity activity)? activityListener;
+
+  @override
+  bool subscribeToolActivity(
+    void Function(WebMcpNativeToolActivity activity) listener,
+  ) {
+    activityListener = listener;
+    return true;
+  }
+
+  @override
+  void unsubscribeToolActivity() {
+    activityListener = null;
+  }
+
+  void emitActivity(WebMcpNativeToolActivity activity) {
+    activityListener?.call(activity);
+  }
 
   @override
   Future<WebMcpNativeRegistration> registerTool(
@@ -59,6 +78,7 @@ final class _FakeBoundary implements WebMcpNativeBoundary {
     WebMcpNativeInvocationHandler invoke,
   ) async {
     registrationAttempts.add(tool.name);
+    registrationObjects.add(webMcpNativeRegistrationObject(tool));
     final WebMcpNativeReasonCode? failure = failures[tool.name];
     if (failure != null) {
       throw WebMcpNativeBoundaryException(failure);
@@ -78,12 +98,38 @@ final class _FakeBoundary implements WebMcpNativeBoundary {
     String name,
     Object? input, {
     bool cancelledBeforeDispatch = false,
+    WebMcpExecutionSignal? executionSignal,
   }) => handlers[name]!(
     input,
     WebMcpNativeInvocationContext(
       cancelledBeforeDispatch: cancelledBeforeDispatch,
+      executionSignal: executionSignal,
     ),
   );
+}
+
+final class _FakeSignal implements WebMcpExecutionSignal {
+  @override
+  bool aborted = false;
+
+  final List<void Function()> _listeners = <void Function()>[];
+
+  void abort() {
+    aborted = true;
+    for (final void Function() listener in _listeners.toList(growable: false)) {
+      listener();
+    }
+  }
+
+  @override
+  void addAbortListener(void Function() listener) {
+    _listeners.add(listener);
+  }
+
+  @override
+  void removeAbortListener(void Function() listener) {
+    _listeners.remove(listener);
+  }
 }
 
 Map<String, Object?> _decode(String value) =>
@@ -94,6 +140,7 @@ void main() {
   late DateTime now;
 
   setUp(() {
+    WebMcp.logHook = null;
     WebMcp.instance.reset();
     boundary = _FakeBoundary();
     now = DateTime.utc(2026, 9, 10);
@@ -102,6 +149,7 @@ void main() {
   });
 
   tearDown(() {
+    WebMcp.logHook = null;
     WebMcp.instance.reset();
     webMcpNativeBoundaryFactory = createWebMcpNativeBoundary;
     webMcpNativeClock = DateTime.now;
@@ -464,4 +512,349 @@ void main() {
       expect(diagnostics, isNot(contains('result')));
     },
   );
+
+  test('call handler sees the execution signal once', () async {
+    final _FakeSignal signal = _FakeSignal();
+    var handlerCalls = 0;
+    var callCalls = 0;
+    bool? observed;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'signaled',
+        description: 'Reads the execution signal',
+        callHandler: (WebMcpToolCall call) {
+          callCalls++;
+          observed = call.executionSignal?.aborted;
+          return observed;
+        },
+      ),
+    );
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'plain',
+        description: 'One argument handler',
+        handler: (Map<String, Object?> arguments) {
+          handlerCalls++;
+          return arguments;
+        },
+      ),
+    );
+    await WebMcpNativePublisher().attach();
+
+    expect(
+      jsonDecode(
+        await boundary.invoke('signaled', const {}, executionSignal: signal),
+      ),
+      isFalse,
+    );
+    expect(callCalls, 1);
+    expect(handlerCalls, 0);
+    expect(observed, isFalse);
+
+    expect(
+      jsonDecode(await boundary.invoke('signaled', const <String, Object?>{})),
+      isNull,
+    );
+    expect(callCalls, 2);
+  });
+
+  test('abort after start leaves the handler future pending', () async {
+    final _FakeSignal signal = _FakeSignal();
+    final Completer<void> started = Completer<void>();
+    final Completer<Object?> release = Completer<Object?>();
+    var calls = 0;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'inflight',
+        description: 'Waits for the test',
+        callHandler: (WebMcpToolCall call) {
+          calls++;
+          started.complete();
+          return release.future;
+        },
+      ),
+    );
+    await WebMcpNativePublisher().attach();
+
+    final Future<String> pending = boundary.invoke(
+      'inflight',
+      const <String, Object?>{},
+      executionSignal: signal,
+    );
+    await started.future;
+    signal.abort();
+    await Future<void>.delayed(Duration.zero);
+    expect(calls, 1);
+    await expectLater(
+      pending.timeout(Duration.zero),
+      throwsA(isA<TimeoutException>()),
+    );
+
+    release.complete(<String, Object?>{'done': true});
+    expect(jsonDecode(await pending), <String, Object?>{'done': true});
+  });
+
+  test('cancel before dispatch skips the call handler', () async {
+    var calls = 0;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'skipped',
+        description: 'Must not run',
+        callHandler: (WebMcpToolCall call) {
+          calls++;
+          return 'ran';
+        },
+      ),
+    );
+    await WebMcpNativePublisher().attach();
+
+    final Map<String, Object?> failure = _decode(
+      await boundary.invoke(
+        'skipped',
+        const <String, Object?>{},
+        cancelledBeforeDispatch: true,
+      ),
+    );
+    expect((failure['error'] as Map<Object?, Object?>)['code'], 'cancelled');
+    expect(calls, 0);
+  });
+
+  test(
+    'registration object omits unset title debugging and exposedTo',
+    () async {
+      WebMcp.instance.registerTool(
+        WebMcpTool(
+          name: 'bare',
+          description: 'No optional members',
+          handler: (Map<String, Object?> arguments) => null,
+        ),
+      );
+      WebMcp.instance.registerTool(
+        WebMcpTool(
+          name: 'titled',
+          description: 'Has a title',
+          title: 'Author title',
+          annotations: const WebMcpToolAnnotations(debugging: true),
+          exposedTo: const <String>['https://a.example', 'https://b.example'],
+          handler: (Map<String, Object?> arguments) => null,
+        ),
+      );
+      WebMcp.instance.registerTool(
+        WebMcpTool(
+          name: 'debug.false',
+          description: 'Debugging false',
+          annotations: const WebMcpToolAnnotations(debugging: false),
+          exposedTo: const <String>[],
+          handler: (Map<String, Object?> arguments) => null,
+        ),
+      );
+      await WebMcpNativePublisher().attach();
+
+      Map<String, Object?> objectNamed(String name) => boundary
+          .registrationObjects
+          .firstWhere((Map<String, Object?> object) => object['name'] == name);
+      final Map<String, Object?> bare = objectNamed('bare');
+      final Map<String, Object?> titled = objectNamed('titled');
+      final Map<String, Object?> debugFalse = objectNamed('debug.false');
+      expect(bare.containsKey('title'), isFalse);
+      expect(titled['title'], 'Author title');
+      final Map<Object?, Object?> bareAnnotations =
+          bare['annotations']! as Map<Object?, Object?>;
+      final Map<Object?, Object?> titledAnnotations =
+          titled['annotations']! as Map<Object?, Object?>;
+      final Map<Object?, Object?> falseAnnotations =
+          debugFalse['annotations']! as Map<Object?, Object?>;
+      expect(bareAnnotations.containsKey('debugging'), isFalse);
+      expect(titledAnnotations['debugging'], isTrue);
+      expect(falseAnnotations['debugging'], isFalse);
+      expect(bare.containsKey('exposedTo'), isFalse);
+      expect(debugFalse['exposedTo'], isEmpty);
+      expect(titled['exposedTo'], <String>[
+        'https://a.example',
+        'https://b.example',
+      ]);
+    },
+  );
+
+  test('tool activity is delivered and dropped after detach', () async {
+    var calls = 0;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'quiet',
+        description: 'Not invoked by activity',
+        handler: (Map<String, Object?> arguments) => calls++,
+      ),
+    );
+    final WebMcpNativePublisher publisher = WebMcpNativePublisher();
+    await publisher.attach();
+    final List<WebMcpNativeToolActivity> seen = <WebMcpNativeToolActivity>[];
+    final List<WebMcpLogRecord> records = <WebMcpLogRecord>[];
+    WebMcp.logHook = records.add;
+    publisher.addToolActivityListener(seen.add);
+
+    boundary.emitActivity(
+      const WebMcpNativeToolActivity(
+        kind: WebMcpNativeToolActivityKind.started,
+        toolName: 'quiet',
+      ),
+    );
+    expect(seen, hasLength(1));
+    expect(seen.single.kind, WebMcpNativeToolActivityKind.started);
+    expect(seen.single.toolName, 'quiet');
+    expect(records.single.kind, WebMcpLogKind.nativeActivity);
+    expect(records.single.toolName, 'quiet');
+    expect(calls, 0);
+
+    await publisher.detach();
+    boundary.emitActivity(
+      const WebMcpNativeToolActivity(
+        kind: WebMcpNativeToolActivityKind.started,
+        toolName: 'quiet',
+      ),
+    );
+    expect(seen, hasLength(1));
+  });
+
+  test('toolcancel does not finish the running call handler', () async {
+    final Completer<void> started = Completer<void>();
+    final Completer<Object?> release = Completer<Object?>();
+    var calls = 0;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'cancel.live',
+        description: 'Overlaps toolcancel',
+        callHandler: (WebMcpToolCall call) {
+          calls++;
+          if (calls == 1) {
+            started.complete();
+            return release.future;
+          }
+          return 'again';
+        },
+      ),
+    );
+    final WebMcpNativePublisher publisher = WebMcpNativePublisher();
+    await publisher.attach();
+    final List<String> names = <String>[];
+    publisher.addToolActivityListener(
+      (WebMcpNativeToolActivity activity) => names.add(activity.toolName),
+    );
+
+    final Future<String> pending = boundary.invoke(
+      'cancel.live',
+      const <String, Object?>{},
+    );
+    await started.future;
+    boundary.emitActivity(
+      const WebMcpNativeToolActivity(
+        kind: WebMcpNativeToolActivityKind.cancelled,
+        toolName: 'cancel.live',
+      ),
+    );
+    await Future<void>.delayed(Duration.zero);
+    expect(names, <String>['cancel.live']);
+    expect(calls, 1);
+    await expectLater(
+      pending.timeout(Duration.zero),
+      throwsA(isA<TimeoutException>()),
+    );
+    release.complete('finished');
+    expect(jsonDecode(await pending), 'finished');
+
+    expect(await WebMcp.instance.invokeTool('cancel.live', const {}), 'again');
+    expect(calls, 2);
+  });
+
+  test('structured tool exceptions become agent errors', () async {
+    const String secret = 'distinctive-argument-secret';
+    const String message = 'distinctive-exception-message';
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'coded',
+        description: 'Throws a structured failure',
+        handler: (Map<String, Object?> arguments) {
+          throw const WebMcpToolException(
+            code: 'author.code',
+            retryable: true,
+            details: <String, Object?>{'note': 'visible-detail'},
+          );
+        },
+      ),
+    );
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'coded.bare',
+        description: 'Throws without details',
+        handler: (Map<String, Object?> arguments) {
+          throw const WebMcpToolException(code: 'bare.code', retryable: false);
+        },
+      ),
+    );
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'state',
+        description: 'Throws StateError',
+        handler: (Map<String, Object?> arguments) => throw StateError(message),
+      ),
+    );
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'oversized',
+        description: 'Details exceed the encoded size',
+        handler: (Map<String, Object?> arguments) {
+          throw WebMcpToolException(
+            code: 'too.big',
+            retryable: false,
+            details: <String, Object?>{'blob': 'y' * webMcpNativeMaxJsonBytes},
+          );
+        },
+      ),
+    );
+    final List<String> logs = <String>[];
+    WebMcp.logHook = (WebMcpLogRecord record) => logs.add(record.toString());
+    await WebMcpNativePublisher().attach();
+
+    final Map<String, Object?> withDetails = _decode(
+      await boundary.invoke('coded', <String, Object?>{'value': secret}),
+    );
+    final Map<Object?, Object?> withError =
+        withDetails['error']! as Map<Object?, Object?>;
+    expect(withDetails['ok'], isFalse);
+    expect(withError['code'], 'author.code');
+    expect(withError['retryable'], isTrue);
+    expect(withError['details'], <String, Object?>{'note': 'visible-detail'});
+
+    final Map<String, Object?> withoutDetails = _decode(
+      await boundary.invoke('coded.bare', const <String, Object?>{}),
+    );
+    expect(
+      (withoutDetails['error']! as Map<Object?, Object?>).containsKey(
+        'details',
+      ),
+      isFalse,
+    );
+
+    final String stateResult = await boundary.invoke('state', <String, Object?>{
+      'value': secret,
+    });
+    expect(
+      (_decode(stateResult)['error'] as Map<Object?, Object?>)['code'],
+      'handlerFailed',
+    );
+    expect(stateResult, isNot(contains(message)));
+    expect(stateResult, isNot(contains(secret)));
+
+    final String oversized = await boundary.invoke(
+      'oversized',
+      const <String, Object?>{},
+    );
+    expect(
+      (_decode(oversized)['error'] as Map<Object?, Object?>)['code'],
+      'handlerFailed',
+    );
+    expect(oversized, isNot(contains('yyy')));
+    expect(logs.join('\n'), isNot(contains(secret)));
+    expect(logs.join('\n'), isNot(contains(message)));
+    expect(logs.join('\n'), isNot(contains('visible-detail')));
+  });
 }

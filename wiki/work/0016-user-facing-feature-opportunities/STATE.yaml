@@ -1,0 +1,28 @@
+# Work item state. The only mutable file in a work item folder.
+# Copy this into wiki/work/NNNN-slug/STATE.yaml and keep it current.
+
+id: "0016-user-facing-feature-opportunities"
+title: "Feature opportunities for application authors using webmcp_flutter"
+route: full
+phase: done
+round: 0
+verdict: null
+owner_agent: null
+created: "2026-09-25"
+updated: "2026-09-25"
+
+blockers: []
+
+followups: []
+
+decisions:
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "User chose scopes A, B, and C on 2026-09-25: expose the execution AbortSignal to the author, add title, debugging, exposedTo, and tool start/cancel events, and add typed decode, structured errors, a logger hook, and non-web safe no-op registration. Library-initiated termination stays omitted. Deferral is rejected."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "F-001 and F-002 from validation/plan-review-01.md. Page dispatch uses callHandler when set and otherwise handler, with a null signal. WebMcpAction stores exactly one of onInvoke or onCall. Research review passed and was not revised."
+
+escalations: []

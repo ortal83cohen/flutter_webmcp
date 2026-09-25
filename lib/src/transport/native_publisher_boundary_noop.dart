@@ -17,9 +17,22 @@ final class NoopWebMcpNativeBoundary implements WebMcpNativeBoundary {
   Future<WebMcpNativeRegistration> registerTool(
     WebMcpTool tool,
     WebMcpNativeInvocationHandler invoke,
-  ) {
-    throw const WebMcpNativeBoundaryException(
-      WebMcpNativeReasonCode.browserUnavailable,
-    );
+  ) async {
+    return _NoopWebMcpNativeRegistration();
   }
+
+  @override
+  bool subscribeToolActivity(
+    void Function(WebMcpNativeToolActivity activity) listener,
+  ) {
+    return false;
+  }
+
+  @override
+  void unsubscribeToolActivity() {}
+}
+
+final class _NoopWebMcpNativeRegistration implements WebMcpNativeRegistration {
+  @override
+  void abort() {}
 }

@@ -17,7 +17,10 @@ final class _Source implements WebMcpToolSource {
 }
 
 void main() {
-  setUp(WebMcp.instance.reset);
+  setUp(() {
+    WebMcp.logHook = null;
+    WebMcp.instance.reset();
+  });
 
   test('registers tools and lists them in ascending order', () {
     WebMcp.instance
@@ -172,6 +175,186 @@ void main() {
       ),
     );
     expect(calls, 0);
+  });
+
+  test('one callback receives the map and exposedTo is copied', () async {
+    final List<String> origins = <String>['https://one.example'];
+    final List<Map<String, Object?>> seen = <Map<String, Object?>>[];
+    final WebMcpTool tool = WebMcpTool(
+      name: 'one.callback',
+      description: 'One argument',
+      exposedTo: origins,
+      handler: (Map<String, Object?> arguments) {
+        seen.add(arguments);
+        return arguments['value'];
+      },
+    );
+    origins.add('https://two.example');
+    WebMcp.instance.registerTool(tool);
+    expect(tool.exposedTo, <String>['https://one.example']);
+    expect(
+      await WebMcp.instance.invokeTool('one.callback', const {'value': 'map'}),
+      'map',
+    );
+    expect(seen.single, <String, Object?>{'value': 'map'});
+  });
+
+  test('both tool callbacks throw and leave the registry unchanged', () {
+    expect(
+      () => WebMcpTool(
+        name: 'both',
+        description: 'Both callbacks',
+        handler: (Map<String, Object?> arguments) => null,
+        callHandler: (WebMcpToolCall call) => null,
+      ),
+      throwsArgumentError,
+    );
+    expect(WebMcp.instance.tools, isEmpty);
+  });
+
+  test('local invoke throws the tool exception', () async {
+    final WebMcpToolException failure = const WebMcpToolException(
+      code: 'author.code',
+      retryable: true,
+    );
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'local.fail',
+        description: 'Throws structured',
+        handler: (Map<String, Object?> arguments) => throw failure,
+      ),
+    );
+    await expectLater(
+      WebMcp.instance.invokeTool('local.fail', const {}),
+      throwsA(
+        isA<WebMcpToolException>().having(
+          (WebMcpToolException error) => error.code,
+          'code',
+          'author.code',
+        ),
+      ),
+    );
+  });
+
+  test('log hook records kind and tool name without arguments', () async {
+    const String secret = 'distinctive-argument-secret';
+    final List<WebMcpLogRecord> records = <WebMcpLogRecord>[];
+    WebMcp.logHook = records.add;
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'logged',
+        description: 'Logged tool',
+        handler: (Map<String, Object?> arguments) {
+          if (arguments['fail'] == true) {
+            throw StateError('distinctive-exception-message');
+          }
+          return arguments[secret];
+        },
+      ),
+    );
+    await WebMcp.instance.invokeTool('logged', const {secret: 'value'});
+    await expectLater(
+      WebMcp.instance.invokeTool('logged', const {'fail': true}),
+      throwsStateError,
+    );
+    WebMcp.instance.unregisterTool('logged');
+    expect(
+      records.map((WebMcpLogRecord record) => record.kind),
+      <WebMcpLogKind>[
+        WebMcpLogKind.registered,
+        WebMcpLogKind.invoked,
+        WebMcpLogKind.invocationFailed,
+        WebMcpLogKind.unregistered,
+      ],
+    );
+    expect(
+      records.map((WebMcpLogRecord record) => record.toolName),
+      everyElement('logged'),
+    );
+    expect(records.join('\n'), isNot(contains(secret)));
+    WebMcp.logHook = null;
+  });
+
+  test('a throwing hook leaves the tool registered', () async {
+    WebMcp.logHook = (WebMcpLogRecord record) => throw StateError('hook');
+    WebMcp.instance.registerTool(
+      WebMcpTool(
+        name: 'kept',
+        description: 'Stays registered',
+        handler: (Map<String, Object?> arguments) => 'ok',
+      ),
+    );
+    expect(await WebMcp.instance.invokeTool('kept', const {}), 'ok');
+    WebMcp.logHook = null;
+  });
+
+  test('declared input rejects bad values before the callback', () async {
+    var calls = 0;
+    WebMcp.instance.registerTool(
+      WebMcpTool.withDecodedArguments(
+        name: 'decoded',
+        description: 'Declared fields',
+        fields: const <WebMcpInputField>[
+          WebMcpInputField(key: 'label', shape: WebMcpInputShape.string),
+          WebMcpInputField(key: 'count', shape: WebMcpInputShape.safeInteger),
+        ],
+        callHandler: (WebMcpToolCall call) {
+          calls++;
+          return call.arguments;
+        },
+      ),
+    );
+    Future<void> expectRejected(Map<String, Object?> arguments) async {
+      await expectLater(
+        WebMcp.instance.invokeTool('decoded', arguments),
+        throwsA(isA<WebMcpInvalidArgumentsException>()),
+      );
+    }
+
+    await expectRejected(const <String, Object?>{
+      'label': 'ok',
+      'count': 1,
+      'extra': true,
+    });
+    await expectRejected(const <String, Object?>{'label': 'ok'});
+    await expectRejected(const <String, Object?>{'label': 'ok', 'count': 1.0});
+    await expectRejected(const <String, Object?>{
+      'label': 'ok',
+      'count': 9007199254740992,
+    });
+    expect(calls, 0);
+
+    final Object? decoded = await WebMcp.instance.invokeTool('decoded', const {
+      'label': 'ok',
+      'count': 1,
+    });
+    expect(calls, 1);
+    expect(decoded, <String, Object?>{'label': 'ok', 'count': 1});
+  });
+
+  test('free-form schema is a shallow copy and is not validated', () async {
+    final Map<String, Object?> nested = <String, Object?>{'inner': true};
+    final Map<String, Object?> schema = <String, Object?>{
+      'type': 'object',
+      'required': <Object?>['needed'],
+      'properties': nested,
+    };
+    var calls = 0;
+    final WebMcpTool tool = WebMcpTool(
+      name: 'free.form',
+      description: 'Schema is descriptive',
+      inputSchema: schema,
+      handler: (Map<String, Object?> arguments) {
+        calls++;
+        return 'ran';
+      },
+    );
+    schema['type'] = 'changed';
+    WebMcp.instance.registerTool(tool);
+    expect(await WebMcp.instance.invokeTool('free.form', const {}), 'ran');
+    expect(calls, 1);
+    expect(identical(tool.inputSchema, schema), isFalse);
+    expect(identical(tool.inputSchema['properties'], nested), isTrue);
   });
 
   test('unregister is idempotent', () {

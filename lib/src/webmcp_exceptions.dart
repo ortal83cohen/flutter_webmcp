@@ -43,3 +43,32 @@ final class WebMcpScopeMissingException extends WebMcpException {
   const WebMcpScopeMissingException(String toolName)
     : super(toolName, 'No enclosing WebMcpScreen scope was found.');
 }
+
+/// A structured tool failure an agent may receive as an allowlisted error.
+class WebMcpToolException implements Exception {
+  /// Creates a failure with an author [code] and [retryable] flag.
+  const WebMcpToolException({
+    required this.code,
+    required this.retryable,
+    this.details,
+  });
+
+  /// The author error code.
+  final String code;
+
+  /// Whether the author marked the failure as retryable.
+  final bool retryable;
+
+  /// Optional JSON details, included only when the publisher accepts them.
+  final Map<String, Object?>? details;
+
+  @override
+  String toString() => 'WebMcpToolException($code)';
+}
+
+/// Indicates that declared tool arguments did not match the field list.
+final class WebMcpInvalidArgumentsException extends WebMcpToolException {
+  /// Creates an invalid-arguments failure with no details.
+  const WebMcpInvalidArgumentsException()
+    : super(code: 'invalidArguments', retryable: false);
+}

@@ -1,4 +1,5 @@
 export 'src/page/page.dart';
+export 'src/transport/native_publisher_boundary.dart';
 export 'src/transport/webmcp_native_capabilities.dart';
 export 'src/transport/webmcp_native_publisher.dart';
 export 'src/transport/webmcp_transport.dart';
@@ -6,6 +7,7 @@ export 'src/webmcp.dart';
 export 'src/webmcp_exceptions.dart';
 export 'src/webmcp_scope.dart';
 export 'src/webmcp_tool.dart';
+export 'src/webmcp_typed_input.dart';
 export 'src/webmcp_tool_source.dart';
 export 'src/widgets/webmcp_action.dart';
 export 'src/widgets/webmcp_screen.dart';

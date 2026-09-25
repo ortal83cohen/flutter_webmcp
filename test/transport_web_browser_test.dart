@@ -6,7 +6,6 @@ import 'dart:js_interop_unsafe';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:web/web.dart';
-import 'package:webmcp_flutter/src/transport/native_publisher_boundary.dart';
 import 'package:webmcp_flutter/src/transport/native_publisher_boundary_web.dart';
 import 'package:webmcp_flutter/src/transport/transport_web.dart';
 import 'package:webmcp_flutter/webmcp_flutter.dart';

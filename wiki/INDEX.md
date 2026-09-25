@@ -51,7 +51,7 @@ Every document in this wiki is reachable from here in one hop. If you add a docu
 | Document | Read it when |
 |---|---|
 | [product/README.md](product/README.md) | Looking for what the product does, its domain rules and its constraints. |
-| [product/webmcp-contract.md](product/webmcp-contract.md) | Working on manual tools, automatic page semantics, generated domain actions, scope ownership, or native browser publication. |
+| [product/webmcp-contract.md](product/webmcp-contract.md) | Working on manual tools, declared-field decoding, execution signals, structured agent errors, automatic page semantics, generated domain actions, scope ownership, or native browser publication. |
 | [product/release-pipeline.md](product/release-pipeline.md) | Touching the release or publish workflow, the version bump helper, or setting up the pub.dev and GitHub prerequisites a release needs. |
 
 ## Work items

@@ -46,11 +46,81 @@ abstract interface class WebMcpRegistryResetObserver {
   void onRegistryReset();
 }
 
+/// Kinds of payload-free tool log records.
+enum WebMcpLogKind {
+  /// A tool was registered locally.
+  registered,
+
+  /// A tool was unregistered locally.
+  unregistered,
+
+  /// A tool invocation finished.
+  invoked,
+
+  /// A tool invocation failed.
+  invocationFailed,
+
+  /// The browser reported tool activity.
+  nativeActivity,
+}
+
+/// A log record that carries a kind, a tool name, and an optional reason code.
+final class WebMcpLogRecord {
+  /// Creates a record with no argument, result, or schema payload.
+  const WebMcpLogRecord({
+    required this.kind,
+    required this.toolName,
+    this.reasonCode,
+  });
+
+  /// The event kind.
+  final WebMcpLogKind kind;
+
+  /// The tool name associated with the event.
+  final String toolName;
+
+  /// An optional allowlisted reason code.
+  final String? reasonCode;
+
+  @override
+  String toString() {
+    final String? reasonCode = this.reasonCode;
+    if (reasonCode == null) {
+      return 'WebMcpLogRecord(${kind.name}, $toolName)';
+    }
+    return 'WebMcpLogRecord(${kind.name}, $toolName, $reasonCode)';
+  }
+}
+
+/// Writes [kind] for [toolName] when a log hook is installed.
+///
+/// Failures from the hook are ignored.
+void webMcpRecordLog(
+  WebMcpLogKind kind,
+  String toolName, {
+  String? reasonCode,
+}) {
+  final void Function(WebMcpLogRecord record)? hook = WebMcp.logHook;
+  if (hook == null) {
+    return;
+  }
+  try {
+    hook(
+      WebMcpLogRecord(kind: kind, toolName: toolName, reasonCode: reasonCode),
+    );
+  } on Object {
+    // A failing hook cannot change registration, invocation, or publication.
+  }
+}
+
 /// The process-wide registry of tools exposed by this package.
 final class WebMcp {
   WebMcp._() : _transport = createDefaultTransport();
 
   static final WebMcp _instance = WebMcp._();
+
+  /// Receives payload-free tool events. Null until an application installs it.
+  static void Function(WebMcpLogRecord record)? logHook;
 
   /// Returns the process-wide registry.
   static WebMcp get instance => _instance;
@@ -93,6 +163,7 @@ final class WebMcp {
       throw WebMcpDuplicateToolException(tool.name);
     }
     _tools[tool.name] = tool;
+    webMcpRecordLog(WebMcpLogKind.registered, tool.name);
     try {
       _transport.onToolRegistered(tool);
     } finally {
@@ -113,6 +184,7 @@ final class WebMcp {
     if (removed == null) {
       return false;
     }
+    webMcpRecordLog(WebMcpLogKind.unregistered, name);
     try {
       _transport.onToolUnregistered(name);
     } finally {
@@ -139,7 +211,33 @@ final class WebMcp {
     if (tool == null) {
       throw WebMcpToolNotFoundException(name);
     }
-    return tool.handler(arguments);
+    try {
+      final Object? result = await _dispatch(tool, arguments, null);
+      webMcpRecordLog(WebMcpLogKind.invoked, name);
+      return result;
+    } on Object {
+      webMcpRecordLog(WebMcpLogKind.invocationFailed, name);
+      rethrow;
+    }
+  }
+
+  Future<Object?> _dispatch(
+    WebMcpTool tool,
+    Map<String, Object?> arguments,
+    WebMcpExecutionSignal? executionSignal,
+  ) {
+    final WebMcpToolCallHandler? callHandler = tool.callHandler;
+    if (callHandler != null) {
+      return Future<Object?>.value(
+        callHandler(
+          WebMcpToolCall(
+            arguments: arguments,
+            executionSignal: executionSignal,
+          ),
+        ),
+      );
+    }
+    return Future<Object?>.value(tool.handler!(arguments));
   }
 
   /// Clears all tools and installs [transport] or the platform default.

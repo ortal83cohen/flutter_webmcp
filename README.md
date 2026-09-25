@@ -37,6 +37,9 @@ Choose the integration that matches what you need:
 | Need | Use | What it solves |
 | --- | --- | --- |
 | Expose an application or backend operation | `WebMcpTool` and `WebMcp.instance` | Gives an agent-facing name, description, schema, and handler for an explicit operation |
+| Decode a fixed argument shape before the handler | `WebMcpTool.withDecodedArguments` | Rejects unknown keys and wrong shapes without validating the free-form schema |
+| Stop the application's own in-flight work | `callHandler` and `WebMcpExecutionSignal` | Forwards the browser execution signal. The library does not cancel the handler |
+| Hear when an agent starts or cancels a tool | `addToolActivityListener` | Delivers the tool name. The event does not invoke or stop a handler |
 | Keep tools aligned with a screen or widget | `WebMcpScope`, `WebMcpScreen`, and `WebMcpAction` | Removes tools automatically when their owner is unmounted or disposed |
 | Let an agent inspect and operate an approved Flutter page | `WebMcpPage`, `WebMcpAppSession`, and `WebMcpNavigatorAdapter` | Turns settled, visible semantics into bounded `page.read` and `page.act` operations with stale-snapshot protection |
 | Expose selected domain-service methods | `webmcp_flutter_annotations` and `webmcp_flutter_generator` | Generates schemas and strict argument decoders without constructing or replacing the live service |
@@ -73,6 +76,12 @@ publication, see [example/lib/main.dart](example/lib/main.dart).
 | Feature | What you can expose or control | Main API |
 | --- | --- | --- |
 | Explicit tools | Synchronous or asynchronous application operations with descriptions, input schemas, and agent hints | `WebMcpTool`, `WebMcp.instance` |
+| Declared arguments | Reject a bad argument map before the author callback, using a field list rather than the schema map | `WebMcpInputField`, `WebMcpTool.withDecodedArguments` |
+| Execution signal | Read whether the browser aborted a published call, and stop only the application's own work | `callHandler`, `WebMcpExecutionSignal` |
+| Publication labels | Set a display title, a debugging hint, and an origin list, or leave each one unset | `title`, `WebMcpToolAnnotations.debugging`, `exposedTo` |
+| Tool activity | Observe tool start and cancel events without those events dispatching a handler | `WebMcpNativePublisher.addToolActivityListener` |
+| Structured agent errors | Throw a coded failure that local callers still see, and that the publisher returns as an allowlisted error | `WebMcpToolException` |
+| Invocation log | Record registration, invocation, failure, and native activity by kind and tool name | `WebMcp.logHook` |
 | Lifetime ownership | Register a group of tools and remove it when its owner closes | `WebMcpScope` |
 | Widget integration | Expose a callback while a widget is mounted, or register tools for a screen | `WebMcpAction`, `WebMcpScreen` |
 | Automatic page reading | Read permitted Flutter semantics: labels, hints, roles, states, values, and optional bounds | `WebMcpPage`, `<pageId>.page.read` |
@@ -558,20 +567,33 @@ skipped and cannot remove the first owner's tool. Closing a scope removes its
 owned tools, is idempotent, and permanently prevents further additions.
 
 `WebMcpAction` registers for its mounted lifetime. Its registered name,
-description, and input schema remain the values from the initial mount until
-the action is unmounted and mounted again. Its handler calls the latest
-`onInvoke` callback. A disabled child does not disable the registered tool or
-grant invocation authority; omit or unmount the wrapper when invocation should
-be unavailable.
+description, input schema, title, annotations, and origin list remain the
+values from the initial mount until the action is unmounted and mounted again.
+Set exactly one of `onInvoke` and `onCall`. The registered handler calls the
+latest callback of that chosen kind. A disabled child does not disable the
+registered tool or grant invocation authority; omit or unmount the wrapper
+when invocation should be unavailable.
+
+A tool has exactly one of `handler` and `callHandler`. Local invocation and
+page dispatch pass a null execution signal. The native publisher passes the
+browser execution signal only to `callHandler`. Aborting that signal does not
+finish or replay the handler.
 
 Manual input schemas are descriptive only. The schema's outer map is copied and exposed as
 unmodifiable, while nested schema values remain shared. The package does not validate
-arguments against the schema at runtime. Registering a source is sequential,
-so tools registered before a later failure remain registered.
+arguments against the schema at runtime. `WebMcpTool.withDecodedArguments`
+checks a separate declared field list before the author callback. Registering
+a source is sequential, so tools registered before a later failure remain
+registered.
 
-Local handler results and exceptions pass through unchanged. The native
-publisher separately validates bounded JSON input/output and sanitizes browser
-errors. With a custom
+Local handler results and exceptions pass through unchanged, including
+`WebMcpToolException`. The native publisher maps an accepted
+`WebMcpToolException` to an allowlisted error object and omits the exception
+message and stack. A code or details value outside the publisher limits
+becomes the existing handler-failed object. The publisher separately validates
+bounded JSON input/output and sanitizes other browser errors. `WebMcp.logHook`
+receives the event kind and tool name only. A hook exception does not change
+registration or invocation. With a custom
 transport, registry mutations happen before registration and unregistration
 notifications; a notification exception propagates without rolling the
 mutation back. `reset` clears local tools and replaces the transport without
@@ -581,7 +603,9 @@ that provide stateful transports must clean up their external state.
 ## Browser and platform support
 
 The implementation targets Flutter web with a minimum of Flutter 3.47.0 and Dart
-3.13.0. Other Flutter platforms are not supported by this release.
+3.13.0. Other Flutter platforms can register and invoke tools locally. Native
+publication on those hosts reports the browser unavailable. This is not support
+for automatic pages, browser agents, or multiple Flutter views.
 
 `WebMcpNativePublisher` additively mirrors local tools to same-origin
 `document.modelContext` without replacing the current transport. Chrome 152
@@ -597,9 +621,9 @@ This is still experimental and is not a native-agent support claim. The
 required isolated official Chrome Inspector profile currently lacks Gemini
 authentication, so no authenticated natural-language model-selected
 discover → observe → read → act → navigate → receipt → observe → read trace
-has passed. Chrome 152 also supplies no invocation `AbortSignal` after a
-callback starts; admitted work may continue and is never automatically
-replayed. Positive observation waits, multiple Flutter views, and Chrome web
+has passed. The native publisher forwards the browser execution `AbortSignal`
+to an author call handler. The library does not terminate or replay that
+handler. Positive observation waits, multiple Flutter views, and Chrome web
 platform-back gestures are not supported.
 
 

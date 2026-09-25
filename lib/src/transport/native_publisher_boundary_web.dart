@@ -11,12 +11,21 @@ import 'native_publisher_boundary.dart';
 WebMcpNativeBoundary createPlatformWebMcpNativeBoundary() =>
     const BrowserWebMcpNativeBoundary();
 
-extension type _ModelContext(JSObject _) implements JSObject {
+extension type _ModelContext(JSObject _) implements JSObject, EventTarget {
   external JSPromise<JSAny?> registerTool(
     JSObject definition,
     JSObject options,
   );
 }
+
+final class _BrowserActivityBinding {
+  void Function(WebMcpNativeToolActivity activity)? listener;
+  EventTarget? target;
+  JSFunction? activated;
+  JSFunction? cancelled;
+}
+
+final _BrowserActivityBinding _activity = _BrowserActivityBinding();
 
 /// Publishes tools to Chrome's same-origin `document.modelContext` surface.
 final class BrowserWebMcpNativeBoundary implements WebMcpNativeBoundary {
@@ -51,23 +60,12 @@ final class BrowserWebMcpNativeBoundary implements WebMcpNativeBoundary {
     }
 
     final AbortController controller = AbortController();
-    final JSFunction execute = ((JSAny? input) {
-      return _executeSafely(input, invoke).toJS;
+    final JSFunction execute = ((JSAny? input, JSAny? options) {
+      return _executeSafely(input, options, invoke).toJS;
     }).toJS;
     final JSObject definition =
-        <String, JSAny?>{
-              'name': tool.name.toJS,
-              'description': tool.description.toJS,
-              'inputSchema': tool.inputSchema.jsify(),
-              'annotations': <String, JSAny?>{
-                'readOnlyHint': tool.annotations.readOnlyHint.toJS,
-                'untrustedContentHint':
-                    tool.annotations.untrustedContentHint.toJS,
-                'consequentialHint': tool.annotations.consequentialHint.toJS,
-              }.jsify(),
-              'execute': execute,
-            }.jsify()!
-            as JSObject;
+        webMcpNativeRegistrationObject(tool).jsify()! as JSObject;
+    definition.setProperty('execute'.toJS, execute);
     final JSObject options =
         <String, JSAny?>{'signal': controller.signal}.jsify()! as JSObject;
 
@@ -84,15 +82,61 @@ final class BrowserWebMcpNativeBoundary implements WebMcpNativeBoundary {
     return _BrowserWebMcpNativeRegistration(controller);
   }
 
+  @override
+  bool subscribeToolActivity(
+    void Function(WebMcpNativeToolActivity activity) listener,
+  ) {
+    unsubscribeToolActivity();
+    final JSObject? context = _modelContext;
+    if (context == null || !context.isA<EventTarget>()) {
+      return false;
+    }
+    final EventTarget target = context as EventTarget;
+    _activity
+      ..listener = listener
+      ..target = target
+      ..activated = ((Event event) {
+        _reportActivity(event, WebMcpNativeToolActivityKind.started);
+      }).toJS
+      ..cancelled = ((Event event) {
+        _reportActivity(event, WebMcpNativeToolActivityKind.cancelled);
+      }).toJS;
+    target.addEventListener('toolactivated', _activity.activated!);
+    target.addEventListener('toolcancel', _activity.cancelled!);
+    return true;
+  }
+
+  @override
+  void unsubscribeToolActivity() {
+    final EventTarget? target = _activity.target;
+    final JSFunction? activated = _activity.activated;
+    final JSFunction? cancelled = _activity.cancelled;
+    if (target != null && activated != null) {
+      target.removeEventListener('toolactivated', activated);
+    }
+    if (target != null && cancelled != null) {
+      target.removeEventListener('toolcancel', cancelled);
+    }
+    _activity
+      ..listener = null
+      ..target = null
+      ..activated = null
+      ..cancelled = null;
+  }
+
   Future<JSAny?> _executeSafely(
     JSAny? input,
+    JSAny? options,
     WebMcpNativeInvocationHandler invoke,
   ) async {
     try {
       final Object? dartInput = input?.dartify();
       final String value = await invoke(
         dartInput,
-        const WebMcpNativeInvocationContext(cancelledBeforeDispatch: false),
+        WebMcpNativeInvocationContext(
+          cancelledBeforeDispatch: false,
+          executionSignal: _adaptSignal(options),
+        ),
       );
       return value.toJS;
     } on Object {
@@ -104,6 +148,69 @@ final class BrowserWebMcpNativeBoundary implements WebMcpNativeBoundary {
         },
       }).toJS;
     }
+  }
+
+  WebMcpExecutionSignal? _adaptSignal(JSAny? options) {
+    if (options == null || !options.isA<JSObject>()) {
+      return null;
+    }
+    final JSObject object = options as JSObject;
+    if (!object.hasProperty('signal'.toJS).toDart) {
+      return null;
+    }
+    final JSAny? signal = object.getProperty<JSAny?>('signal'.toJS);
+    if (signal == null || !signal.isA<AbortSignal>()) {
+      return null;
+    }
+    return _BrowserExecutionSignal(signal as AbortSignal);
+  }
+}
+
+void _reportActivity(Event event, WebMcpNativeToolActivityKind kind) {
+  final void Function(WebMcpNativeToolActivity activity)? listener =
+      _activity.listener;
+  if (listener == null) {
+    return;
+  }
+  final JSObject raw = event as JSObject;
+  if (!raw.hasProperty('toolName'.toJS).toDart) {
+    return;
+  }
+  final JSAny? name = raw.getProperty<JSAny?>('toolName'.toJS);
+  if (name == null || !name.isA<JSString>()) {
+    return;
+  }
+  listener(
+    WebMcpNativeToolActivity(kind: kind, toolName: (name as JSString).toDart),
+  );
+}
+
+final class _BrowserExecutionSignal implements WebMcpExecutionSignal {
+  _BrowserExecutionSignal(this._signal);
+
+  final AbortSignal _signal;
+  final Map<void Function(), EventListener> _listeners =
+      <void Function(), EventListener>{};
+
+  @override
+  bool get aborted => _signal.aborted;
+
+  @override
+  void addAbortListener(void Function() listener) {
+    final EventListener wrapped = ((Event event) {
+      listener();
+    }).toJS;
+    _listeners[listener] = wrapped;
+    _signal.addEventListener('abort', wrapped);
+  }
+
+  @override
+  void removeAbortListener(void Function() listener) {
+    final EventListener? wrapped = _listeners.remove(listener);
+    if (wrapped == null) {
+      return;
+    }
+    _signal.removeEventListener('abort', wrapped);
   }
 }
 

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import '../webmcp.dart';
+import '../webmcp_exceptions.dart';
 import '../webmcp_tool.dart';
 import 'native_publisher_boundary.dart';
 import 'webmcp_native_capabilities.dart';
@@ -166,6 +167,10 @@ final class WebMcpNativePublisher {
   final Map<String, WebMcpNativeReasonCode> _skippedTools =
       <String, WebMcpNativeReasonCode>{};
   final Set<WebMcpNativeReasonCode> _reasonCodes = <WebMcpNativeReasonCode>{};
+  final Map<int, void Function(WebMcpNativeToolActivity activity)>
+  _activityListeners =
+      <int, void Function(WebMcpNativeToolActivity activity)>{};
+  var _nextActivityListenerId = 0;
   WebMcpRegistrySubscription? _subscription;
   Future<void> _mutationQueue = Future<void>.value();
   Future<WebMcpNativePublisherStatus>? _attaching;
@@ -194,6 +199,9 @@ final class WebMcpNativePublisher {
       _reasonCodes.add(WebMcpNativeReasonCode.browserUnavailable);
       return status;
     }
+    if (!_boundary.subscribeToolActivity(_onToolActivity)) {
+      _reasonCodes.add(WebMcpNativeReasonCode.browserUnavailable);
+    }
 
     final _WebMcpNativeRegistryObserver observer =
         _WebMcpNativeRegistryObserver(this);
@@ -208,6 +216,7 @@ final class WebMcpNativePublisher {
   /// Releases every browser registration owned by this publisher.
   Future<void> detach() async {
     _attached = false;
+    _boundary.unsubscribeToolActivity();
     _subscription?.cancel();
     _subscription = null;
     await _mutationQueue;
@@ -220,6 +229,19 @@ final class WebMcpNativePublisher {
     _reasonCodes.clear();
     _conformanceObserved = false;
     _operations.clearIdentifiableRecords();
+  }
+
+  /// Listens for browser tool activity while this publisher is attached.
+  ///
+  /// Events that arrive after [detach] are ignored until a later [attach].
+  WebMcpToolActivitySubscription addToolActivityListener(
+    void Function(WebMcpNativeToolActivity activity) listener,
+  ) {
+    final int listenerId = _nextActivityListenerId++;
+    _activityListeners[listenerId] = listener;
+    return WebMcpToolActivitySubscription._(() {
+      _activityListeners.remove(listenerId);
+    });
   }
 
   /// Returns current safe publisher diagnostics.
@@ -332,12 +354,31 @@ final class WebMcpNativePublisher {
 
     final Object? result;
     try {
-      result = await tool.handler(normalizedInput);
+      final WebMcpToolCallHandler? callHandler = tool.callHandler;
+      if (callHandler != null) {
+        result = await callHandler(
+          WebMcpToolCall(
+            arguments: normalizedInput,
+            executionSignal: context.executionSignal,
+          ),
+        );
+      } else {
+        result = await tool.handler!(normalizedInput);
+      }
+      webMcpRecordLog(WebMcpLogKind.invoked, tool.name);
+    } on WebMcpToolException catch (error) {
+      _operations.settle(
+        operation,
+        reason: WebMcpNativeReasonCode.handlerFailed,
+      );
+      webMcpRecordLog(WebMcpLogKind.invocationFailed, tool.name);
+      return _toolExceptionFailure(error);
     } on Object {
       _operations.settle(
         operation,
         reason: WebMcpNativeReasonCode.handlerFailed,
       );
+      webMcpRecordLog(WebMcpLogKind.invocationFailed, tool.name);
       return _safeFailure(WebMcpNativeReasonCode.handlerFailed);
     }
     try {
@@ -353,6 +394,45 @@ final class WebMcpNativePublisher {
       );
       return _safeFailure(WebMcpNativeReasonCode.invalidOutput);
     }
+  }
+
+  void _onToolActivity(WebMcpNativeToolActivity activity) {
+    if (!_attached) {
+      return;
+    }
+    webMcpRecordLog(WebMcpLogKind.nativeActivity, activity.toolName);
+    for (final void Function(WebMcpNativeToolActivity activity) listener
+        in _activityListeners.values.toList(growable: false)) {
+      try {
+        listener(activity);
+      } on Object {
+        // One failing listener must not finish a handler or stop later events.
+      }
+    }
+  }
+
+  String _toolExceptionFailure(WebMcpToolException error) {
+    if (!RegExp(r'^[A-Za-z0-9_.-]{1,64}$').hasMatch(error.code)) {
+      return _safeFailure(WebMcpNativeReasonCode.handlerFailed);
+    }
+    final Map<String, Object?> body = <String, Object?>{
+      'code': error.code,
+      'retryable': error.retryable,
+    };
+    final Map<String, Object?>? details = error.details;
+    if (details != null) {
+      try {
+        final Object? normalized = _normalizeJson(details);
+        _enforceEncodedSize(normalized);
+        if (normalized is! Map<String, Object?>) {
+          return _safeFailure(WebMcpNativeReasonCode.handlerFailed);
+        }
+        body['details'] = normalized;
+      } on Object {
+        return _safeFailure(WebMcpNativeReasonCode.handlerFailed);
+      }
+    }
+    return jsonEncode(<String, Object?>{'ok': false, 'error': body});
   }
 
   String _safeFailure(WebMcpNativeReasonCode reason) =>
@@ -428,6 +508,26 @@ final class WebMcpNativePublisher {
     if (bytes > webMcpNativeMaxJsonBytes) {
       throw const _WebMcpNativeWireException();
     }
+  }
+}
+
+/// A cancellable subscription to browser tool activity.
+final class WebMcpToolActivitySubscription {
+  WebMcpToolActivitySubscription._(this._cancel);
+
+  void Function()? _cancel;
+
+  /// Whether this subscription still receives activity.
+  bool get isActive => _cancel != null;
+
+  /// Stops later notifications. Calling this more than once has no effect.
+  void cancel() {
+    final void Function()? cancel = _cancel;
+    if (cancel == null) {
+      return;
+    }
+    _cancel = null;
+    cancel();
   }
 }
 

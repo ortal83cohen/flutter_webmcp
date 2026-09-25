@@ -1,0 +1,26 @@
+id: "0017-promote-unreleased-on-deploy"
+title: "Promote Unreleased changelog notes into the deployed version"
+route: full
+phase: implement
+round: 1
+verdict: PASS
+owner_agent: null
+created: "2026-09-25"
+updated: "2026-09-25"
+
+blockers: []
+followups: []
+decisions:
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "Folder started as 0016-promote-unreleased-on-deploy and was renumbered because 0016-user-facing-feature-opportunities already existed. Research streams were written before the rename."
+  - round: 1
+    verdict: PASS
+    action: annotate-only
+    reason: "Research review F-001 is a NIT about a 0009 line citation. It does not change the promotion decision."
+  - round: 1
+    verdict: PASS
+    action: revise-plan
+    reason: "Plan review F-001 and F-002: step 2 and the verification approach now name three lookalike fixtures and the orphan-only fixture. No second validation round; the criteria already required those cases."
+escalations: []

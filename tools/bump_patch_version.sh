@@ -110,6 +110,13 @@ if grep -Eq "^## $NEW_VERSION([[:space:]]|$)" "$CHANGELOG_PATH"; then
     exit 1
 fi
 
+# An Unreleased heading is exactly two hashes, one space, and Unreleased.
+UNRELEASED_COUNT=$(grep -c '^## Unreleased$' "$CHANGELOG_PATH" || true)
+if [ "${UNRELEASED_COUNT:-0}" -gt 1 ]; then
+    echo "Error: More than one Unreleased heading was found." >&2
+    exit 1
+fi
+
 # Determine release date
 if [ -n "${RELEASE_DATE:-}" ]; then
     DATE="$RELEASE_DATE"
@@ -128,22 +135,80 @@ trap 'rm -f "$TEMP_PUBSPEC" "$TEMP_CHANGELOG"' EXIT
 sed "s/^version: .*/version: $NEW_VERSION/" "$PUBSPEC_PATH" > "$TEMP_PUBSPEC"
 
 # Create new CHANGELOG.md content: everything up to and including the title line, the new
-# section, then the untouched remainder.
-{
-    sed -n "1,${TITLE_LINE_NUMBER}p" "$CHANGELOG_PATH"
-    echo ""
-    echo "## $NEW_VERSION - $DATE"
-    echo ""
-    echo "- Automated patch release from main."
-    echo ""
-    # Remainder after the title, with its leading blank lines dropped so exactly one blank
-    # line separates the new section from the previously top-most one.
-    awk -v title_line="$TITLE_LINE_NUMBER" '
-        NR <= title_line { next }
-        !started && $0 ~ /^[[:space:]]*$/ { next }
-        { started = 1; print }
-    ' "$CHANGELOG_PATH"
-} > "$TEMP_CHANGELOG"
+# section, then the remainder. The new body is promoted Unreleased start and wrap lines
+# when that span is populated; otherwise it is the automated sentence. Copied Unreleased
+# lines are omitted from the remainder so the exact heading stays without those items.
+awk -v title_line="$TITLE_LINE_NUMBER" \
+    -v new_version="$NEW_VERSION" \
+    -v date="$DATE" \
+    '
+    { lines[NR] = $0 }
+    END {
+        n = NR
+        heading_nr = 0
+        for (i = 1; i <= n; i++) {
+            if (lines[i] == "## Unreleased") {
+                heading_nr = i
+                break
+            }
+        }
+        span_end = 0
+        if (heading_nr > 0) {
+            span_end = n
+            for (i = heading_nr + 1; i <= n; i++) {
+                if (lines[i] ~ /^## /) {
+                    span_end = i - 1
+                    break
+                }
+            }
+            attach = 0
+            for (i = heading_nr + 1; i <= span_end; i++) {
+                line = lines[i]
+                if (substr(line, 1, 2) == "- ") {
+                    is_copy[i] = 1
+                    attach = 1
+                } else if (attach && line !~ /^[[:space:]]*$/ && line ~ /^[[:space:]]/) {
+                    is_copy[i] = 1
+                } else {
+                    attach = 0
+                }
+            }
+        }
+
+        for (i = 1; i <= title_line; i++) {
+            print lines[i]
+        }
+        print ""
+        print "## " new_version " - " date
+        print ""
+
+        copied = 0
+        if (heading_nr > 0) {
+            for (i = heading_nr + 1; i <= span_end; i++) {
+                if (is_copy[i]) {
+                    print lines[i]
+                    copied = 1
+                }
+            }
+        }
+        if (!copied) {
+            print "- Automated patch release from main."
+        }
+        print ""
+
+        started = 0
+        for (i = title_line + 1; i <= n; i++) {
+            if (is_copy[i]) {
+                continue
+            }
+            if (!started && lines[i] ~ /^[[:space:]]*$/) {
+                continue
+            }
+            started = 1
+            print lines[i]
+        }
+    }
+    ' "$CHANGELOG_PATH" > "$TEMP_CHANGELOG"
 
 # Validate that we successfully created new content
 if ! grep -q "^version: $NEW_VERSION$" "$TEMP_PUBSPEC"; then

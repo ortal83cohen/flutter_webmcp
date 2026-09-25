@@ -1002,6 +1002,74 @@ void main() {
     },
   );
 
+  testWidgets('page dispatch uses a call handler with a null signal', (
+    WidgetTester tester,
+  ) async {
+    final _Harness harness = _Harness();
+    final List<WebMcpExecutionSignal?> signals = <WebMcpExecutionSignal?>[];
+    var calls = 0;
+    final _ToolSource source = _ToolSource(
+      WebMcpTool(
+        name: 'domain.call',
+        description: 'Call handler only',
+        callHandler: (WebMcpToolCall call) {
+          calls++;
+          signals.add(call.executionSignal);
+          return 'called';
+        },
+      ),
+    );
+    await harness.pump(
+      tester,
+      WebMcpPage(
+        pageId: 'domain-call',
+        sources: <WebMcpToolSource>[source],
+        child: const Text('call-page'),
+      ),
+    );
+    expect(await WebMcp.instance.invokeTool('domain.call', const {}), 'called');
+    expect(calls, 1);
+    expect(signals.single, isNull);
+  });
+
+  testWidgets('page dispatch invokes a handler-only tool once', (
+    WidgetTester tester,
+  ) async {
+    final _Harness harness = _Harness();
+    var calls = 0;
+    final _ToolSource source = _ToolSource(
+      WebMcpTool(
+        name: 'domain.handler',
+        description: 'Handler only',
+        handler: (Map<String, Object?> arguments) {
+          calls++;
+          return arguments['value'];
+        },
+      ),
+    );
+    await harness.pump(
+      tester,
+      WebMcpPage(
+        pageId: 'domain-handler',
+        sources: <WebMcpToolSource>[source],
+        child: const Text('handler-page'),
+      ),
+    );
+    expect(
+      await WebMcp.instance.invokeTool('domain.handler', const {
+        'value': 'once',
+      }),
+      'once',
+    );
+    expect(calls, 1);
+    expect(
+      WebMcp.instance.tools
+          .singleWhere((WebMcpTool tool) => tool.name == 'domain.handler')
+          .callHandler,
+      isNull,
+    );
+  });
+
   testWidgets('disposing a page removes owned endpoints and remounts fresh', (
     WidgetTester tester,
   ) async {

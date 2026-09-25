@@ -237,6 +237,101 @@ void main() {
     expect(await WebMcp.instance.invokeTool('shared', const {}), 'first');
   });
 
+  testWidgets('onCall and onInvoke each mount one callback', (
+    WidgetTester tester,
+  ) async {
+    WebMcpToolCall? seen;
+    await tester.pumpWidget(
+      _host(
+        _Screen(
+          child: WebMcpAction(
+            name: 'call.only',
+            description: 'Call only',
+            onCall: (WebMcpToolCall call) {
+              seen = call;
+              return 'called';
+            },
+            child: const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    final WebMcpTool callTool = WebMcp.instance.tools.single;
+    expect(callTool.callHandler, isNotNull);
+    expect(callTool.handler, isNull);
+    expect(
+      await WebMcp.instance.invokeTool('call.only', const {'n': 1}),
+      'called',
+    );
+    expect(seen!.arguments, <String, Object?>{'n': 1});
+    expect(seen!.executionSignal, isNull);
+
+    await tester.pumpWidget(_host(const SizedBox()));
+    await tester.pumpWidget(
+      _host(
+        _Screen(
+          child: WebMcpAction(
+            name: 'invoke.only',
+            description: 'Invoke only',
+            onInvoke: (Map<String, Object?> arguments) => arguments['n'],
+            child: const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    final WebMcpTool invokeTool = WebMcp.instance.tools.single;
+    expect(invokeTool.handler, isNotNull);
+    expect(invokeTool.callHandler, isNull);
+    expect(await WebMcp.instance.invokeTool('invoke.only', const {'n': 2}), 2);
+  });
+
+  test('both widget callbacks throw and register nothing', () {
+    expect(
+      () => WebMcpAction(
+        name: 'both.callbacks',
+        description: 'Invalid',
+        onInvoke: (Map<String, Object?> arguments) => null,
+        onCall: (WebMcpToolCall call) => null,
+        child: const SizedBox(),
+      ),
+      throwsArgumentError,
+    );
+    expect(WebMcp.instance.tools, isEmpty);
+  });
+
+  testWidgets('first mount keeps the published title', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        _Screen(
+          child: WebMcpAction(
+            name: 'titled.action',
+            description: 'Title',
+            title: 'First title',
+            onInvoke: (Map<String, Object?> arguments) => null,
+            child: const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    expect(WebMcp.instance.tools.single.title, 'First title');
+    await tester.pumpWidget(
+      _host(
+        _Screen(
+          child: WebMcpAction(
+            name: 'titled.action',
+            description: 'Title',
+            title: 'Second title',
+            onInvoke: (Map<String, Object?> arguments) => null,
+            child: const SizedBox(),
+          ),
+        ),
+      ),
+    );
+    expect(WebMcp.instance.tools.single.title, 'First title');
+  });
+
   testWidgets('invalid action names fail loudly', (WidgetTester tester) async {
     await tester.pumpWidget(_host(const _Screen(actionName: 'invalid name')));
     expect(tester.takeException(), isA<WebMcpInvalidToolNameException>());

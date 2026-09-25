@@ -3,20 +3,22 @@ id: product-readme
 title: Product knowledge
 status: active
 owner: unassigned
-last_verified: 2026-09-10
+last_verified: 2026-09-25
 applies_to: ["**"]
 summary: What the product does, its domain rules and its constraints. Grown one shipped feature at a time.
 ---
 
 # Product knowledge
 
-The repository contains a detection-first local WebMCP-style registry for
-Flutter web. Read [webmcp-contract.md](webmcp-contract.md) for the product
+The repository contains an application-owned WebMCP-style registry for
+Flutter. Read [webmcp-contract.md](webmcp-contract.md) for the product
 boundary: explicit action declarations, lifetime-bounded exposure, globally
-unique names, local invocation semantics, custom transport failure behavior,
-and detection-only browser integration. The browser API is experimental. The
-package does not publish tools to the browser or accept browser-originated
-invocations.
+unique names, local invocation semantics, declared-field decoding, structured
+agent errors, custom transport failure behavior, and experimental native
+publication. The browser API is experimental. Native publication is opt-in.
+It forwards an execution signal to the author and does not terminate the
+handler. Non-web hosts can register and invoke locally. Native publication
+there reports the browser unavailable.
 
 ## What belongs here
 

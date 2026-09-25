@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:webmcp_flutter/src/transport/native_publisher_boundary_noop.dart';
 import 'package:webmcp_flutter/webmcp_flutter.dart';
 
 final class _RecordingTransport implements WebMcpTransport {
@@ -104,6 +105,39 @@ void main() {
     );
     expect(WebMcp.instance.tools, isEmpty);
   });
+
+  test(
+    'non-web registration is local and native publication is a no-op',
+    () async {
+      WebMcp.instance.registerTool(
+        WebMcpTool(
+          name: 'vm.tool',
+          description: 'Runs locally',
+          handler: (Map<String, Object?> arguments) => 'local',
+        ),
+      );
+      final NoopWebMcpNativeBoundary boundary =
+          const NoopWebMcpNativeBoundary();
+      final WebMcpNativeRegistration registration = await boundary.registerTool(
+        WebMcp.instance.tools.single,
+        (Object? input, WebMcpNativeInvocationContext context) async => '{}',
+      );
+      registration.abort();
+      registration.abort();
+      expect(await WebMcp.instance.invokeTool('vm.tool', const {}), 'local');
+
+      webMcpNativeBoundaryFactory = createWebMcpNativeBoundary;
+      final WebMcpNativePublisherStatus status = await WebMcpNativePublisher()
+          .attach();
+      expect(status.publishedToolCount, 0);
+      expect(
+        status.reasonCodes,
+        contains(WebMcpNativeReasonCode.browserUnavailable.name),
+      );
+      expect(await WebMcp.instance.invokeTool('vm.tool', const {}), 'local');
+      webMcpNativeBoundaryFactory = createWebMcpNativeBoundary;
+    },
+  );
 
   test('reset clears tools and replaces transport without notifications', () {
     final _RecordingTransport previous = _RecordingTransport('previous');

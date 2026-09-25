@@ -34,10 +34,55 @@ enum WebMcpNativeReasonCode {
 /// Browser invocation state available before handler dispatch.
 final class WebMcpNativeInvocationContext {
   /// Creates invocation state.
-  const WebMcpNativeInvocationContext({required this.cancelledBeforeDispatch});
+  const WebMcpNativeInvocationContext({
+    required this.cancelledBeforeDispatch,
+    this.executionSignal,
+  });
 
   /// Whether cancellation was known before application dispatch.
   final bool cancelledBeforeDispatch;
+
+  /// The adapted browser execution signal, when the execute callback had one.
+  final WebMcpExecutionSignal? executionSignal;
+}
+
+/// Whether a browser tool activity event started or cancelled a tool.
+enum WebMcpNativeToolActivityKind {
+  /// The browser reported `toolactivated`.
+  started,
+
+  /// The browser reported `toolcancel`.
+  cancelled,
+}
+
+/// A browser tool-activity notification.
+final class WebMcpNativeToolActivity {
+  /// Creates an activity for [toolName].
+  const WebMcpNativeToolActivity({required this.kind, required this.toolName});
+
+  /// Whether the event started or cancelled the named tool.
+  final WebMcpNativeToolActivityKind kind;
+
+  /// The tool name carried by the browser event.
+  final String toolName;
+}
+
+/// Builds the browser registration object, omitting unset optional members.
+Map<String, Object?> webMcpNativeRegistrationObject(WebMcpTool tool) {
+  return <String, Object?>{
+    'name': tool.name,
+    'description': tool.description,
+    'inputSchema': tool.inputSchema,
+    if (tool.title != null) 'title': tool.title,
+    'annotations': <String, Object?>{
+      'readOnlyHint': tool.annotations.readOnlyHint,
+      'untrustedContentHint': tool.annotations.untrustedContentHint,
+      'consequentialHint': tool.annotations.consequentialHint,
+      if (tool.annotations.debugging != null)
+        'debugging': tool.annotations.debugging,
+    },
+    if (tool.exposedTo != null) 'exposedTo': tool.exposedTo,
+  };
 }
 
 /// Handles one browser-originated invocation.
@@ -62,6 +107,17 @@ abstract interface class WebMcpNativeBoundary {
     WebMcpTool tool,
     WebMcpNativeInvocationHandler invoke,
   );
+
+  /// Subscribes to browser tool activity.
+  ///
+  /// Returns false when the event target is missing. Publication still
+  /// continues in that case.
+  bool subscribeToolActivity(
+    void Function(WebMcpNativeToolActivity activity) listener,
+  );
+
+  /// Stops delivering browser tool activity.
+  void unsubscribeToolActivity();
 }
 
 /// A safe failure emitted by a native publication boundary.

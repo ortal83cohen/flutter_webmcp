@@ -60,6 +60,14 @@ void main() {
       expect(WebMcpDuplicateToolException, isNotNull);
       expect(WebMcpToolNotFoundException, isNotNull);
       expect(WebMcpScopeMissingException, isNotNull);
+      expect(WebMcpToolException, isNotNull);
+      expect(WebMcpInvalidArgumentsException, isNotNull);
+      expect(WebMcpExecutionSignal, isNotNull);
+      expect(WebMcpToolCall, isNotNull);
+      expect(WebMcpInputField, isNotNull);
+      expect(webMcpDecodeArguments, isNotNull);
+      expect(WebMcpLogRecord, isNotNull);
+      expect(WebMcpNativeToolActivity, isNotNull);
     },
   );
 }

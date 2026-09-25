@@ -616,53 +616,75 @@ final class _WebMcpPageState extends State<WebMcpPage>
   }
 
   WebMcpTool _wrapSourceTool(WebMcpTool tool) {
+    final WebMcpToolCallHandler? authorCall = tool.callHandler;
+    FutureOr<Object?> run(Map<String, Object?> arguments) {
+      if (!_mountedOwner || !_eligible) {
+        return webMcpPageError(WebMcpPageErrorCode.inactiveScope);
+      }
+      if (!(_session?.beginAsynchronousExecution() ?? false)) {
+        return webMcpPageError(WebMcpPageErrorCode.busy);
+      }
+      final String? operationId = _session?.beginOperation(
+        scopeReference: _scopeReference,
+        requestId: 0,
+      );
+      if (operationId == null) {
+        _session?.settleAsynchronousExecution();
+        return webMcpPageError(WebMcpPageErrorCode.busy);
+      }
+      final Object? result;
+      try {
+        if (authorCall != null) {
+          result = authorCall(
+            WebMcpToolCall(arguments: arguments, executionSignal: null),
+          );
+        } else {
+          result = tool.handler!(arguments);
+        }
+      } on Object {
+        _session?.recordEvidence(
+          operationId,
+          WebMcpEvidenceKind.commandDispatched,
+        );
+        _session?.settleAsynchronousExecution();
+        rethrow;
+      }
+      _session?.recordEvidence(
+        operationId,
+        WebMcpEvidenceKind.commandDispatched,
+      );
+      if (result is! Future<Object?>) {
+        _session?.settleAsynchronousExecution();
+        return result;
+      }
+      return result.whenComplete(() {
+        _session?.settleAsynchronousExecution();
+        _session?.recordEvidence(
+          operationId,
+          WebMcpEvidenceKind.domainFutureCompleted,
+        );
+      });
+    }
+
+    if (authorCall != null) {
+      return WebMcpTool(
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema,
+        annotations: tool.annotations,
+        title: tool.title,
+        exposedTo: tool.exposedTo,
+        callHandler: (WebMcpToolCall call) => run(call.arguments),
+      );
+    }
     return WebMcpTool(
       name: tool.name,
       description: tool.description,
       inputSchema: tool.inputSchema,
       annotations: tool.annotations,
-      handler: (Map<String, Object?> arguments) {
-        if (!_mountedOwner || !_eligible) {
-          return webMcpPageError(WebMcpPageErrorCode.inactiveScope);
-        }
-        if (!(_session?.beginAsynchronousExecution() ?? false)) {
-          return webMcpPageError(WebMcpPageErrorCode.busy);
-        }
-        final String? operationId = _session?.beginOperation(
-          scopeReference: _scopeReference,
-          requestId: 0,
-        );
-        if (operationId == null) {
-          _session?.settleAsynchronousExecution();
-          return webMcpPageError(WebMcpPageErrorCode.busy);
-        }
-        final Object? result;
-        try {
-          result = tool.handler(arguments);
-        } on Object {
-          _session?.recordEvidence(
-            operationId,
-            WebMcpEvidenceKind.commandDispatched,
-          );
-          _session?.settleAsynchronousExecution();
-          rethrow;
-        }
-        _session?.recordEvidence(
-          operationId,
-          WebMcpEvidenceKind.commandDispatched,
-        );
-        if (result is! Future<Object?>) {
-          _session?.settleAsynchronousExecution();
-          return result;
-        }
-        return result.whenComplete(() {
-          _session?.settleAsynchronousExecution();
-          _session?.recordEvidence(
-            operationId,
-            WebMcpEvidenceKind.domainFutureCompleted,
-          );
-        });
-      },
+      title: tool.title,
+      exposedTo: tool.exposedTo,
+      handler: run,
     );
   }
 
