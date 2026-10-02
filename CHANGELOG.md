@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.11 - 2026-10-02
+
+- Derive a descriptive input schema from a declared field list when the author
+  leaves the schema empty on `WebMcpTool.withDecodedArguments` or
+  `WebMcpAction` with fields. A non-empty author schema is kept unchanged.
+- Report manual decode failures with a top-level field key and a closed reason
+  of missing, unknown, or type. The native publisher forwards those two
+  strings in the invalid-arguments details map without the rejected value,
+  message, or stack.
+- Let `WebMcpAction` decode declared fields through `onCall` only. Pairing a
+  field list with `onInvoke` throws at construction.
+- Extend `@WebMcpDomainAction` with optional title, debugging, and exposedTo.
+  Emit each member only when set; an omitted debugging hint is not sent as
+  false.
+
 ## 0.1.10 - 2026-09-26
 
 - Automated patch release from main.
@@ -57,18 +72,6 @@
 
 ## Unreleased
 
-- Derive a descriptive input schema from a declared field list when the author
-  leaves the schema empty on `WebMcpTool.withDecodedArguments` or
-  `WebMcpAction` with fields. A non-empty author schema is kept unchanged.
-- Report manual decode failures with a top-level field key and a closed reason
-  of missing, unknown, or type. The native publisher forwards those two
-  strings in the invalid-arguments details map without the rejected value,
-  message, or stack.
-- Let `WebMcpAction` decode declared fields through `onCall` only. Pairing a
-  field list with `onInvoke` throws at construction.
-- Extend `@WebMcpDomainAction` with optional title, debugging, and exposedTo.
-  Emit each member only when set; an omitted debugging hint is not sent as
-  false.
 
 ## 0.1.1 - 2026-09-10
 
