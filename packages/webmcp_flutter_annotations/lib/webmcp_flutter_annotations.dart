@@ -13,6 +13,9 @@ final class WebMcpDomainAction {
     this.readOnlyHint = false,
     this.untrustedContentHint = false,
     this.consequentialHint = false,
+    this.title,
+    this.debugging,
+    this.exposedTo,
   });
 
   /// Human-readable tool description.
@@ -29,4 +32,21 @@ final class WebMcpDomainAction {
 
   /// Whether the application declares significant real-world consequences.
   final bool consequentialHint;
+
+  /// Optional display title.
+  ///
+  /// Null means the generated tool omits the member. A non-null title must not
+  /// be empty or whitespace only.
+  final String? title;
+
+  /// Optional debugging hint forwarded in the tool annotations.
+  ///
+  /// Null means the generated annotations omit the member.
+  final bool? debugging;
+
+  /// Optional origin strings forwarded to the browser.
+  ///
+  /// Null means the generated tool omits the member. An empty list is emitted
+  /// as an empty list and is distinct from null.
+  final List<String>? exposedTo;
 }

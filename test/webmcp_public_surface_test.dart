@@ -66,6 +66,8 @@ void main() {
       expect(WebMcpToolCall, isNotNull);
       expect(WebMcpInputField, isNotNull);
       expect(webMcpDecodeArguments, isNotNull);
+      expect(webMcpSchemaFromFields, isNotNull);
+      expect(WebMcpDecodeFailureReason, isNotNull);
       expect(WebMcpLogRecord, isNotNull);
       expect(WebMcpNativeToolActivity, isNotNull);
     },

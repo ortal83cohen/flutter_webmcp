@@ -51,6 +51,9 @@ final class InventoryService {
     name: 'inventory.read',
     description: 'Reads the current live inventory quantity.',
     readOnlyHint: true,
+    title: 'Read inventory',
+    debugging: true,
+    exposedTo: <String>['https://agent.example'],
   )
   int read() => quantity;
 

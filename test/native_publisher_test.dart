@@ -857,4 +857,94 @@ void main() {
     expect(logs.join('\n'), isNot(contains(message)));
     expect(logs.join('\n'), isNot(contains('visible-detail')));
   });
+
+  test(
+    'declared decode failures reach the agent with key and reason',
+    () async {
+      const String rejected = 'distinctive-rejected-value';
+      WebMcp.instance.registerTool(
+        WebMcpTool.withDecodedArguments(
+          name: 'declared',
+          description: 'Declared fields',
+          fields: const <WebMcpInputField>[
+            WebMcpInputField(key: 'count', shape: WebMcpInputShape.safeInteger),
+            WebMcpInputField(
+              key: 'tags',
+              shape: WebMcpInputShape.list,
+              isRequired: false,
+              child: WebMcpInputField(
+                key: 'tag',
+                shape: WebMcpInputShape.string,
+              ),
+            ),
+          ],
+          callHandler: (WebMcpToolCall call) => call.arguments,
+        ),
+      );
+      await WebMcpNativePublisher().attach();
+
+      Future<void> expectFailure(
+        Map<String, Object?> arguments, {
+        required String field,
+        required String reason,
+        String? absent,
+      }) async {
+        final String encoded = await boundary.invoke('declared', arguments);
+        final Map<String, Object?> response = _decode(encoded);
+        expect(response['ok'], isFalse);
+        final Map<Object?, Object?> error =
+            response['error']! as Map<Object?, Object?>;
+        expect(error['code'], 'invalidArguments');
+        expect(error['retryable'], isFalse);
+        final Map<Object?, Object?> details =
+            error['details']! as Map<Object?, Object?>;
+        expect(details, <Object?, Object?>{'field': field, 'reason': reason});
+        expect(details.length, 2);
+        expect(
+          details.values.every((Object? value) => value is String),
+          isTrue,
+        );
+        expect(encoded, isNot(contains('WebMcpInvalidArgumentsException')));
+        expect(encoded, isNot(contains('Exception')));
+        expect(encoded, isNot(contains('#0')));
+        if (absent != null) {
+          expect(encoded, isNot(contains(absent)));
+        }
+      }
+
+      await expectFailure(
+        <String, Object?>{'count': rejected},
+        field: 'count',
+        reason: 'type',
+        absent: rejected,
+      );
+      await expectFailure(
+        <String, Object?>{
+          'count': 1,
+          'tags': <Object?>[
+            'ok',
+            <String, Object?>{'k': rejected},
+          ],
+        },
+        field: 'tags',
+        reason: 'type',
+        absent: rejected,
+      );
+      await expectFailure(
+        const <String, Object?>{},
+        field: 'count',
+        reason: 'missing',
+      );
+      await expectFailure(
+        const <String, Object?>{'count': 1, 'extra': rejected},
+        field: 'extra',
+        reason: 'unknown',
+      );
+
+      final Map<String, Object?> success = _decode(
+        await boundary.invoke('declared', const <String, Object?>{'count': 2}),
+      );
+      expect(success, <String, Object?>{'count': 2});
+    },
+  );
 }

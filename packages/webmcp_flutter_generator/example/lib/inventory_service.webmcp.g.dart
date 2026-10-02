@@ -120,6 +120,8 @@ final class InventoryServiceWebMcpSource implements _webmcp.WebMcpToolSource {
     _webmcp.WebMcpTool(
       name: "inventory.read",
       description: "Reads the current live inventory quantity.",
+      title: "Read inventory",
+      exposedTo: const <String>["https://agent.example"],
       inputSchema: <String, Object?>{
         "type": "object",
         "additionalProperties": false,
@@ -129,6 +131,7 @@ final class InventoryServiceWebMcpSource implements _webmcp.WebMcpToolSource {
         readOnlyHint: true,
         untrustedContentHint: false,
         consequentialHint: false,
+        debugging: true,
       ),
       handler: _invoke1,
     ),

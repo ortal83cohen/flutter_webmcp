@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -123,6 +124,26 @@ final class WebMcpDomainActionGenerator extends Generator {
         element: method,
       );
     }
+    // Optional publication metadata. peek returns null for an absent field
+    // and for a null value, so typed accessors run only on a real reader.
+    final ConstantReader? titleReader = annotation.peek('title');
+    final String? title = titleReader == null ? null : titleReader.stringValue;
+    if (title != null && title.trim().isEmpty) {
+      throw InvalidGenerationSource(
+        'WebMCP domain action title for "${method.name}" cannot be empty.',
+        element: method,
+      );
+    }
+    final ConstantReader? debuggingReader = annotation.peek('debugging');
+    final bool? debugging = debuggingReader == null
+        ? null
+        : debuggingReader.boolValue;
+    final ConstantReader? exposedToReader = annotation.peek('exposedTo');
+    final List<String>? exposedTo = exposedToReader == null
+        ? null
+        : exposedToReader.listValue
+              .map((DartObject item) => ConstantReader(item).stringValue)
+              .toList(growable: false);
     final String? overrideName = annotation.peek('name')?.stringValue;
     final String toolName = overrideName ?? '${owner.name}.${method.name}';
     if (!RegExp(r'^[A-Za-z0-9_.-]{1,128}$').hasMatch(toolName)) {
@@ -162,6 +183,9 @@ final class WebMcpDomainActionGenerator extends Generator {
       readOnlyHint: annotation.read('readOnlyHint').boolValue,
       untrustedContentHint: annotation.read('untrustedContentHint').boolValue,
       consequentialHint: annotation.read('consequentialHint').boolValue,
+      title: title,
+      debugging: debugging,
+      exposedTo: exposedTo,
       parameters: parameters,
       returnShape: returnShape,
     );
@@ -294,14 +318,28 @@ final class WebMcpDomainActionGenerator extends Generator {
       output
         ..writeln('    _webmcp.WebMcpTool(')
         ..writeln('      name: ${jsonEncode(method.toolName)},')
-        ..writeln('      description: ${jsonEncode(method.description)},')
+        ..writeln('      description: ${jsonEncode(method.description)},');
+      if (method.title != null) {
+        output.writeln('      title: ${jsonEncode(method.title)},');
+      }
+      if (method.exposedTo != null) {
+        output.writeln(
+          '      exposedTo: const <String>'
+          '[${method.exposedTo!.map(jsonEncode).join(', ')}],',
+        );
+      }
+      output
         ..writeln('      inputSchema: ${_dartLiteral(_schemaFor(method))},')
         ..writeln('      annotations: const _webmcp.WebMcpToolAnnotations(')
         ..writeln('        readOnlyHint: ${method.readOnlyHint},')
         ..writeln(
           '        untrustedContentHint: ${method.untrustedContentHint},',
         )
-        ..writeln('        consequentialHint: ${method.consequentialHint},')
+        ..writeln('        consequentialHint: ${method.consequentialHint},');
+      if (method.debugging != null) {
+        output.writeln('        debugging: ${method.debugging},');
+      }
+      output
         ..writeln('      ),')
         ..writeln('      handler: _invoke$index,')
         ..writeln('    ),');
@@ -613,6 +651,9 @@ final class _ExposedMethod {
     required this.readOnlyHint,
     required this.untrustedContentHint,
     required this.consequentialHint,
+    required this.title,
+    required this.debugging,
+    required this.exposedTo,
     required this.parameters,
     required this.returnShape,
   });
@@ -623,6 +664,9 @@ final class _ExposedMethod {
   final bool readOnlyHint;
   final bool untrustedContentHint;
   final bool consequentialHint;
+  final String? title;
+  final bool? debugging;
+  final List<String>? exposedTo;
   final List<_ExposedParameter> parameters;
   final _ReturnShape returnShape;
 }

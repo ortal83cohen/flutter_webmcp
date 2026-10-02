@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import '../webmcp_exceptions.dart';
 import '../webmcp_scope.dart';
 import '../webmcp_tool.dart';
+import '../webmcp_typed_input.dart';
 import 'webmcp_screen.dart';
 
 /// Exposes an explicit tool for exactly as long as [child] is mounted.
@@ -20,6 +21,7 @@ final class WebMcpAction extends StatefulWidget {
     this.annotations = const WebMcpToolAnnotations(),
     this.title,
     List<String>? exposedTo,
+    List<WebMcpInputField>? fields,
     this.onInvoke,
     this.onCall,
     required this.child,
@@ -28,10 +30,20 @@ final class WebMcpAction extends StatefulWidget {
        ),
        exposedTo = exposedTo == null
            ? null
-           : List<String>.unmodifiable(exposedTo) {
+           : List<String>.unmodifiable(exposedTo),
+       fields = fields == null
+           ? null
+           : List<WebMcpInputField>.unmodifiable(fields) {
+    // The exactly-one-callback check runs first so that error keeps priority.
     if ((onInvoke == null) == (onCall == null)) {
       throw ArgumentError(
         'WebMcpAction requires exactly one of onInvoke or onCall.',
+      );
+    }
+    if (fields != null && onInvoke != null) {
+      throw ArgumentError(
+        'WebMcpAction fields require onCall; onInvoke cannot be combined '
+        'with fields.',
       );
     }
   }
@@ -53,6 +65,13 @@ final class WebMcpAction extends StatefulWidget {
 
   /// Optional origin list captured at the first mount.
   final List<String>? exposedTo;
+
+  /// Optional declared input fields captured at the first mount.
+  ///
+  /// When non-null, including when empty, arguments are decoded against these
+  /// fields before the newest [onCall] runs. Only valid together with
+  /// [onCall].
+  final List<WebMcpInputField>? fields;
 
   /// The one-argument invocation callback, when this action has no [onCall].
   final WebMcpToolHandler? onInvoke;
@@ -88,8 +107,23 @@ final class _WebMcpActionState extends State<WebMcpAction> {
     _registeredName = widget.name;
     final WebMcpToolHandler? onInvoke = widget.onInvoke;
     final WebMcpToolCallHandler? onCall = widget.onCall;
-    _ownsTool = scope.addTool(
-      WebMcpTool(
+    final List<WebMcpInputField>? fields = widget.fields;
+    final WebMcpTool tool;
+    if (fields != null) {
+      // The constructor guarantees onCall is set whenever fields is set. The
+      // handler reads the live widget so the newest callback runs after decode.
+      tool = WebMcpTool.withDecodedArguments(
+        name: widget.name,
+        description: widget.description,
+        fields: fields,
+        inputSchema: widget.inputSchema,
+        annotations: widget.annotations,
+        title: widget.title,
+        exposedTo: widget.exposedTo,
+        callHandler: (WebMcpToolCall call) => widget.onCall!(call),
+      );
+    } else {
+      tool = WebMcpTool(
         name: widget.name,
         description: widget.description,
         inputSchema: widget.inputSchema,
@@ -102,8 +136,9 @@ final class _WebMcpActionState extends State<WebMcpAction> {
         callHandler: onCall == null
             ? null
             : (WebMcpToolCall call) => widget.onCall!(call),
-      ),
-    );
+      );
+    }
+    _ownsTool = scope.addTool(tool);
   }
 
   @override

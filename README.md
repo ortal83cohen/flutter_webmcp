@@ -37,7 +37,7 @@ Choose the integration that matches what you need:
 | Need | Use | What it solves |
 | --- | --- | --- |
 | Expose an application or backend operation | `WebMcpTool` and `WebMcp.instance` | Gives an agent-facing name, description, schema, and handler for an explicit operation |
-| Decode a fixed argument shape before the handler | `WebMcpTool.withDecodedArguments` | Rejects unknown keys and wrong shapes without validating the free-form schema |
+| Decode a fixed argument shape before the handler | `WebMcpTool.withDecodedArguments` | Rejects unknown keys and wrong shapes; derives a descriptive schema from the field list when the author leaves the schema empty |
 | Stop the application's own in-flight work | `callHandler` and `WebMcpExecutionSignal` | Forwards the browser execution signal. The library does not cancel the handler |
 | Hear when an agent starts or cancels a tool | `addToolActivityListener` | Delivers the tool name. The event does not invoke or stop a handler |
 | Keep tools aligned with a screen or widget | `WebMcpScope`, `WebMcpScreen`, and `WebMcpAction` | Removes tools automatically when their owner is unmounted or disposed |
@@ -76,7 +76,7 @@ publication, see [example/lib/main.dart](example/lib/main.dart).
 | Feature | What you can expose or control | Main API |
 | --- | --- | --- |
 | Explicit tools | Synchronous or asynchronous application operations with descriptions, input schemas, and agent hints | `WebMcpTool`, `WebMcp.instance` |
-| Declared arguments | Reject a bad argument map before the author callback, using a field list rather than the schema map | `WebMcpInputField`, `WebMcpTool.withDecodedArguments` |
+| Declared arguments | Reject a bad argument map before the author callback, using a field list rather than the schema map; optional schema derivation when the schema is empty | `WebMcpInputField`, `WebMcpTool.withDecodedArguments`, `webMcpSchemaFromFields` |
 | Execution signal | Read whether the browser aborted a published call, and stop only the application's own work | `callHandler`, `WebMcpExecutionSignal` |
 | Publication labels | Set a display title, a debugging hint, and an origin list, or leave each one unset | `title`, `WebMcpToolAnnotations.debugging`, `exposedTo` |
 | Tool activity | Observe tool start and cancel events without those events dispatching a handler | `WebMcpNativePublisher.addToolActivityListener` |
@@ -198,6 +198,27 @@ final result = await WebMcp.instance.invokeTool('inventory.lookup', {
 });
 print(result);
 scope.close(); // Remove this owner's tools when its lifetime ends.
+```
+
+When you want strict decoding without hand-writing a matching schema, use
+`WebMcpTool.withDecodedArguments` and omit `inputSchema` (or pass an empty
+map). The registered descriptor then carries a schema derived from your field
+list; a non-empty author schema is kept unchanged. Decoding still does not read
+that schema at runtime.
+
+```dart
+scope.addTool(WebMcpTool.withDecodedArguments(
+  name: 'inventory.lookup',
+  description: 'Returns an item identifier for a supplied SKU.',
+  fields: const [
+    WebMcpInputField(key: 'sku', shape: WebMcpInputShape.string),
+  ],
+  annotations: const WebMcpToolAnnotations(readOnlyHint: true),
+  callHandler: (call) async {
+    final String sku = call.arguments['sku']! as String;
+    return <String, Object?>{'sku': sku};
+  },
+));
 ```
 
 `WebMcp.instance.tools` returns an immutable snapshot sorted by name.
@@ -479,6 +500,9 @@ class StockService {
     name: 'stock.read',
     description: 'Reads the current stock quantity.',
     readOnlyHint: true,
+    title: 'Read stock',
+    debugging: true,
+    exposedTo: ['https://example.com'],
   )
   int read() => quantity;
 }
@@ -503,10 +527,13 @@ Alternatively, supply `StockServiceWebMcpSource(liveService)` through
 `WebMcpPage(sources: [...], pageId: 'stock', child: ...)` to bind its exposure
 to page eligibility. Page-bound sources add operation tracking and bounded
 asynchronous execution; plain registry registration does not add those guards.
-Methods without the annotation remain unexposed. The generator emits schemas
-and validates supported typed inputs/outputs; manual tools do not receive that
-validation automatically. For enums, optional/default parameters, nested
-collections, and asynchronous methods, see the
+Methods without the annotation remain unexposed. Optional annotation members
+`title`, `debugging`, and `exposedTo` reach the browser only when set; null
+omits the member and an omitted debugging hint is not sent as false. The
+generator emits schemas and validates supported typed inputs/outputs; manual
+tools rely on declared-field decoding when you supply a field list. For enums,
+optional/default parameters, nested collections, and asynchronous methods, see
+the
 [complete generator fixture](packages/webmcp_flutter_generator/example/lib/inventory_service.dart).
 
 ## Browser publication and diagnostics
@@ -567,30 +594,39 @@ skipped and cannot remove the first owner's tool. Closing a scope removes its
 owned tools, is idempotent, and permanently prevents further additions.
 
 `WebMcpAction` registers for its mounted lifetime. Its registered name,
-description, input schema, title, annotations, and origin list remain the
-values from the initial mount until the action is unmounted and mounted again.
-Set exactly one of `onInvoke` and `onCall`. The registered handler calls the
-latest callback of that chosen kind. A disabled child does not disable the
-registered tool or grant invocation authority; omit or unmount the wrapper
-when invocation should be unavailable.
+description, input schema, optional declared field list, title, annotations,
+and origin list remain the values from the initial mount until the action is
+unmounted and mounted again. Set exactly one of `onInvoke` and `onCall`. A
+field list is valid only with `onCall`; pairing it with `onInvoke` throws at
+construction. When `fields` is set, arguments decode before the newest
+`onCall` runs and an empty input schema publishes a derived schema. The
+registered handler calls the latest callback of that chosen kind. A disabled
+child does not disable the registered tool or grant invocation authority;
+omit or unmount the wrapper when invocation should be unavailable.
 
 A tool has exactly one of `handler` and `callHandler`. Local invocation and
 page dispatch pass a null execution signal. The native publisher passes the
 browser execution signal only to `callHandler`. Aborting that signal does not
 finish or replay the handler.
 
-Manual input schemas are descriptive only. The schema's outer map is copied and exposed as
-unmodifiable, while nested schema values remain shared. The package does not validate
-arguments against the schema at runtime. `WebMcpTool.withDecodedArguments`
-checks a separate declared field list before the author callback. Registering
+Manual input schemas are descriptive only: the outer map is copied and exposed
+as unmodifiable while nested values remain shared, and the registry never
+validates arguments against the schema. Tools built with a declared field list
+decode before the author callback; an empty schema on those tools publishes a
+schema derived from the fields, and a non-empty author schema is kept
+unchanged. Manual decode failures throw `WebMcpInvalidArgumentsException` with
+a top-level field key and a reason of `missing`, `unknown`, or `type`. Registering
 a source is sequential, so tools registered before a later failure remain
 registered.
 
 Local handler results and exceptions pass through unchanged, including
 `WebMcpToolException`. The native publisher maps an accepted
 `WebMcpToolException` to an allowlisted error object and omits the exception
-message and stack. A code or details value outside the publisher limits
-becomes the existing handler-failed object. The publisher separately validates
+message and stack. For manual declared-field failures it forwards exactly
+`field` and `reason` in the details map, without the rejected value. Generated
+decode failures still return `invalidArguments` with no details entry. A code
+or details value outside the publisher limits becomes the existing
+handler-failed object. The publisher separately validates
 bounded JSON input/output and sanitizes other browser errors. `WebMcp.logHook`
 receives the event kind and tool name only. A hook exception does not change
 registration or invocation. With a custom

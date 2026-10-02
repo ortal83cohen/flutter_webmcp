@@ -100,8 +100,10 @@ final class WebMcpTool {
 
   /// Creates a tool that decodes [fields] before [callHandler] runs.
   ///
-  /// Decode failure throws before [callHandler] runs. This constructor does not
-  /// set [handler].
+  /// Decode failure throws before [callHandler] runs. When [inputSchema] is
+  /// empty, the published schema is derived from [fields]; a non-empty
+  /// [inputSchema] is stored unchanged. This constructor does not set
+  /// [handler].
   factory WebMcpTool.withDecodedArguments({
     required String name,
     required String description,
@@ -115,7 +117,11 @@ final class WebMcpTool {
     return WebMcpTool(
       name: name,
       description: description,
-      inputSchema: inputSchema,
+      // Derive once, at construction, and only for the empty default. A
+      // non-empty author schema is stored unchanged.
+      inputSchema: inputSchema.isEmpty
+          ? webMcpSchemaFromFields(fields)
+          : inputSchema,
       annotations: annotations,
       title: title,
       exposedTo: exposedTo,

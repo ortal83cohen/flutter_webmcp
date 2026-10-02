@@ -66,9 +66,44 @@ class WebMcpToolException implements Exception {
   String toString() => 'WebMcpToolException($code)';
 }
 
+/// The closed set of reasons declared-field decoding can reject an argument.
+enum WebMcpDecodeFailureReason {
+  /// A required declared key was absent from the argument map.
+  missing,
+
+  /// The argument map held a key that no declared field names.
+  unknown,
+
+  /// A present value, or a field declaration, failed the declared shape.
+  type,
+}
+
 /// Indicates that declared tool arguments did not match the field list.
 final class WebMcpInvalidArgumentsException extends WebMcpToolException {
-  /// Creates an invalid-arguments failure with no details.
+  /// Creates an invalid-arguments failure with no details, key or reason.
   const WebMcpInvalidArgumentsException()
-    : super(code: 'invalidArguments', retryable: false);
+    : key = null,
+      reason = null,
+      super(code: 'invalidArguments', retryable: false);
+
+  /// Creates an invalid-arguments failure for the top-level argument [key].
+  ///
+  /// The inherited details map holds exactly two string entries, `field` and
+  /// `reason`. It never carries the rejected value, a message or a stack.
+  WebMcpInvalidArgumentsException.withFailure({
+    required String key,
+    required WebMcpDecodeFailureReason reason,
+  }) : key = key,
+       reason = reason,
+       super(
+         code: 'invalidArguments',
+         retryable: false,
+         details: <String, Object?>{'field': key, 'reason': reason.name},
+       );
+
+  /// The top-level argument key that failed, or null when not recorded.
+  final String? key;
+
+  /// Why the argument failed, or null when not recorded.
+  final WebMcpDecodeFailureReason? reason;
 }

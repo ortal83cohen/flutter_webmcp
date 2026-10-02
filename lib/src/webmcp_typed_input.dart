@@ -61,10 +61,80 @@ final class WebMcpInputField {
   final WebMcpInputField? child;
 }
 
+/// Returns a new object schema describing [fields].
+///
+/// The schema is descriptive only; invocation never validates arguments against
+/// it. Every call allocates fresh nested maps and lists. A list or map field
+/// with no child emits only its base type. When two fields share a key, the
+/// later declaration wins in the properties map.
+Map<String, Object?> webMcpSchemaFromFields(List<WebMcpInputField> fields) {
+  final Map<String, Object?> properties = <String, Object?>{};
+  final List<String> required = <String>[];
+  for (final WebMcpInputField field in fields) {
+    properties[field.key] = _schemaForField(field);
+    if (field.isRequired) {
+      required.add(field.key);
+    }
+  }
+  return <String, Object?>{
+    'type': 'object',
+    'additionalProperties': false,
+    'properties': properties,
+    if (required.isNotEmpty) 'required': required,
+  };
+}
+
+// Builds the schema for one field. Only shape, nullable, allowedNames and
+// child are read, so the same code serves top-level and nested fields.
+Map<String, Object?> _schemaForField(WebMcpInputField field) {
+  final Map<String, Object?> base;
+  switch (field.shape) {
+    case WebMcpInputShape.string:
+      base = <String, Object?>{'type': 'string'};
+    case WebMcpInputShape.boolean:
+      base = <String, Object?>{'type': 'boolean'};
+    case WebMcpInputShape.safeInteger:
+      base = <String, Object?>{
+        'type': 'integer',
+        'minimum': webMcpSafeIntegerMinimum,
+        'maximum': webMcpSafeIntegerMaximum,
+      };
+    case WebMcpInputShape.finiteDouble:
+      base = <String, Object?>{'type': 'number'};
+    case WebMcpInputShape.enumeration:
+      base = <String, Object?>{
+        'type': 'string',
+        'enum': List<String>.of(field.allowedNames),
+      };
+    case WebMcpInputShape.list:
+      final WebMcpInputField? child = field.child;
+      base = <String, Object?>{
+        'type': 'array',
+        if (child != null) 'items': _schemaForField(child),
+      };
+    case WebMcpInputShape.map:
+      final WebMcpInputField? child = field.child;
+      base = <String, Object?>{
+        'type': 'object',
+        if (child != null) 'additionalProperties': _schemaForField(child),
+      };
+  }
+  if (!field.nullable) {
+    return base;
+  }
+  return <String, Object?>{
+    'anyOf': <Object?>[
+      base,
+      <String, Object?>{'type': 'null'},
+    ],
+  };
+}
+
 /// Returns a new map containing only the keys declared by [fields].
 ///
 /// Throws [WebMcpInvalidArgumentsException] before any author callback when
 /// [arguments] contain an unknown key, omit a required key, or fail a shape.
+/// The exception carries the failed top-level key and a closed reason.
 Map<String, Object?> webMcpDecodeArguments(
   List<WebMcpInputField> fields,
   Map<String, Object?> arguments,
@@ -74,81 +144,94 @@ Map<String, Object?> webMcpDecodeArguments(
   };
   for (final String key in arguments.keys) {
     if (!declared.containsKey(key)) {
-      throw const WebMcpInvalidArgumentsException();
+      throw WebMcpInvalidArgumentsException.withFailure(
+        key: key,
+        reason: WebMcpDecodeFailureReason.unknown,
+      );
     }
   }
   final Map<String, Object?> decoded = <String, Object?>{};
   for (final WebMcpInputField field in fields) {
     if (!arguments.containsKey(field.key)) {
       if (field.isRequired) {
-        throw const WebMcpInvalidArgumentsException();
+        throw WebMcpInvalidArgumentsException.withFailure(
+          key: field.key,
+          reason: WebMcpDecodeFailureReason.missing,
+        );
       }
       continue;
     }
-    decoded[field.key] = _decodeValue(field, arguments[field.key]);
+    decoded[field.key] = _decodeValue(field, arguments[field.key], field.key);
   }
   return decoded;
 }
 
-Object? _decodeValue(WebMcpInputField field, Object? value) {
+// Decodes one value. [topKey] is always the top-level argument key, so a
+// nested failure names a key the caller actually sent.
+Object? _decodeValue(WebMcpInputField field, Object? value, String topKey) {
+  Never reject() => throw WebMcpInvalidArgumentsException.withFailure(
+    key: topKey,
+    reason: WebMcpDecodeFailureReason.type,
+  );
+
   if (value == null) {
     if (field.nullable) {
       return null;
     }
-    throw const WebMcpInvalidArgumentsException();
+    reject();
   }
   switch (field.shape) {
     case WebMcpInputShape.string:
       if (value is! String) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return value;
     case WebMcpInputShape.boolean:
       if (value is! bool) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return value;
     case WebMcpInputShape.safeInteger:
       if (value is! int ||
           value < webMcpSafeIntegerMinimum ||
           value > webMcpSafeIntegerMaximum) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return value;
     case WebMcpInputShape.finiteDouble:
       if (value is! num) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       final double decoded = value.toDouble();
       if (!decoded.isFinite) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return decoded;
     case WebMcpInputShape.enumeration:
       if (value is! String || !field.allowedNames.contains(value)) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return value;
     case WebMcpInputShape.list:
       final WebMcpInputField? child = field.child;
       if (child == null || value is! List<Object?>) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       return value
-          .map((Object? item) => _decodeValue(child, item))
+          .map((Object? item) => _decodeValue(child, item, topKey))
           .toList(growable: false);
     case WebMcpInputShape.map:
       final WebMcpInputField? child = field.child;
       if (child == null || value is! Map<Object?, Object?>) {
-        throw const WebMcpInvalidArgumentsException();
+        reject();
       }
       final Map<String, Object?> decoded = <String, Object?>{};
       for (final MapEntry<Object?, Object?> entry in value.entries) {
         final Object? key = entry.key;
         if (key is! String) {
-          throw const WebMcpInvalidArgumentsException();
+          reject();
         }
-        decoded[key] = _decodeValue(child, entry.value);
+        decoded[key] = _decodeValue(child, entry.value, topKey);
       }
       return decoded;
   }

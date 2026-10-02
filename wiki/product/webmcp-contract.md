@@ -3,7 +3,7 @@ id: webmcp-contract
 title: WebMCP product contract
 status: active
 owner: unassigned
-last_verified: 2026-09-25
+last_verified: 2026-10-02
 applies_to: ["lib/**", "example/**", "README.md"]
 summary: Product constraints for manual tools, declared-field decoding, automatic single-view pages, generated domain actions, and experimental native Chrome publication.
 ---
@@ -37,8 +37,29 @@ changes to the caller's outer map do not change the descriptor, but referenced
 nested objects remain shared. The schema is descriptive; the registry performs
 no runtime JSON Schema validation. Declared-field decoding is a separate check.
 It runs only for a tool built from a field list, and it does not read the
-schema map. The log hook records event kind and tool name only. A hook
-exception does not change registration, invocation, or publication.
+schema map.
+
+A manual tool built with a declared field list and an empty input schema
+publishes a descriptive schema derived from those fields at construction. A
+non-empty author schema is stored unchanged and wins over derivation.
+Derivation matches generated schemas: nullable fields use an `anyOf` union with
+null; safe integers use `integer` with the decoder's inclusive bounds; finite
+doubles use `number` without a finiteness keyword; childless lists and maps
+emit only their base type. The derived map is not memoised across tools—each
+descriptor owns a fresh copy.
+
+When declared-field decoding rejects input, the failure names the top-level
+argument key and a closed reason of `missing`, `unknown`, or `type`. Nested
+shape failures still report the top-level key the caller sent, not an inner
+path. On the native publisher, an accepted `WebMcpInvalidArgumentsException`
+from manual decoding maps to the allowlisted invalid-arguments object with a
+details map of exactly two string entries, `field` and `reason`, using those
+reason names. The details map never carries the rejected value, a message, or
+a stack. The generated-tool decode path still returns `invalidArguments` with
+no details entry, unchanged from before.
+
+The log hook records event kind and tool name only. A hook exception does not
+change registration, invocation, or publication.
 
 ## Flutter lifecycle
 
@@ -48,11 +69,14 @@ lifetime. Omitting or unmounting it removes the exposure. The wrapper renders
 the identical child and does not inspect children, discover buttons, or infer
 actions from the widget tree.
 
-The registered descriptor's name, description, input schema, title,
-annotations, and origin list are fixed at the initial mount. Rebuilding the
-same action state with new descriptor values does not reconcile the
-registration; unmount and mount a new action to change them. A
-`WebMcpAction` has exactly one of `onInvoke` and `onCall`. Its handler calls
+The registered descriptor's name, description, input schema, optional declared
+field list, title, annotations, and origin list are fixed at the initial
+mount. Rebuilding the same action state with new descriptor values does not
+reconcile the registration; unmount and mount a new action to change them. A
+`WebMcpAction` has exactly one of `onInvoke` and `onCall`. A declared field
+list is valid only together with `onCall`; pairing it with `onInvoke` throws
+at construction. When fields are set, the action registers a decoding tool
+whose published schema follows the derivation rules above. Its handler calls
 the newest callback of the kind chosen at the first mount.
 
 A mounted wrapper remains directly invokable even when its child is visually
@@ -101,6 +125,12 @@ Generated schemas and strict decoders support strings, booleans, safe JSON
 integers, finite doubles, enums, nullable forms, and recursive lists and
 string-keyed maps. Unknown fields, invalid values, unsupported signatures, and
 duplicate generated names fail safely before the domain method runs.
+
+`@WebMcpDomainAction` may set optional `title`, `debugging`, and `exposedTo`.
+Null omits the corresponding registration member. An omitted debugging hint is
+not emitted as false. A non-null title must not be empty or whitespace only.
+An empty `exposedTo` list is emitted as an empty list and is distinct from
+null.
 
 ## Custom transports and reset
 

@@ -1,0 +1,48 @@
+# Work item state. The only mutable file in a work item folder.
+# Copy this into wiki/work/NNNN-slug/STATE.yaml and keep it current.
+
+id: "0018-author-argument-dx"
+title: "Author argument schema, generated metadata, and agent-visible decode errors"
+route: full
+phase: done
+round: 0
+verdict: PASS
+owner_agent: doc-keeper
+created: "2026-10-02"
+updated: "2026-10-02"
+
+blockers: []
+
+followups: []
+
+decisions:
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "Parent closed research UNRESOLVED items before planning. Derive a descriptive schema only when inputSchema is omitted or empty; a non-empty author schema wins. safeInteger uses integer plus the decoder's existing inclusive bounds. finiteDouble uses number and does not invent a finiteness keyword. Nullable fields match the generator's existing null union. Annotation title, debugging, and exposedTo are optional and null means omit. Do not change the generator's FormatException return path; the agent already receives invalidArguments, and throwing would only change logs and operation settlement. Decode failures add a field key and a WebMcpDecodeFailureReason of missing, unknown, or type, with no rejected value. WebMcpAction accepts a field list only with onCall; pairing it with onInvoke throws ArgumentError at construction. Document the field key in the product contract during the document phase."
+  - round: 0
+    verdict: null
+    action: annotate-only
+    reason: "Confirmed the generator null union is anyOf at packages/webmcp_flutter_generator/lib/src/webmcp_domain_action_generator.dart line 577. The earlier oneOf label was wrong. The plan's anyOf reading stands."
+  - round: 1
+    verdict: FAIL
+    action: revise-research
+    reason: "Research review F-001, F-002, F-003, F-004, F-005, F-006 and F-007 patched in 00-research.md. oneOf corrected to anyOf. Generator bounds and number type stated as emitted. Generated field-detail and childless-schema questions added to Unresolved. Const-constructor claim corrected. Contract citation narrowed to lines 37-38. F-008 through F-012 accepted as NIT line-offset and wording issues that do not change the plan."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "Plan review F-001 through F-009 patched in 01-plan.md and 02-criteria.md. AC-013 observes the builder log instead of a thrown error and drops the unreachable non-string origin element. AC-014 is a builder assertion that unset annotations emit none of the three members. AC-018 includes the childless list or map as reason type. Steps 10 and 13 name the const constructor test and the disabled-child invocation. Slices are sequenced with exclusive file groups and no parallel tasks. AC-033 follows the check script's own stages."
+  - round: 2
+    verdict: CONDITIONAL
+    action: revise-plan
+    reason: "Plan review round 2 had no blockers. F-001 duplicate-key justification corrected. The named constructor is WebMcpInvalidArgumentsException.withFailure and is not a new library export. AC-007 is assigned to step 3. Generator reads use peek and call a typed accessor only when peek returns a reader. Research round 2 recurring NITs are accepted. No third validation round."
+
+escalations:
+  - phase: plan
+    raised: "2026-10-02"
+    status: closed
+    item: "The closed decision says nullable fields use the oneOf-with-null shape the generator already emits, and research constraint 6 and unresolved item 3 say the same. The generator emits no oneOf. Its null union at line 577 of packages/webmcp_flutter_generator/lib/src/webmcp_domain_action_generator.dart uses anyOf, and a repository-wide search finds the oneOf spelling only inside this work item's own research files. The decision's operative clause (match the generator) and its label (oneOf) contradict each other. The plan follows the operative clause and specifies anyOf; it invents no third option. AC-005 names the keyword explicitly, so the parent must confirm the reading before the criteria are frozen."
+  - phase: plan
+    raised: "2026-10-02"
+    status: informational
+    item: "Research finding F1.6 and constraint 3 state that the generator derives no safe-integer bounds and no number type for a finite double. The generator's shape-to-schema getter emits both at lines 554 to 559. The closed decision agrees with the source rather than the research text, so nothing is blocked; recorded so a validator does not report the plan as contradicting the research."
