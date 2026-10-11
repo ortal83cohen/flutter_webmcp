@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.12 - 2026-10-11
+
+- Automated patch release from main.
+
 ## 0.1.11 - 2026-10-02
 
 - Derive a descriptive input schema from a declared field list when the author
