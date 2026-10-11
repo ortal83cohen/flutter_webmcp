@@ -1,0 +1,62 @@
+# Work item state. The only mutable file in a work item folder.
+# Copy this into wiki/work/NNNN-slug/STATE.yaml and keep it current.
+
+id: "0019-library-maintenance-wins"
+title: "Tighten package publishing, tests, and onboarding docs"
+route: full
+phase: done
+round: 0
+verdict: PASS
+owner_agent: impl-validator
+created: "2026-10-11"
+updated: "2026-10-11"
+
+blockers: []
+
+followups:
+  - summary: "Tag protection or a deployment environment would stop a tag whose commit removes the publish.yml check job. Not configured."
+    severity: IMPORTANT
+    owner: "unassigned"
+
+decisions:
+  - round: 1
+    verdict: CONDITIONAL
+    action: revise-research
+    reason: "Research F-001: the ten-symbol list is this work item's inventory, not every unreferenced export. Remaining exports are recorded as unresolved and out of scope."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "Plan F-001: the goal now names the ten-symbol inventory and no longer says every public export is covered."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "Plan F-002: the page test keeps its existing source imports and does not add the public library import."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "Plan F-003: archive checks use box-drawing tree entry names, not full relative paths or the bare word packages."
+  - round: 1
+    verdict: FAIL
+    action: revise-plan
+    reason: "Plan F-004: comparison base is pinned to bf6d4795e0f339043487c4f007f1365573adf762."
+  - round: 1
+    verdict: FAIL
+    action: annotate-only
+    reason: "Plan F-005 and F-006 were nits and were patched in the same edit: the risk row names the differing Flutter setup action, and the formatter step covers example/lib and example/test."
+  - round: 2
+    verdict: CONDITIONAL
+    action: annotate-only
+    reason: "Research round 02 has zero blockers and repeats earlier documentation findings. No third research round. The check job remains the chosen gate, and rulesets or deployment environments stay out of scope."
+  - round: 2
+    verdict: FAIL
+    action: escalate
+    reason: "Plan F-001: the planned README sentence would say every changed fingerprint field returns duplicateRequest. The act path returns scopeGone or staleSnapshot first. Escalated instead of a third validation round."
+  - round: 2
+    verdict: FAIL
+    action: revise-plan
+    reason: "The user chose to drop the root README sentence. AC-018 now requires README.md to stay byte-identical to bf6d4795e0f339043487c4f007f1365573adf762. Criteria were frozen after that edit."
+
+escalations:
+  - date: "2026-10-11"
+    reason: oscillating-loop
+    question: "Plan review round 02 failed because the README retry sentence would claim every changed fingerprint field returns duplicateRequest. Changed pageId or mountToken returns scopeGone, and a non-current revision returns staleSnapshot. Should the sentence state those three codes, or should the README sentence leave this work item?"

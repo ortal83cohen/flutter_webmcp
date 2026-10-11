@@ -2,7 +2,7 @@ name: publish
 
 # Publishes the package to pub.dev when release.yml pushes a version tag. Authentication is a
 # short-lived OpenID Connect token signed by GitHub and exchanged with pub.dev, so no pub.dev
-# credential is stored in this repository.
+# credential is stored in this repository. Publication runs only after the check job passes.
 #
 # Operator prerequisite, outside this file: on the pub.dev admin tab for webmcp_flutter,
 # enable publishing from GitHub Actions with repository ortal83cohen/flutter_webmcp and tag
@@ -14,9 +14,27 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
+  check:
+    name: Run package check suite
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: flutter-actions/setup-flutter@v4
+        with:
+          channel: stable
+          version: 3.47.0
+      - name: Run check suite
+        run: bash tools/check.sh
+
   publish:
     name: Publish to pub.dev
     runs-on: ubuntu-latest
+    needs: check
     permissions:
       id-token: write
       contents: read

@@ -3,9 +3,9 @@ id: release-pipeline
 title: Release pipeline operator gates
 status: active
 owner: unassigned
-last_verified: 2026-09-25
+last_verified: 2026-10-11
 applies_to: [".github/workflows/release.yml", ".github/workflows/publish.yml", "tools/bump_patch_version.sh"]
-summary: The three human prerequisites that make the automated pub.dev release work, the pub.dev permanence constraint, and which changelog notes a deploy publishes.
+summary: The three human prerequisites that make the automated pub.dev release work, the pub.dev permanence constraint, which changelog notes a deploy publishes, and the automated check gate that must pass before publishing.
 ---
 
 # Release pipeline operator gates
@@ -13,6 +13,16 @@ summary: The three human prerequisites that make the automated pub.dev release w
 Every push to `main` bumps the patch version and publishes the package to pub.dev. The
 mechanics live in the two workflow files and the bump helper; this document records only the
 things an agent cannot learn by reading them.
+
+## Publication gate
+
+When `release.yml` pushes a version tag, `publish.yml` is triggered. The workflow runs a
+`check` job that invokes `bash tools/check.sh` — the full repository suite — before the `publish`
+job is allowed to run. A tagged commit whose workflow contains that job, and which fails
+format, analysis, tests, wiki lint, version constraints, or any other stage of the check
+script, will not publish. The check job
+requests no secrets and only `contents: read` permission. The publish job remains on the same
+setup, steps and permissions as before; the gate is added to it via the `needs` field.
 
 ## Why the release is split across two workflows
 
@@ -54,8 +64,11 @@ reused; the first version this automation can produce is 0.1.2. Deleting the wor
 stops future releases but removes nothing already uploaded, so each release is a one-way door.
 Retraction exists as a pub.dev feature but this repository builds no path for it.
 
-Because the release job runs the full check suite before it tags, a repository state that fails
-that suite cannot produce a release at all.
+The release job runs the full check suite before it creates a tag. The publish workflow on a
+commit that contains the check job runs that suite again before publishing. The gate is the
+workflow file on the tagged commit. Tagging an older commit, or a commit that removes the
+check job, is not stopped by this file. This repository does not configure tag protection or
+a deployment environment.
 
 ## Which notes a deploy publishes
 

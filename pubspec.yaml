@@ -3,6 +3,7 @@ description: A Flutter tool registry with widget lifecycle, optional page semant
 version: 0.1.11
 repository: https://github.com/ortal83cohen/flutter_webmcp
 homepage: https://github.com/ortal83cohen/flutter_webmcp
+issue_tracker: https://github.com/ortal83cohen/flutter_webmcp/issues
 topics:
   - webmcp
   - mcp

@@ -169,6 +169,92 @@ void main() {
     expect(taps, 1);
   });
 
+  testWidgets(
+    'requestId zero, above maximum, duplicate action, and maximum boundary',
+    (WidgetTester tester) async {
+      final _Harness harness = _Harness();
+      int taps = 0;
+      await harness.pump(
+        tester,
+        WebMcpPage(
+          pageId: 'boundary',
+          child: Semantics(
+            label: 'Boundary target',
+            button: true,
+            onTap: () => taps++,
+            child: const SizedBox(width: 20, height: 20),
+          ),
+        ),
+      );
+      final Map<String, Object?> read = await _read('boundary');
+      final Map<String, Object?> node = _actionNode(read, 'tap');
+
+      // requestId 0 returns invalidArguments
+      final Map<String, Object?> zeroResult = await _act(
+        'boundary',
+        read,
+        node,
+        requestId: 0,
+        action: 'tap',
+      );
+      expect(zeroResult['code'], 'invalidArguments');
+      expect(taps, 0);
+
+      // Dart integer webMcpMaxSafeInteger + 1 returns invalidArguments
+      final Map<String, Object?> overMaxResult =
+          await WebMcp.instance.invokeTool(
+            'boundary.page.act',
+            <String, Object?>{
+              'pageId': 'boundary',
+              'mountToken': read['mountToken'],
+              'revision': read['revision'],
+              'handle': node['handle'],
+              'action': 'tap',
+              'requestId': webMcpMaxSafeInteger + 1,
+              'arguments': <String, Object?>{},
+            },
+          ) as Map<String, Object?>;
+      expect(overMaxResult['code'], 'invalidArguments');
+      expect(taps, 0);
+
+      // requestId 1 with action tap dispatches
+      final Map<String, Object?> firstDispatch = await _act(
+        'boundary',
+        read,
+        node,
+        requestId: 1,
+        action: 'tap',
+      );
+      expect(firstDispatch['dispatched'], isTrue);
+      expect(taps, 1);
+
+      // Same requestId 1 with action longPress returns duplicateRequest (no pump between)
+      final Map<String, Object?> duplicateResult = await _act(
+        'boundary',
+        read,
+        node,
+        requestId: 1,
+        action: 'longPress',
+      );
+      expect(duplicateResult['code'], 'duplicateRequest');
+      expect(taps, 1);
+
+      // Pump, take fresh read, act with requestId == webMcpMaxSafeInteger
+      await tester.pumpAndSettle();
+      final Map<String, Object?> freshRead = await _read('boundary');
+      final Map<String, Object?> freshNode = _actionNode(freshRead, 'tap');
+      final Map<String, Object?> maxResult = await _act(
+        'boundary',
+        freshRead,
+        freshNode,
+        requestId: webMcpMaxSafeInteger,
+        action: 'tap',
+      );
+      expect(maxResult['dispatched'], isTrue);
+      expect(taps, 2);
+    },
+  );
+
   testWidgets('cancel-before-dispatch causes no callback', (
     WidgetTester tester,
   ) async {

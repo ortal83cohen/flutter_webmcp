@@ -1,3 +1,12 @@
+/// WebMcp Flutter library.
+///
+/// [WebMcp] is the central tool registry. [WebMcpPage] provides optional page
+/// observation and guarded actions. [WebMcpNativePublisher] is the browser
+/// publication entry point.
+///
+/// Browser publication is experimental. See the package README for details.
+library;
+
 export 'src/page/page.dart';
 export 'src/transport/native_publisher_boundary.dart';
 export 'src/transport/webmcp_native_capabilities.dart';

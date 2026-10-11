@@ -41,3 +41,7 @@ __pycache__/
 venv/
 .DS_Store
 Thumbs.db
+
+# Companion packages and spikes are repository-only and must not be published
+/packages/
+/spikes/

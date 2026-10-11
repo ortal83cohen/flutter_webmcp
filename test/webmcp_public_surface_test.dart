@@ -70,6 +70,29 @@ void main() {
       expect(WebMcpDecodeFailureReason, isNotNull);
       expect(WebMcpLogRecord, isNotNull);
       expect(WebMcpNativeToolActivity, isNotNull);
+
+      // Page API inventory symbols
+      expect(WebMcpEvidenceKind, isNotNull);
+      expect(WebMcpPageErrorCode, isNotNull);
+      expect(WebMcpBindingViewProvider, isNotNull);
+      expect(WebMcpViewBinding, isNotNull);
+      expect(WebMcpViewProvider, isNotNull);
+      expect(WebMcpInputShape, isNotNull);
+
+      // Integer constants
+      expect(webMcpPageProtocolVersion, equals(1));
+      expect(webMcpMaxSafeInteger, equals(9007199254740991));
+      expect(webMcpSafeIntegerMinimum, equals(-9007199254740991));
+      expect(webMcpSafeIntegerMaximum, equals(9007199254740991));
+
+      // Error code inventory
+      expect(
+        WebMcpPageErrorCode.values,
+        containsAll(<WebMcpPageErrorCode>[
+          WebMcpPageErrorCode.invalidArguments,
+          WebMcpPageErrorCode.duplicateRequest,
+        ]),
+      );
     },
   );
 }
